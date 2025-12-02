@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TripMocha</title>
+  <style>
+    
+  </style>
+  <link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <script type=text/javascript src="{{url_for('static', filename='js/jquery-3.7.1.js') }}"></script>
+  <script type=text/javascript src="{{url_for('static', filename='js/main.js') }}"></script>
+  <script type=text/javascript src="{{url_for('static', filename='js/index.js') }}"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+</head>
+<body>
+  <div id="wrap">
+    {% include 'config/header.html' %}
+    
+    <div id="container">
+      <div id="main_search_wrap">
+        <div id="search_wrap">
+          <div id="search_area">
+            <form id="sform" name="search" method="get" action="/search">
+            <div id="search_input_box">
+              <input type="search" id="query" name="query" placeholder="여행지를 입력해 주세요.">
+              <i class="bi bi-search search_btn"></i>
+            </div>
+          </form>
+          </div>
+        </div>
+      </div>
+      <div id="contents">
+        <div class="thema_cont">
+          <div class="cont_head">
+            <h2>테마별로 찾아가기</h2>
+            <p>좋아하는 테마를 선택하여 여행을 떠나보세요.</p>
+          </div>
+          <!-- Swiper -->
+          <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+              <div class="swiper-slide">
+                <img src="../static/img/nature.jpg">
+                <a href="#" class="card_contents">
+                  <div class="card_title">
+                    자연과 힐링
+                  </div>
+                  <div class="card_note">
+                    산과 바다 등 자연 속으로 떠나는 힐링 가득한 여행
+                    <span class="material-symbols-outlined arrow">arrow_right_alt</span>
+                  </div>
+                </a>
+              </div>
+              <div class="swiper-slide">
+                <img src="../static/img/food.jpg">
+                <a href="#" class="card_contents">
+                  <div class="card_title">
+                    미식탐방
+                  </div>
+                  <div class="card_note">
+                    지역의 고유한 음식, 전통시장, 유명 맛집을 중심으로 떠나는 여행
+                    <span class="material-symbols-outlined arrow">arrow_right_alt</span>
+                  </div>
+                </a>
+              </div>
+              <div class="swiper-slide">
+                <img src="../static/img/history.jpg">
+                <a href="#" class="card_contents">
+                  <div class="card_title">
+                    예술과 역사
+                  </div>
+                  <div class="card_note">
+                    미술관, 갤러리, 박물관 등을 중심으로 문화와 역사속으로 떠나는 여행
+                    <span class="material-symbols-outlined arrow">arrow_right_alt</span>
+                  </div>
+                </a>
+              </div>
+              <div class="swiper-slide">
+                <img src="../static/img/entertainment.jpg">
+                <a href="#" class="card_contents">
+                  <div class="card_title">
+                    오락
+                  </div>
+                  <div class="card_note">
+                    놀이공원, 아쿠아리움 등 오락 시설을 중심으로 즐거움과 함께하는 여행
+                    <span class="material-symbols-outlined arrow">arrow_right_alt</span>
+                  </div>
+                </a>
+              </div>
+              <div class="swiper-slide">
+                <img src="../static/img/entertainment.jpg">
+                <a href="#" class="card_contents">
+                  <div class="card_title">
+                    오락
+                  </div>
+                  <div class="card_note">
+                    놀이공원, 아쿠아리움 등 오락 시설을 중심으로 즐거움과 함께하는 여행
+                    <span class="material-symbols-outlined arrow">arrow_right_alt</span>
+                  </div>
+                </a>
+              </div>
+              <div class="swiper-slide">
+                <img src="../static/img/entertainment.jpg">
+                <a href="#" class="card_contents">
+                  <div class="card_title">
+                    오락
+                  </div>
+                  <div class="card_note">
+                    놀이공원, 아쿠아리움 등 오락 시설을 중심으로 즐거움과 함께하는 여행
+                    <span class="material-symbols-outlined arrow">arrow_right_alt</span>
+                  </div>
+                </a>
+              </div>
+              <div class="swiper-slide">
+                <img src="../static/img/entertainment.jpg">
+                <a href="#" class="card_contents">
+                  <div class="card_title">
+                    오락
+                  </div>
+                  <div class="card_note">
+                    놀이공원, 아쿠아리움 등 오락 시설을 중심으로 즐거움과 함께하는 여행
+                    <span class="material-symbols-outlined arrow">arrow_right_alt</span>
+                  </div>
+                </a>
+              </div>
+              <div class="swiper-slide">
+                <img src="../static/img/entertainment.jpg">
+                <a href="#" class="card_contents">
+                  <div class="card_title">
+                    오락
+                  </div>
+                  <div class="card_note">
+                    놀이공원, 아쿠아리움 등 오락 시설을 중심으로 즐거움과 함께하는 여행
+                    <span class="material-symbols-outlined arrow">arrow_right_alt</span>
+                  </div>
+                </a>
+              </div>
+            </div>
+            <div class="swiper-pagination"></div>
+          </div>
+        </div>  
+        <div class="festival_cont">
+          <div class="cont_head">
+            <h2>최근 축제 알아보기</h2>
+            <p>최근 축제에 대해서 알아보고 참여해보세요.</p>
+            <div class="festival_list">
+              <div>
+                <a href="#" class="festival_img_wrap">
+                  <img src="../static/img/winterfestival.png" alt="12월 겨울 축제">
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="popular_cont">
+          <div class="cont_head">
+            <h2>인기 여행지 알아보기</h2>
+            <p>많은 사람들이 방문하는 여행지로 떠나보세요.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% include 'config/footer.html' %}
+  </div>
+</body>
+</html>

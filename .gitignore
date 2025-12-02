@@ -1,1 +1,3 @@
-#github push시 제외
+# Python Caching Files
+__pycache__/
+*.pyc
