@@ -4,20 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TripMocha</title>
-  <style>
-    
-  </style>
-  <link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
+
+  {% include 'config/config.html' %}
   <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-  <script type=text/javascript src="{{url_for('static', filename='js/jquery-3.7.1.js') }}"></script>
-  <script type=text/javascript src="{{url_for('static', filename='js/main.js') }}"></script>
   <script type=text/javascript src="{{url_for('static', filename='js/index.js') }}"></script>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 </head>
 <body>
   <div id="wrap">
