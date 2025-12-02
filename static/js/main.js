@@ -71,30 +71,6 @@ function Scroll(isIndexPage){
     $(window).trigger('scroll');
 }
 
-// tour Api
-async function TourApi(keyword='전주') {
-  const apiKey = "37241fb3be15e8f7ff12f2eeabe7001570fd01b65e94f15a6fa974aa722e86fc";
-  const encodedKeyword = encodeURIComponent(keyword);
-
-  const url = `http://apis.data.go.kr/B551011/KorService2/detailCommon2?serviceKey=${apiKey}&numOfRows=10&pageNo=1&MobileOS=ETC&MobileApp=TestApp&_type=json`;
-  try {
-    // 3. **fetch 호출:** URL을 인자로 넣어 직접 호출합니다.
-    const response = await fetch(url);
-
-    // 응답 상태 확인 (404, 500 등 오류 처리)
-    if (!response.ok) {
-      throw new Error(`HTTP 오류 발생! Status: ${response.status}`);
-    }
-
-    const jsonData = await response.json();
-    return jsonData;
-
-  } catch (error) {
-    console.error("Tour API 호출 중 오류 발생:", error);
-    // 오류 발생 시 빈 객체나 null 등을 반환하여 호출 측에서 처리할 수 있게 합니다.
-    return null;
-  }
-}
 
   
 

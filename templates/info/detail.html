@@ -4,23 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TripMocha</title>
-  <style>
-    
-  </style>
-  <!-- css -->
-  <link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
+  {% include 'config/config.html' %}
   <link rel="stylesheet" href="{{url_for('static', filename='css/info.css')}}">
-  <!-- stylesheet -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  <!-- js -->
-  <script type=text/javascript src="{{url_for('static', filename='js/jquery-3.7.1.js') }}"></script>
-  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-  <script type=text/javascript src="{{url_for('static', filename='js/main.js') }}"></script>
-    <!-- etc -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
-  <!-- map -->
+  <!-- map --> 
    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=499d34eba732283c0c164001c9b3597a"></script>
 </head>
 <body>
@@ -29,16 +15,16 @@
     <div id="container">
       <div class="head">
         <p>충북 음성군</p>
-        <p class="title"><span>광명선원</span></p>
+        <p class="title"><span>{{item.title}}</span></p>
         <p class="intro"><span>영원한 안식처, 국내 최대 영탑 공원이 공존하는 특별한 도량</span></p>
         <div class="detail_img">
-          <img src="../static/img/flower.jpg">
+          <img src="{{item.image}}">
         </div>
       </div>
       <div id="contents">
         <h2>상세정보</h2>
         <p>
-          광명선원은 1974년 창건된 광명사에 뿌리를 두고 있으며, 1998년 대한불교조계종 광명선원으로 사찰 명칭을 변경하였다.<br>사찰에는 대웅전을 비롯해 요사채, 공양간, 강당, 산신각 등이 갖춰져 있다.<br> 아울러 2기의 도량탑과 영탑 공원이 조성되어 있다. 영탑 공원은 불교의 장례법인 부도탑을 현대적으로 계승한 것을 말한다.
+          {{item.intro}}
         </p>
         <div id="map" class="detail_map"></div>
         <script type=text/javascript src="{{url_for('static', filename='js/map.js') }}"></script>    
