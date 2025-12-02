@@ -19,7 +19,6 @@ $(document).ready(function() {
   });
 
   Scroll(isIndexPage);
-  console.log(TourApi());
  
   //지도가 있는 경우면 지도 크기를 조정한다.
   

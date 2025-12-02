@@ -1,4 +1,3 @@
-const MAP_API_KEY = window.AppConfig.MAP_API_KEY;
         
 // 동적으로 URL을 생성하고 <script> 태그를 문서에 삽입합니다.
 const script = document.createElement('script');
