@@ -1,6 +1,10 @@
 from flask import jsonify, request, Blueprint, render_template
 from routes.models import db, CityCounty 
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
+key = os.getenv("choakey")
 
 schedule_bp = Blueprint("schedule", __name__, url_prefix="/schedule")
 
@@ -34,7 +38,7 @@ def main():
 
 @schedule_bp.route("/view", methods=["GET"])
 def view():
-    return render_template("schedule/schedule_view.html")
+    return render_template("schedule/schedule_view.html", choakey=key)
 
 @schedule_bp.route("/list", methods=["GET"])
 def list():
