@@ -1,0 +1,1134 @@
+ body { 
+            font-family: Arial, sans-serif; 
+            background-color: white; 
+            padding: 20 px; 
+         
+        }
+        
+.container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background-color: white; 
+            padding: 50px; 
+            border-radius: 10px; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+ 
+   
+h1, h2 { 
+            color: #333; }
+
+table { 
+            width: 100%; 
+            border-collapse: collapse; }
+        
+td { 
+            padding: 10px;  }
+        
+.header-logo { 
+            font-size: 28px; 
+            font-weight: bold; 
+            color: #5B8B7B; }
+.search-input { 
+            /* width: 1000px;  --------------제목길이확인!!!!*/
+            height: 25px;
+            padding: 10px; 
+            font-size: 20px;
+            border: 1px solid #d2d3d3; 
+            border-radius: 30px; 
+            margin: 0 auto;
+            width: 100%;}
+.input-container {
+    position: relative;
+    display: flex; 
+    align-items: center; 
+    width: 100%;
+}
+
+.search-input {
+    flex-grow: 1; 
+    margin-right: 10px; 
+    padding: 10px 80px 10px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    height: 60px;
+    border-radius: 40px;
+    box-sizing: border-box;
+}
+
+.confirm-button {
+    flex-shrink: 0; 
+    position: absolute; 
+    padding: 10px 15px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    right: 25px; /* 오른쪽에서 5px 떨어진 위치 */
+    top: 50%; 
+    transform: translateY(-50%); 
+    
+    /* 버튼의 스타일 */
+    padding: 5px 15px;
+    height: 40px;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
+}
+.h2-and-input {
+            display: flex;         
+            align-items: center;   
+            gap: 20px;             
+            margin-bottom: 20px;   
+            }   
+
+.input-wrapper {
+            flex-grow: 1; 
+            max-width: 1100px;
+        /* 화면 중앙에 배치합니다. */
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 0px;
+        position: relative; 
+    
+}
+            
+.h22-and-input {
+            display: flex;         
+            align-items: center;   
+            gap: 20px;             
+            margin-bottom: 20px; 
+            margin-top: 30px;  
+            }
+.h222-and-input {
+            display: flex;         
+            align-items: center;   
+            gap: 20px;             
+            margin-bottom: 0px; 
+            margin-top: 10px;  
+            max-width: 1100px; 
+            margin-left: auto;
+            margin-right: auto;
+
+            }  
+            
+.theme-icon-container { 
+            text-align: center; 
+            font-size: 20px;
+            font-weight: bold;
+        }
+       
+.theme-icon { 
+            display: inline-block; 
+            width: 60px; height: 60px; 
+            border-radius: 50%; 
+            background-color: #eee; 
+            margin: 5px; 
+            line-height: 60px; 
+            font-size: 24px; }
+        
+.ai-recommend-box { 
+            border: 1px solid #ddd; 
+            padding: 15px; 
+            background-color: #f9f9f9; 
+            margin-top: 15px; }
+
+.footer-button { 
+            background-color: #5B8B7B; 
+            color: white;
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            float: right; }
+    
+    /* ----------------------------------- */
+    /* 1. 기본 스타일 및 레이아웃 */
+    /* ----------------------------------- */
+  
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        margin: 0;
+        padding: 50px 0;
+        background-color: white;
+        /* display: flex; */
+        /* justify-content: center; */
+    }
+
+    .search-container {
+        width: 100%;
+        max-width: 1000px; /* 검색바 최대 폭 */
+        position: relative;
+       
+        align-items: center;
+    }
+
+    .search-bar {
+        display: flex;
+        background-color: white;
+        border-radius: 50px; 
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        height: 60px; /* 검색바 높이 통일 */
+        
+    }
+
+    .search-table{
+        align-items: center;
+    }
+
+    .search-item {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 8px 18px;
+        cursor: pointer;
+        border-right: 1px solid #eee;
+        flex-grow: 1;
+        position: relative; /* 드롭다운 위치 기준 */
+        transition: background-color 0.2s;
+        
+    }
+    
+    /* 마지막 항목의 border-right 제거 */
+    .search-item:nth-child(3) {
+            border-right: none;
+    }
+
+    .search-item.destination {
+        flex-grow: 1.5; /* 여행지 검색 창을 가장 넓게 */
+        position: static; /* 드롭다운을 search-container 기준으로 */
+    }
+
+    .search-item label {
+        font-size: 12px;
+        font-weight: bold;
+        margin-bottom: 0px;
+        color: #555;
+    }
+
+    .search-item input {
+        border: none;
+        width: 100%;
+        font-size: 14px;
+        outline: none;
+        background: transparent;
+        font-weight: 600;
+        color: #333;
+        cursor: pointer;
+        /* 플레이스홀더 스타일링 */
+    }
+    .search-item.destination input::placeholder {
+        font-weight: normal;
+        color: #999;
+    }
+
+
+    /* 활성화된 검색 항목 스타일 */
+    .search-item.active {
+        background-color: white; /* 활성화 시 배경색 유지 */
+        box-shadow: 0 0 0 1px #222; /* 선택된 항목 강조 테두리 (선택 시 더 강조) */
+    }
+    .search-item.destination.active {
+        border-radius: 50px;
+        box-shadow: 0 0 0 1px #222;
+    }
+
+    
+.top-search-item:hover {
+    background-color: #f7f7f7;
+    cursor: pointer;
+}
+
+/* 2. 클릭으로 '활성화'된 항목의 배경색 (선택 사항) */
+/* 만약 클릭되어 드롭다운이 열린 항목은 다른 색을 유지하고 싶다면: */
+.top-search-item.active {
+    background-color: #f0f0f0; /* 활성화된 항목은 호버와 다르게 유지 */
+}
+
+/* 3. 전환 효과 추가 (선택 사항) */
+/* 배경색이 부드럽게 변하도록 애니메이션 효과를 추가합니다. */
+.top-search-item {
+    transition: background-color 0.2s ease;
+    border-radius: 20px; 
+}
+
+    .search-button {
+        background-color: #06402B;
+        color: white;
+        border: none;
+        width: 80px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 5px 5px 5px 0; /* 우측에 붙은 버튼 모양 */
+    }
+    .search-button:hover {
+        opacity: 0.9;
+    }
+    .search-button .icon {
+        font-size: 14px;
+        margin-right: 5px;
+    }
+
+    /* ----------------------------------- */
+    /* 2. 드롭다운 창 스타일 */
+    /* ----------------------------------- */
+    .dropdown-content {
+        display: none; /* 기본적으로 숨김 */
+        position: absolute;
+        top: 60px; /* 검색바 높이만큼 아래에 위치 */
+        left: 0;
+        width: 420px; 
+        margin-top: 10px;
+        background-color: white;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+        border-radius: 20px;
+        padding: 10px 10px 20px 10px;
+        z-index: 200;
+    }
+
+    /* destination 항목이 active일 때만 드롭다운을 보여줌 */
+    .search-item.destination.active + .dropdown-content {
+        display: block; 
+    }
+
+    .dropdown-header {
+        font-size: 14px;
+        font-weight: bold;
+        padding: 10px 15px;
+        color: #222;
+    }
+
+    .recommendation-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .recommendation-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 15px;
+        text-decoration: none;
+        color: black;
+        border-radius: 10px;
+        transition: background-color 0.1s;
+    }
+
+    .recommendation-item:hover {
+        background-color: #f0f0f0;
+    }
+
+    .recommendation-item .icon {
+        width: 40px;
+        height: 40px;
+        background-color: #eee;
+        border-radius: 8px;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        flex-shrink: 0;
+    }
+    .recommendation-item:first-child .icon {
+            background-color: #ff385c;
+            color: white;
+    }
+
+    .recommendation-item .text-content strong {
+        display: block;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .recommendation-item .text-content p {
+        font-size: 12px;
+        color: #777;
+        margin: 0;
+    }
+
+
+    /* ----------------------------------- */
+    /* 3. 여행테마*/
+    /* ----------------------------------- */
+    
+    .button-make-travel{
+        display: block;
+        width: 300px;
+        height: 90px;
+        font-size: 30px;
+        padding: 5px;
+        margin-left: auto;
+        margin-right: 800px;
+        margin-bottom: 100px;
+        
+        }
+   
+
+    #button-al{
+        color: #006060;
+        border: 1px solid #006060; 
+        border-radius: 30px; 
+        width: 300px;
+        height: 45px;
+        font-size: 20px;
+        padding: 5px;
+        margin: 10px ;
+    }
+        
+    .trip-link-wrapper {
+    display: block; 
+    text-decoration: none; 
+    color: inherit; 
+}
+
+/* ====================================================== */
+/* 🌟 달력 드롭다운 스타일 🌟 */
+/* ====================================================== */
+
+.date-dropdown-container {
+    position: relative; /* 드롭다운을 위한 기준점 설정 */
+    width: 150px; /* 드롭다운 입력 상자의 너비 (조절 가능) */
+    margin-bottom: 20px;
+}
+
+.date-input-box {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+    background-color: white;
+    text-align: center;
+    font-weight: bold;
+    color: #333;
+}
+
+/* 드롭다운 내용 (달력) */
+.calendar-dropdown-content {
+    display: none; /* 초기에는 숨김 */
+    position: absolute;
+    top: 70px; /* 입력 상자 바로 아래에 배치 */
+    left: 0;
+    z-index: 1000; /* 다른 요소 위에 표시 */
+    background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 20px;
+    padding: 20px;
+    width: 500px; /* 2개의 달력을 나란히 배치하기 위한 충분한 너비 */
+}
+
+/* 달력 이동 컨트롤 (상단) */
+.calendar-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 10px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.calendar-controls .arrow {
+    cursor: pointer;
+    font-size: 1.5em;
+    padding: 0 10px;
+}
+
+.calendar-controls .year-month {
+    font-size: 50px;
+    font-weight: bold;
+}
+
+/* 2개월 달력 컨테이너 */
+.calendar-grid-wrapper {
+    display: flex;
+    gap: 15px; /* 두 달력 사이 간격 */
+    justify-content: space-between;
+}
+
+/* 개별 달력 스타일 */
+.calendar-month {
+    flex: 1; /* 너비를 균등하게 분할 */
+    text-align: center;
+}
+
+.calendar-title {
+    font-size: 1.1em;
+    margin: 5px 0 10px;
+    font-weight: normal;
+}
+
+/* 달력 테이블 */
+.calendar-table {
+    width: 100%;
+    font-size: 0.9em;
+    border-collapse: collapse;
+}
+
+.calendar-table th {
+    color: #aaa;
+    padding: 5px 0;
+    font-weight: normal;
+}
+.calendar-table th:first-child { color: red; } /* 일요일 */
+.calendar-table th:last-child { color: blue; } /* 토요일 */
+
+.calendar-table td {
+    padding: 5px 0;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.1s;
+}
+
+.calendar-table td.day:hover {
+    background-color: #f0f0f0;
+}
+
+.calendar-table td.today {
+    background-color: #5B8B7B;
+    color: white;
+    font-weight: bold;
+}
+
+.calendar-table td.selected {
+    border: 2px solid #5B8B7B;
+}
+
+.calendar-buttons {
+    text-align: right;
+    margin-top: 15px;
+}
+.calendar-buttons button {
+    padding: 8px 15px;
+    border: none;
+    background-color: #5B8B7B;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* 범위 내 날짜에 연한 배경색 적용 */
+#calendarDropdown td.range {
+    background-color: #e6f7e9; 
+    border-radius: 0; 
+    color: #333; 
+}
+
+/* 시작/종료 날짜 사이 색 */
+#calendarDropdown td.selected {
+    background-color: #39774d;
+    color: white;
+    border-radius: 5px; 
+}
+
+
+
+
+
+/* -----------------------검색창--------------------------- */
+/* --- 전체 레이아웃 및 스타일 --- */
+body {  font-family: 'Malgun Gothic', 'Arial', sans-serif; 
+        background: white; padding: 30px; }
+#wrap { 
+    max-width: 800px; 
+    margin: auto; 
+    background: #fff; 
+    border-radius: 10px; 
+    padding: 0px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+/* --- 상단 검색 바 (이미지 상단) --- */
+.top-search-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 50px;
+    padding: 5px;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    flex-wrap: wrap;
+    width: 1200px;
+    height: 60px;
+    margin:0 auto;
+}
+.top-search-item {
+    padding: 10px 25px;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    flex: 1;
+    padding: 10px 15px;
+}
+
+#destinationSearchInput{
+    border: none;
+    width: 250px;
+    height: 30px;
+}
+
+/* display-group 내 요소들이 자연스럽게 연결되도록 */
+.display-group {
+    display: flex; /* 또는 inline-flex */
+    white-space: nowrap; /* 줄바꿈 방지 */
+}
+
+
+
+.top-search-item .search-label { margin-right: 5px; }
+
+.top-search-item .sub-label { 
+    font-weight: normal; 
+    font-size: 12px; 
+    color: #777; }
+.top-search-item i.icon { margin-left: 10px; 
+    font-size: 18px; 
+    color: #555; } 
+
+/* 버튼 스타일 (추가 버튼) */
+.search-button {
+    background: #183028; 
+    color: white;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.confirm-button {
+    background: #183028; 
+    color: white;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+
+/* --- 드롭다운 공통 스타일 --- */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: calc(100% + 15px);
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    z-index: 1000;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
+.search-item.active .dropdown-content { display: flex; } /* flex로 변경하여 내부 콘텐츠 배열 */
+
+/* --- 1. 여행지 드롭다운 --- */
+#destinationDropdown {
+    width: 250px;
+    height: 300px; /* 이미지와 같은 스크롤 영역을 위해 높이 지정 */
+    flex-direction: column;
+    left: 0;
+    overflow-y: auto;
+    padding: 5px;
+}
+.destination-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.1s;
+}
+.destination-item:hover { background-color: #f0f0f0; }
+.dest-img { 
+    width: 40px; height: 40px; 
+    border-radius: 5px; 
+    object-fit: cover; 
+    margin-right: 10px; }
+.dest-info { line-height: 1.3; }
+.dest-name { font-weight: bold; font-size: 17px; }
+.dest-sido { font-size: 13px;}
+.dest-location { font-size: 12px; color: #777; }
+
+.selected-city{
+    margin-left: 10px;
+    font-size: 17px;
+
+}
+.selected-province{
+    margin-right: 5px; 
+    margin-left: 10px;
+    font-size: 17px;
+}
+
+/* --- 2. 날짜 (2개 달력) 드롭다운 --- */
+#calendarDropdown {
+    width: 600px; /* 2개 달력 배치 */
+    padding: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none; /* JS에서 active 클래스로 제어 */
+    flex-direction: row;
+    gap: 20px;
+}
+.calendar-col { flex: 1; }
+.calendar-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+     margin-bottom: 10px; 
+     font-weight: bold; 
+     color: #030303; }
+.calendar-controls span { cursor: pointer; font-size: 18px; padding: 5px; }
+
+table { border-collapse: collapse; width: 100%; text-align: center; font-size: 13px; }
+th, td { padding: 8px 0; width: 14.28%; cursor: pointer; border-radius: 5px; }
+
+/* 일요일 (첫 번째 자식) */
+#calendarDropdown table th:first-child, 
+#calendarDropdown table td:first-child { 
+    color: rgb(231, 38, 38); 
+}
+
+/* 토요일 (마지막 자식) */
+#calendarDropdown table th:last-child, 
+#calendarDropdown table td:last-child { 
+    color: rgb(51, 51, 245); 
+}
+
+/* 여행테마 영역 */
+
+
+
+/* 기본 스타일 (원래 제공된 스타일이 있다고 가정) */
+.theme-icon-container {
+    text-align: center;
+    cursor: pointer;
+    padding: 10px 5px;
+    
+}
+/* 2. 기존 테마 아이콘 스타일 (위치 기준점 설정) */
+.theme-icon {
+    display: inline-flex; 
+    justify-content: center;
+    align-items: center;
+    width: 60px; 
+    height: 60px; 
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    font-size: 24px;
+    margin-bottom: 5px;
+    
+    /* 🚨 오버레이의 위치 기준점 */
+    position: relative; 
+    
+    /* 🚨 오버레이가 아이콘 밖으로 나가지 않도록 설정 */
+    overflow: hidden; 
+}
+
+/* 3. 선택 표시 오버레이 스타일 (크기가 .theme-icon에 맞춰짐) */
+.selection-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    
+    /* 🚨 부모(.theme-icon)의 크기에 맞춰 덮음 */
+    width: 100%;
+    height: 100%;
+    
+    /* 체크 아이콘 정렬 */
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    
+    /* 배경 및 체크 모양 */
+    background-color: rgba(39, 107, 44, 0.7); 
+    border-radius: 50%; /* 부모와 동일한 모양 */
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    
+    /* 초기에는 숨김 */
+    opacity: 0; 
+    transition: opacity 0.3s ease;
+}
+
+/* 4. 선택된 상태일 때 오버레이를 보이게 함 */
+/* 'selected' 클래스는 여전히 td.theme-icon-container에 있습니다. */
+.theme-icon-container.selected .selection-overlay {
+    opacity: 1;
+}
+
+/* 마우스 오버 시 스타일 (유지하고 싶은 스타일) */
+.theme-icon-container:hover { 
+    border: 1px solid;
+    border-color: rgb(105, 145, 110);
+    border-radius: 50px; 
+}
+
+/* 선택되었을 때 유지할 스타일 (핵심) */
+.theme-icon-container.selected { 
+    border-radius: 200px; 
+    border-color: rgb(19, 77, 43); /* 선택된 항목을 구분하기 위해 색상 변경 */
+  
+}
+
+
+.calendar-footer { display: flex; justify-content: space-between; margin-top: 15px; }
+.calendar-footer button {
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+.calendar-footer .reset-btn { background: #eee; color: #555; }
+.calendar-footer .apply-btn { background: #5B8B7B; color: white; }
+
+/* 여행 날짜 검색창에 표시 */
+.selected-dates{
+    margin-left: 10px;
+    margin-right: 20px;
+    font-size: 18px;
+}
+
+
+
+
+/* --- 3. 여행 타입 드롭다운 --- */
+#tourDropdown {
+    width: 300px;
+    flex-direction: column;
+    right: 0;
+    padding: 15px;
+}
+.tour-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+.tour-tab {
+    padding: 8px 15px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 13px;
+    color: #555;
+}
+.tour-tab.active {
+    background-color: #5B8B7B;
+    border-color: #5B8B7B;
+    color: white;
+}
+.tour-type-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-top: 1px solid #eee;
+}
+.tour-type-item:last-child { border-bottom: 1px solid #eee; }
+
+.count-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.count-btn {
+    width: 25px;
+    height: 25px;
+    line-height: 23px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 18px;
+    color: #5B8B7B;
+}
+.count-number { font-weight: bold; width: 20px; text-align: center; }
+
+/* 인원 글자크기 */
+.selected-personnel-name{
+    margin-left: 10px;
+    font-size: 20px;
+}
+.selected-personnel-count{
+    font-size: 20px;
+}
+
+/* 나의여행 만들기 */
+.mytravel{
+    text-align: left;
+    font-size: 30px;
+}
+
+
+
+
+/* 여행일정 리스트 */
+/* 여행 리스트 그리드 레이아웃 */
+.trip-list-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* 반응형 3열 레이아웃 */
+    gap: 20px;
+}
+
+/* 개별 여행 아이템 카드 스타일 */
+.trip-item {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.trip-item h4 {
+    color: #333;
+    font-size: 18px;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.trip-meta {
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 10px;
+}
+
+.trip-tags span {
+    display: inline-block;
+    background: #f0f8f0; /* 연한 녹색 배경 */
+    color: #5B8B7B;
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 15px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.trip-rating {
+    font-size: 15px;
+    font-weight: bold;
+    color: #FFC107; /* 별점 색상 */
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.detail-btn {
+    width: 100%;
+    padding: 10px;
+    background: #5B8B7B;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+.detail-btn:hover {
+    background-color: #39774d;
+}
+
+
+
+/* 여행 리스트 그리드 레이아웃 */
+.trip-list-grid {
+    display: grid;
+    /* grid-template-columns: repeat(3, 1fr); */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+/* 개별 여행 아이템 카드 스타일 */
+.trip-item {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.trip-item h4 {
+    color: #333;
+    font-size: 18px;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.trip-meta {
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 10px;
+}
+
+.trip-tags span {
+    display: inline-block;
+    background: #f0f8f0; /* 연한 녹색 배경 */
+    color: #5B8B7B;
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 15px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.trip-rating {
+    font-size: 15px;
+    font-weight: bold;
+    color: #FFC107; /* 별점 색상 */
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+/* 자세히보기버튼 */
+.detail-btn {
+    width: 100%;
+    padding: 10px;
+    background: #707d70;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+.detail-btn:hover {
+    background-color: #39774d;
+}
+
+/* 일정 상세 정보 컨테이너 스타일 */
+.trip-detail-row {
+    /* grid-column: 1 / 3; */
+    /* 👇 절대 위치 설정 */
+    position: absolute; 
+    top: 0; /* 그리드 컨테이너의 상단부터 시작 */
+    left: 0; 
+    width: 1200px;
+    
+    /* 다른 요소 위에 표시되도록 Z-index 설정 */
+    z-index: 10; 
+    
+    /* 팝업처럼 보이도록 배경색 및 그림자 추가 */
+    background: white; 
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+   
+    
+    /* 초기에는 숨김 처리 */
+    display: none;
+}
+
+/* 일정과 버튼을 감싸는 컨테이너 (Flexbox를 사용하여 가로 배치) */
+.trip-detail-schedule {
+    display: flex; 
+    justify-content: space-between; /* 버튼을 오른쪽 끝으로 밀기 */
+    align-items: center; 
+    
+    background-color: #ffffff; 
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-top: 20px; /* 리스트와 간격 벌리기 */
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+/* 일정 내용 스타일 */
+.schedule-content {
+    flex-grow: 1; /* 남은 공간을 모두 차지하여 버튼을 오른쪽 끝으로 밀어냅니다. */
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+    line-height: 1.5;
+    margin-right: 20px; /* 버튼과의 간격 확보 */
+}
+
+/* 선택 버튼 스타일 */
+.create-trip-btn {
+    background-color: #1b6f36; 
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap; /* 버튼 텍스트가 줄바꿈되지 않도록 */
+}
+
+
+/* 닫기 버튼 */
+.detail-btn-hide {
+    width: 100%;
+    padding: 10px;
+    background: #1b6f36; /* 기본 배경색 유지 */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center; /* 텍스트 정렬 */
+    transition: background-color 0.2s;
+    /* 일정이 열렸음을 나타내는 배경색을 원하면 여기서 변경 가능 */
+    /* background-color: #39774d; */
+}
+
+/* 닫기 버튼 호버 */
+.detail-btn-hide:hover {
+    background-color: #1f422a; 
+}
+
+/* 추천다시받기버튼 */
+.reload-btn{
+    background-color: #06402B; 
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* 여행만들기 이미지 호버효과 */
+.button-area img{
+  --g: 0.1em;     /* the gap */
+  --b: 5px;    /* border thickness*/
+  --c: #1c7237; /* the color */
+  height: 100%;
+  width: 100%;
+  margin-left: 350px;
+  display: flex;             
+  justify-content: center;           
+  margin-top: 60px;  
+  margin-bottom: 50px;
+
+  padding: calc(var(--g) + var(--b));
+  --_c: #0000 0 25%, var(--c) 0 50%;
+  --_g1: repeating-linear-gradient(90deg ,var(--_c)) repeat-x;
+  --_g2: repeating-linear-gradient(180deg,var(--_c)) repeat-y;
+  background:
+    var(--_g1) var(--_p, 25%) 0   ,var(--_g2) 0    var(--_p,125%),
+    var(--_g1) var(--_p,125%) 100%,var(--_g2) 100% var(--_p, 25%);
+  background-size: 200% var(--b),var(--b) 200%;
+  cursor: pointer;
+  filter: grayscale(50%);
+  transition: .3s;
+}
+.button-area:hover {
+  --_p: 75%;
+  filter: grayscale(0%);
+}
+

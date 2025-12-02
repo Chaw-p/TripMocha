@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripMocha</title>
+    <style>
+
+    </style>
+    <!-- css -->
+    <link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/schedule_view.css')}}">
+
+    <!-- stylesheet -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <!-- js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+        integrity="sha512-Z6J08Fef76tV9vX7E3x6Q5r/n4tqKx4a7aF5E3m/r8Fk6tQ3vX0f+7F1zL4zQ3z6tG6T1W0R1Z2p4aG4qA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script type=text/javascript src="{{url_for('static', filename='js/jquery-3.7.1.js') }}"></script>
+
+    <script type="text/javascript"
+        src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=efef8ea35d67c112f5b61558c19fbcc6"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script type=text/javascript src="{{url_for('static', filename='js/main.js') }}"></script>
+
+    <!-- etc -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+</head>
+
+<body>
+    <div id="wrap">
+        {% include 'config/header.html' %}
+        <div id="container">
+            <div class="trip-summary">
+                <div class="trip-summary-left">
+
+                    <h1 class="trip-title-main">모카님을 위한 여행코스</h1>
+
+                    <p class="trip-dates"><strong>12월 5일 → 12월 6일</strong></p>
+                    <div class="meta-info">
+                        - 1인 여행<br>
+                        - 여행지역 | 전주 ~ 군산<br>
+                        - 총 5개 여행지 / 음식점 / 숙소 추천!
+                    </div>
+                </div>
+                <div class="trip-summary-right">
+                </div>
+            </div>
+
+            <hr style="margin: 20px 0;">
+
+            <div class="schedule-controls">
+                <h1>여행 일정</h1>
+
+                <div class="control-buttons">
+                    <button class="pdf-button" id="downloadPdfButton"
+                    onclick="downloadPDF()">PDF 저장</button>
+                    <a class="pdf-button" href="{{ url_for('schedule.list') }}">목록</a>
+                    <a class="pdf-button" href="{{ url_for('schedule.list') }}" id="list-del-btn">삭제</a>
+
+                </div>
+            </div>
+
+            <div class="travel-schedule-layout">
+                <div class="schedule-list-area">
+                    <div class="modify_cntainer">
+                        <div class="schedule-day-title">Day 1 - 12월 5일 금요일</div>
+                        <div id="btnwrap">
+                            <a href="#" class="schedule_modify" id="popupbtn">일정편집</a>
+                        </div>
+
+
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-item-content">
+                            <div class="details">
+                                <div class="header-info">
+                                    <div class="sequence">1</div>
+                                    <h4>한옥마을</h4>
+                                    <div class="rating">⭐ 4.5</div>
+                                </div>
+                                <div class="add-delete">
+                                    <p>전라북도 전주시 완산구 풍남로 000</p>
+                                    <button class="delete-btn hidden">삭제</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-item-content">
+                            <div class="details">
+                                <div class="header-info">
+                                    <div class="sequence">2</div>
+                                    <h4>한국관</h4>
+                                    <div class="rating">⭐ 4.3</div>
+                                </div>
+                                <p>전라북도 전주시 덕진구 금암동 000</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-item-content">
+                            <div class="details">
+                                <div class="header-info">
+                                    <div class="sequence">3</div>
+                                    <h4>전주호텔</h4>
+                                    <div class="rating">⭐ 4.5</div>
+                                </div>
+                                <p>전라북도 전주시 완산구 효자동 000</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="timeline-item hidden">
+                        <div class="timeline-item-content">
+                            <div class="list-add" hidden>
+                                <a href="#" class="add-schedule-btn" data-day="1">+ 방문지 추가</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="schedule-day-title" style="margin-top: 3em;">Day 2 - 12월 6일 토요일</div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-item-content">
+                            <div class="details">
+                                <div class="header-info">
+                                    <div class="sequence">1</div>
+                                    <h4>선유도</h4>
+                                    <div class="rating">⭐ 4</div>
+                                </div>
+                                <p>전라북도 군산시 옥도면 선유도 </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-item-content">
+                            <div class="details">
+                                <div class="header-info">
+                                    <div class="sequence">2</div>
+                                    <h4>군산식당</h4>
+                                    <div class="rating">⭐ 4.6</div>
+                                </div>
+                                <p>전라북도 군산시 옥도면 000</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-item-content">
+                            <div class="details">
+                                <div class="header-info">
+                                    <div class="sequence">2</div>
+                                    <h4>군산식당</h4>
+                                    <div class="rating">⭐ 4.6</div>
+                                </div>
+                                <p>전라북도 군산시 옥도면 000</p>
+                            </div>
+                        </div>
+                    </div>
+             
+                <div class="timeline-item hidden">
+                        <div class="timeline-item-content">
+                            <div class="list-add" hidden>
+                                <a href="#" class="add-schedule-btn" data-day="1">+ 방문지 추가</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="map-section-wrapper">
+                    <div id="map" class="map-container-bottom"></div>
+                    <script>
+                        var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+                            mapOption = {
+                                center: new kakao.maps.LatLng(35.815967, 127.147255), // 지도의 중심좌표 (전주 인근)
+                                level: 7 // 지도의 확대 레벨
+                            };
+
+                        // 지도를 표시할 div와 지도 옵션으로 지도를 생성합니다
+                        var map = new kakao.maps.Map(mapContainer, mapOption);
+
+                        var mapTypeControl = new kakao.maps.MapTypeControl();
+
+                        // 지도에 컨트롤을 추가
+                        map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+
+                        // 지도 확대 축소를 제어할 수 있는 줌 컨트롤 생성
+                        var zoomControl = new kakao.maps.ZoomControl();
+                        map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+
+                        var marker = new kakao.maps.Marker();
+
+                        // 타일 로드가 완료되면 지도 중심에 마커를 표시합니다
+                        kakao.maps.event.addListener(map, 'tilesloaded', displayMarker);
+
+                        function displayMarker() {
+                            // 마커의 위치를 지도중심으로 설정합니다 
+                            marker.setPosition(map.getCenter());
+                            marker.setMap(map);
+
+                            // kakao.maps.event.removeListener(map, 'tilesloaded', displayMarker);
+                        }
+                    </script>
+                </div>
+            </div>
+        </div>
+        {% include 'config/footer.html' %}
+    </div>
+    <div id="modalwrap">
+        <div id="modalbody">
+            <span id="closebtn">&times;</span>
+            <p class="modal-p">방문지 추가</p>
+            <br>
+            <div id="modal-search-wrap">
+                <div id="modal-in-search-wrap">
+                    <div id="modal-search-area">
+                        <form id="modalform" name="search" method="get" action="/search">
+                            <div id="modal-search-input-box">
+                                <input type="search" id="query" name="query" placeholder="여행지를 입력해 주세요."
+                                    >
+                                <i class="bi bi-search modal-search-btn"></i>
+                                
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <hr>
+            <div class="modal-area-list">
+                <div>풍남문</div>
+                <input type="button" value="추가" class="arealist-btn">
+
+            </div>
+        </div>
+    </div>
+    <script type=text/javascript src="{{url_for('static', filename='js/schedule_view.js') }}"></script>
+</body>
+
+</html>

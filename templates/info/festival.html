@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TripMocha</title>
+  <style>
+    
+  </style>
+  <!-- css -->
+  <link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='css/info.css')}}">
+  <!-- stylesheet -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <!-- js -->
+  <script type=text/javascript src="{{url_for('static', filename='js/jquery-3.7.1.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script type=text/javascript src="{{url_for('static', filename='js/main.js') }}"></script>
+  <!-- etc -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+</head>
+<body>
+  <div id="wrap">
+    {% include 'config/header.html' %}
+    <div id="container" class="festival_back">
+      <div id="contents">
+        <div class="festival_list">
+          <img src="../static/img/winterfestival.png" alt="겨울 축제">
+          <ul>
+            <li>
+              <div class="poster_wrap">
+                <img src="../static/img/festival_1.png">
+              </div>
+              <div class="poster_info">
+                <p class="title">2025 구리 빛 축제</p>
+                <p>개최지역 : 장자호수공원 일원</p>
+                <p>개최기간 : 2025. 10. 18(토) ~ 2025.12.25(목)</p>
+                <a href="https://www.guri.go.kr/lightfesta/index.do" class="detail_btn">자세히 알아보기</a>
+              </div>
+            </li>
+            <li>
+              <div class="poster_wrap">
+                <img src="../static/img/festival_2.jpg">
+              </div>
+              <div class="poster_info">
+                <p class="title">2025 함평 겨울빛축제</p>
+                <p>개최지역 : 함평 엑스포공원 일원</p>
+                <p>개최기간 : 2025. 11. 28(금) ~ 2026.1.11(일)</p>
+                <a href="https://www.hpftf.or.kr/contentsView.do?pageId=www259" class="detail_btn">자세히 알아보기</a>
+              </div>
+            </li>
+            <li>
+              <div class="poster_wrap">
+                <img src="../static/img/festival_3.png">
+              </div>
+              <div class="poster_info">
+                <p class="title">2025 제23회 논산양촌곶감축제</p>
+                <p>개최지역 : 양촌면 양촌리 체육공원</p>
+                <p>개최기간 : 2025. 12. 12(금) ~ 2026.12.14(일)</p>
+                <a href="https://nonsan.go.kr/tour/html/sub03/030107.html" class="detail_btn">자세히 알아보기</a>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    {% include 'config/footer.html' %}
+  </div>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripMocha</title>
+    <style>
+
+    </style>
+    <!-- css -->
+    <link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/schedule_list.css')}}">
+
+    <!-- stylesheet -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    <!-- js -->
+    <script type=text/javascript src="{{url_for('static', filename='js/jquery-3.7.1.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script type=text/javascript src="{{url_for('static', filename='js/main.js') }}"></script>
+    <!-- etc -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+</head>
+
+<body>
+    <div id="wrap">
+        {% include 'config/header.html' %}
+        <div id="container">
+            <!-- 작업영역 -->
+            <table>
+                <tr>
+                    <td><button class="new-trip-button"><a href="{{ url_for('schedule.main') }}"> + 새 여행
+                                만들기</a></button></td>
+                </tr>
+            </table>
+
+            {% if trips %}
+            {% for trip in trips %}
+            <div class="trip-item">
+                <a href="{{ url_for('schedule.view', trip_id=trip.id) }}" class="trip-link-wrapper">
+                    <table>
+                        <tr>
+                            <td rowspan="2" style="width: 105px;"><img src="{{ trip.image_url }}"
+                                    alt="{{ trip.title }} 이미지" class="trip-image"></td>
+                            <td style="width: calc(100% - 150px);">
+                                <div class="trip-title">{{ trip.title }}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="trip-info">{{ trip.start_date }} → {{ trip.end_date }} 📍 {{ trip.location
+                                    }}</div>
+                                <div class="trip-tags">
+                                    {% for tag in trip.tags.split(',') %}
+                                    <span>#{{ tag | trim }}</span>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </a>
+                <div>
+                    <a href="#">수정</a> | 삭제
+                </div>
+            </div>
+            {% endfor %}
+
+            {% else %}
+            <div class="trip-item">
+                <a class="trip-link-wrapper">
+                    <table>
+                        <tr>
+                            <td rowspan="2" style="width: 105px;"></td>
+                            <td style="width: calc(100% - 150px);">
+                                <div class="trip-title">군산시여행</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="trip-info">2025-12-5 → 2025-12-6 📍 군산시</div>
+                                <div class="trip-tags">
+                                    <span>#맛집</span>
+                                    <span>#체험</span>
+                                    <span>#축제</span>
+                                </div>
+                            </td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </a>
+            </div>    
+                <div class="trip-item">
+                    <table id="no-travle">
+                        <tr>
+                            <td>
+                                <img src="{{ url_for('static', filename='img/nono.png') }}">
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                {% endif %}
+
+                <!-- 작업영역 -->
+            </div>
+            {% include 'config/footer.html' %}
+        </div>
+</body>
+
+</html>

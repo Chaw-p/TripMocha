@@ -1,0 +1,12 @@
+<div id="search_wrap">
+  <div id="search_area">
+    <form id="sform" name="search" method="get" action="/info">
+    <div id="search_input_box">
+      <input type="search" id="query" name="query" placeholder="여행지를 입력해 주세요." value="{% for q in query %}{{q}} {% endfor %}">
+      <button class="search_btn">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </form>
+  </div>
+</div>

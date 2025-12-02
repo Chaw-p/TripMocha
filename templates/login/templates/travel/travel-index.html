@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TripMocha</title>
+  <style>
+    
+  </style>
+  <!-- css -->
+  <link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
+  <link rel="stylesheet" href="../../static/css/travel-index.css">
+  <!-- stylesheet -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <!-- js -->
+  <script type=text/javascript src="{{url_for('static', filename='js/jquery-3.7.1.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script type=text/javascript src="{{url_for('static', filename='js/main.js') }}"></script>
+  <!-- etc -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+</head>
+
+<body>
+  <div id="wrap">
+    {% include 'config/header.html' %}
+    <div id="container">
+      <!-- 작업영역 -->
+       <h2>여행 이름</h2>
+        <table>
+            <tr>
+                <td><input type="text" class="search-input" placeholder="예: 그리스에서 보내는 여름 휴가"></td>
+            </tr>
+        </table>
+        
+        <h2 style="margin-top: 20px;">검색 옵션</h2>
+        <table>
+             <div class="search-container">
+        <div class="search-bar">
+            
+            <div class="search-item destination" id="destination-item">
+                <label>여행지</label>
+                <input type="text" placeholder="여행지 검색">
+            </div>
+            
+            <div class="dropdown-content" id="dropdown-menu">
+                <div class="dropdown-header">추천 여행</div>
+                
+                <div class="recommendation-list">
+                    <a href="#" class="recommendation-item">
+                        <span class="icon">🧭</span>
+                        <div class="text-content">
+                            <strong>근처 체험 찾기</strong>
+                            <p>가까운 곳에서 즐길 수 있는 체험을 찾아보세요.</p>
+                        </div>
+                    </a>
+                    
+                    <a href="#" class="recommendation-item">
+                        <span class="icon">🏖️</span>
+                        <div class="text-content">
+                            <strong>광안리해수욕장, 부산</strong>
+                            <p>해변으로 인기 있는 곳</p>
+                        </div>
+                    </a>
+                    
+                    <a href="#" class="recommendation-item">
+                        <span class="icon">🏡</span>
+                        <div class="text-content">
+                            <strong>부산</strong>
+                            <p>관광 명소: 감천문화마을</p>
+                        </div>
+                    </a>
+                    
+                    <a href="#" class="recommendation-item">
+                        <span class="icon">🌲</span>
+                        <div class="text-content">
+                            <strong>강릉시, 강원도</strong>
+                            <p>자연을 만끽하기 좋은 곳</p>
+                        </div>
+                    </a>
+                    
+                    <a href="#" class="recommendation-item">
+                        <span class="icon">🌊</span>
+                        <div class="text-content">
+                            <strong>속초시, 강원도</strong>
+                            <p>호수로 인기 있는 곳</p>
+                        </div>
+                    </a>
+                    
+                    <a href="#" class="recommendation-item">
+                        <span class="icon">🍽️</span>
+                        <div class="text-content">
+                            <strong>전주, 전라북도</strong>
+                            <p>최고급 다이닝을 즐기기 좋은 곳</p>
+                        </div>
+                    </a>
+                    
+                    <a href="#" class="recommendation-item">
+                        <span class="icon">🏯</span>
+                        <div class="text-content">
+                            <strong>경주시, 경상북도</strong>
+                            <p>관광 명소: 첨성대</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="search-item date">
+                <label>날짜</label>
+                <input type="text" value="11월 21일" readonly>
+            </div>
+            
+            <div class="search-item guests">
+                <label>여행자</label>
+                <input type="text" value="게스트 2명" readonly>
+            </div>
+            
+            <button class="search-button">
+                <span class="icon">🔍</span> 검색
+            </button>
+        </div>
+    </div>
+        </table>
+
+        <h2 style="margin-top: 30px;">여행 테마</h2>
+        <p>원하는 여행 테마 2가지 선택해주세요. (최대 4개 선택)</p>
+        
+        <table>
+            <tr>
+                <td class="theme-icon-container"><div class="theme-icon">⛰️</div><br>산</td>
+                <td class="theme-icon-container"><div class="theme-icon">🏖️</div><br>바다</td>
+                <td class="theme-icon-container"><div class="theme-icon">🏠</div><br>실내</td>
+                <td class="theme-icon-container"><div class="theme-icon">🧗</div><br>액티비티</td>
+                <td class="theme-icon-container"><div class="theme-icon">🧑‍🎨</div><br>체험</td>
+                <td class="theme-icon-container"><div class="theme-icon">☕</div><br>카페</td>
+            </tr>
+            <tr>
+                <td class="theme-icon-container"><div class="theme-icon">🎡</div><br>테마파크</td>
+                <td class="theme-icon-container"><div class="theme-icon">🛍️</div><br>전통시장</td>
+                <td class="theme-icon-container"><div class="theme-icon">🍽️</div><br>맛집</td>
+                <td class="theme-icon-container"><div class="theme-icon">🎉</div><br>축제</td>
+                <td class="theme-icon-container"><div class="theme-icon">🧘</div><br>힐링</td>
+                <td class="theme-icon-container"><div class="theme-icon">📸</div><br>사진</td>
+            </tr>
+        </table>
+        
+        <h2 style="margin-top: 30px;">AI 추천코스</h2>
+        <table>
+            <tr>
+                <td>
+                    <button style="background: #c4d2c4; border: 1px solid #5B8B7B; padding: 5px 15px; border-radius: 5px; font-weight: bold;">AI 추천코스 START →</button>
+                    <span style="font-size: small; color: #888; margin-left: 10px;">AI가 인기 여행 코스를 추천해줍니다.</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="ai-recommend-box">
+                    <p>#1인여행 #추천코스</p>
+                    <ol>
+                        <li>전주 한옥마을 → 전동성당 → 한국관 → 호텔 → 오목대</li>
+                        <li>군산 선유도 → 군산회집 → 이성당 → 군산호텔</li>
+                    </ol>
+                </td>
+            </tr>
+        </table>
+
+      <!-- 작업영역 -->
+    </div>
+    {% include 'config/footer.html' %}
+  </div>
+</body>
+</html>

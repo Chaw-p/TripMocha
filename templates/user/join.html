@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/login.css')}}">
+</head>
+
+<body>
+    <div class="login-container">
+        <img src={{ url_for('static', filename='img/logo.png') }} alt="TripMocha 로고" class="tripmocha-logo">
+
+        <main class="login-box">
+            <form action="/signup" method="post" class="signup-form">
+
+                <div class="input-group">
+                    <input type="text" placeholder="아이디" class="input-email-field">
+                </div>
+
+                <div class="input-group">
+                    <input type="password" placeholder="비밀번호">
+                </div>
+
+                <div class="input-group">
+                    <input type="password" placeholder="비밀번호 확인">
+                </div>
+
+                <div class="input-group">
+                    <input type="text" placeholder="이름">
+                </div>
+
+                <div class="input-group">
+                    <input type="text" placeholder="생년월일 8자리">
+                </div>
+
+                <div class="input-group">
+                    <input type="text" placeholder="주소 입력">
+                </div>
+
+                <div class="input-group select-container">
+
+                    <div class="select-buttons">
+                        <button type="button" class="select-btn">남자</button>
+                        <button type="button" class="select-btn">여자</button>
+                    </div>
+
+                    <div class="select-buttons">
+                        <button type="button" class="select-btn">내국인</button>
+                        <button type="button" class="select-btn">외국인</button>
+                    </div>
+
+                </div>
+
+                <div class="input-group">
+                    <input type="text" placeholder="휴대전화 번호">
+                </div>
+
+                <button type="submit" class="login-btn signup-btn">가입하기</button>
+            </form>
+        </main>
+    </div>
+</body>
+
+</html>

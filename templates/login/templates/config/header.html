@@ -1,0 +1,46 @@
+<div id="header">
+  <div>
+    <div id="logo">
+      <a href="{{ url_for('index') }}">
+        <img src={{ url_for('static', filename='img/logo.png') }}>
+      </a>
+    </div>
+    <div id="nav_search_wrap">
+      <div id="search_wrap">
+        <div id="search_area">
+          <form id="sform" name="search" method="get" action="/search">
+          <div id="search_input_box">
+            <input type="search" id="query" name="query" placeholder="여행지를 입력해 주세요." value="{{query}}">
+            <i class="bi bi-search search_btn"></i>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
+    <div id="nav">
+      <ul>
+        <li>
+          <a href="#">
+            <span class="material-symbols-outlined">kid_star</span>별로 알아보기
+          </a>
+          <div class="nav_balloon">테마, 축제, 인기검색어 별로 알아봅시다.</div>
+        </li>
+        <li>
+          <a href="#">
+            <span class="material-symbols-outlined">travel_explore</span>여행 계획짜기
+          </a>
+          <div class="nav_balloon">테마 또는 ai로 내 여행계획을 작성해봅시다.</div>
+        </li>
+      </ul>
+    </div>
+    <div id="header_profile">
+      {% if session[user] %}
+      <a>로그인중</a>
+      {% else %}
+      <button class="mocha_btn_1" onclick = "location.href = '/login'">
+        로그인
+      </button>
+      {% endif %}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,38 @@
+<div id="header">
+  <div class="cont">
+    <div id="logo">
+      <a href="{{ url_for('index') }}">
+        <img src={{ url_for('static', filename='img/logo.png') }}>
+      </a>
+    </div>
+    <div id="nav_search_wrap">
+      {% include 'config/search.html' %}
+    </div>
+    <div id="nav">
+      <ul>
+        <li>
+          <a href="#">
+            <span class="material-symbols-outlined">kid_star</span>축제 보기
+          </a>
+          <div class="nav_balloon">이 달의 축제에 대해서 알아봅시다.</div>
+        </li>
+        <li>
+          <a href="#">
+            <span class="material-symbols-outlined">travel_explore</span>나의 여행계획
+          </a>
+          <div class="nav_balloon">테마를 고르고, ai 추천으로 여행을 떠나봅시다.</div>
+        </li>
+      </ul>
+    </div>
+    <div id="header_profile">
+      {% if session["user"] %}
+      <!-- <a class="profile_wrap"><img src={{ url_for('static', filename='img/profile.png') }}></a> -->
+       홍길동 님
+      {% else %}
+      <button class="mocha_btn_1" onclick = "location.href = '/login'">
+        로그인
+      </button>
+      {% endif %}
+    </div>
+  </div>
+</div>

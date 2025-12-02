@@ -1,0 +1,485 @@
+
+body { 
+    font-family: Arial, sans-serif; 
+    background-color: white; 
+    padding: 20px; 
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.container { 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    background-color: white; 
+    padding: 30px;
+    border-radius: 10px; 
+    box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+}
+
+h1, h2, h3, h4, h5, h6 { 
+    font-family: 'Oswald', sans-serif;
+    color: #333; 
+    margin-top: 0; 
+}
+h1 { 
+    font-size: 2rem;
+    margin-bottom: .5em;
+}
+p { 
+    font-family: 'Roboto', sans-serif;
+    font-size: .8rem;
+    margin: 0; 
+}
+
+.header-logo { 
+    font-size: 28px; 
+    font-weight: bold; 
+    color: #5B8B7B; 
+}
+
+.schedule-controls { 
+    display: flex; 
+    /* h3는 왼쪽, 버튼 그룹은 오른쪽으로 밀어냅니다. */
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 15px; 
+}
+
+/* h3의 기본 마진을 제거하여 정렬을 깔끔하게 합니다. */
+.schedule-controls h3 {
+    margin: 0;
+}
+
+/* 2. 버튼 그룹: PDF 버튼과 목록 링크를 서로 붙이기 */
+.control-buttons {
+    display: flex;
+    /* 버튼과 링크 사이에 띄울 간격 (0px로 하면 완전히 붙습니다) */
+    gap: 10px; 
+}
+
+/* 3. 버튼 및 링크 공통 스타일 */
+.pdf-button { 
+    background-color: #5B8B7B; 
+    color: white; 
+    padding: 10px 15px; 
+    border-radius: 5px; 
+    border: none; 
+    cursor: pointer; 
+    font-size: 15px;
+    
+    /* a 태그에 버튼 스타일을 정확히 적용하기 위해 필요합니다. */
+    display: inline-block; 
+    text-decoration: none;
+    text-align: center;
+}
+
+.trip-summary { 
+    
+    justify-content: space-between; 
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.trip-summary-right { 
+    width: 40%; 
+    text-align: right; 
+}
+.trip-title-main { 
+    font-size: 40px; 
+    font-weight: bold; 
+}
+.trip-dates { 
+    font-size: 20px; 
+    color: #666; 
+}
+.meta-info { 
+    font-size: 20px; 
+    line-height: 1.6; 
+}
+
+
+/*
+ * ========================================
+ * 3. 메인 2열 레이아웃 (일정 목록 & 지도)
+ * ========================================
+ */
+
+.travel-schedule-layout {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px; 
+    margin-top: 20px;
+}
+
+.schedule-list-area {
+    flex: 1; /* 너비 비율을 55% 대신 Flex 비율로 변경 */
+    min-width: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.map-section-wrapper { 
+    flex: 1; /* 너비 비율을 45% 대신 Flex 비율로 변경 */
+    margin-top: 0; 
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 15px;
+    box-sizing: border-box; 
+}
+
+/* 지도 영역 제목 (필요하다면 추가) */
+.map-section-title { 
+    font-size: 1.5em; 
+    font-weight: bold; 
+    margin-bottom: 15px; 
+}
+
+/* 지도 크기 조정 및 고정 높이 설정 (필수) */
+.map-container-bottom {
+    width: 100%; 
+    height: 800px; /* 높이를 충분히 확보 */
+    background-color: #e0e0e0; 
+    border-radius: 5px; 
+    overflow: hidden;
+}
+
+
+/*
+ * ========================================
+ * 4. 타임라인 리스트 스타일 (여행 일정)
+ * ========================================
+ */
+
+/* Day 제목 스타일 */
+.schedule-day-title { 
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.5rem; /* 원본 타임라인 스타일 기준 */
+    font-weight: bold; 
+    color: #333;
+    /* 타임라인 선과 연결되도록 상하 마진 조정 */
+    margin-top: 2.5em; 
+    margin-bottom: 0;
+}
+.schedule-day-title:first-child {
+    margin-top: 0;
+}
+
+/* 타임라인 아이템 (기존 SCSS 기반) */
+.timeline-item {
+    padding: 1.5em 2em 1em; /* 상단 패딩을 줄여서 Day 제목과 붙이고, 하단 패딩도 줄임 */
+    position: relative;
+    color: rgba(0, 0, 0, 0.7);
+    border-left: 2px solid rgba(0, 0, 0, 0.3);
+    margin-bottom: 0; /* 다음 아이템과 마진 없이 붙여서 선이 이어지도록 */
+}
+
+.list-add{
+    display: flex;
+    text-align: center;
+}
+/* 타임라인 마커의 상단 날짜/순서 텍스트 */
+.timeline-item::before {
+    content: attr(date-is);
+    position: absolute;
+    left: 2em;
+    font-weight: bold;
+    top: 0.5em; /* 마커와 높이를 맞추기 위해 조정 */
+    display: block;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    font-size: .785rem;
+}
+
+/* 타임라인 마커 (원형) */
+.timeline-item::after {
+    width: 10px;
+    height: 10px;
+    display: block;
+    top: 3.5em; /* ::before와 높이를 맞춤 */
+    position: absolute;
+    left: -7px;
+    border-radius: 10px;
+    content: '';
+    border: 2px solid rgba(0, 0, 0, 0.3);
+    background: white;
+    z-index: 1; 
+}
+
+/* 마지막 아이템 선 연결 처리 */
+.timeline-item:last-child {
+    /* 기존의 border-image를 제거하고 일반 border-left를 유지하여 선이 끊어지지 않게 함 */
+    border-image: none;
+    border-left: 2px solid rgba(0, 0, 0, 0.3);
+    padding-bottom: 1em; /* 마지막 아이템 아래의 여백을 확보 */
+    margin-bottom: 2em; /* 다음 Day 제목과의 간격을 확보 */
+}
+
+/* 새로운 타임라인 아이템 내부 컨텐츠 스타일 */
+.timeline-item-content {
+   
+    align-items: center; /* 이미지와 텍스트 중앙 정렬 */
+    margin: auto;
+    border: 2px solid ;
+    border-radius: 10px;
+    border-color: darkgray;
+    padding: 10px;
+}
+.timeline-item-content img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 15px;
+}
+.timeline-item-content .details h4 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #1D1D26; 
+}
+.timeline-item-content .details p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #77777D; 
+}
+
+/*
+ * ========================================
+ * 5. 모바일 반응형
+ * ========================================
+ */
+@media (max-width: 992px) {
+    .travel-schedule-layout {
+        flex-direction: column; /* 태블릿/모바일에서는 세로로 배치 */
+        gap: 0;
+    }
+    .schedule-list-area, .map-section-wrapper {
+        width: 100%; /* 전체 너비 사용 */
+        min-width: auto;
+        padding: 0;
+        margin-bottom: 20px;
+    }
+    .map-section-wrapper {
+        padding: 15px;
+        box-sizing: border-box;
+    }
+    .map-container-bottom {
+        height: 50vh; /* 모바일에서 지도를 화면 높이의 50% 정도로 조정 */
+    }
+
+    .timeline-item {
+        padding: 1em 1em 0.5em; /* 모바일에서 패딩 줄임 */
+    }
+    .timeline-item::before {
+        left: 1em;
+        top: 0.5em;
+    }
+    .timeline-item::after {
+        left: -6px; /* 마커 위치 조정 */
+        top: 0.5em;
+    }
+}
+
+/* 일정 박스  */
+.header-info {
+    display: flex;
+    align-items: center; /* 세로 중앙 정렬 */
+    margin-bottom: 5px; /* 주소와 약간의 간격 확보 */
+}
+
+.header-info .sequence {
+    font-weight: bold;
+    font-size: 14px;
+    padding: 2px 8px; /* 순서 번호 크기 조정 */
+    margin-right: 10px; /* 이름과의 간격 */
+    background-color: #ffffff; /* 배경색 (메인 색상) */
+    border: 2px solid;
+    border-color: rgb(100, 99, 99);
+    color: rgb(0, 0, 0);
+    border-radius: 15px;
+}
+
+.header-info h4 {
+    margin: 0; /* h4의 기본 마진 제거 */
+    font-size: 18px;
+    font-weight: bold;
+    flex-grow: 1; /* 남은 공간을 차지하여 별점을 오른쪽으로 밉니다. */
+}
+
+.header-info .rating {
+    font-size: 16px;
+    font-weight: bold;
+    color: #cdaf09; /* 별점 색상 */
+    margin-left: 10px; /* 이름과의 간격 */
+    white-space: nowrap; /* 별점이 줄바꿈되지 않도록 방지 */
+}
+
+.modify_cntainer{
+    display: flex;
+}
+.schedule_modify{
+    margin-top: 15px;
+    margin-left: 200px;
+    color: #5a5959; 
+    text-decoration: none;
+}
+.schedule_modify:visited {
+    color: #5a5959; 
+}
+.schedule_modify:hover {
+    color: #5a5959; 
+}
+
+/* 일정편집 */
+.hidden {
+    display: none !important;
+}
+/* 공통 숨김 클래스 */
+.hidden {
+    display: none !important;
+}
+
+.add-delete {
+    display: flex;
+    align-items: center;
+    margin-top: 5px; 
+}
+
+
+.add-delete p {
+    margin: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis; 
+    flex-grow: 1;
+}
+
+/* 삭제 버튼 스타일 */
+.delete-btn {
+    color: red;
+    border: 1px solid red;
+    border-radius: 7px;
+    background-color: white;
+
+    flex-shrink: 0; 
+    /* 주소와 버튼 사이의 간격 추가 (선택 사항) */
+    margin-left: 30px; 
+}
+
+/* 일정추가 */
+.add-schedule-btn{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 20px;
+    text-align: center;
+}
+.list-add{
+    
+    padding: 10px 0;
+}
+
+/* 모달 */
+
+#modalwrap {
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: none; 
+  
+}
+
+#modalbody {
+  width: 500px;
+  height: auto;
+  padding: 30px 30px;
+  min-height: 300px;
+  border: 1px solid #777;
+  background-color: #fff; 
+  position: absolute; 
+  top: 50%;
+  left: 50%;
+  z-index: 10000; 
+  transform: translate(-50%, -50%);
+}
+
+#closebtn {
+  float: right;
+  font-weight: bold;
+  color: #777;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+#modal-search-wrap {
+  position: relative;
+  width: 500px; 
+  height: 40px;
+  box-sizing: border-box;
+  display: flex; 
+  align-items: center;
+  justify-content: center;
+  border: 2px solid;
+  border-radius: 20px;
+  border-color: rgb(5, 75, 5);
+}
+
+#modal-in-search_wrap { 
+  width: 100%;
+  
+}
+
+#modal-search_input_box {
+ 
+  padding-left: 20px;
+  padding-right: 60px; 
+  
+}
+#query {
+  width: 300px;
+  border: 0;
+  font-size: 1.125rem;
+  padding: 0;
+  outline: none;
+  height: 100%;
+  color: var(--gray-700);
+  font-family: inherit;
+}
+
+.modal-search-btn {
+  color: var(--mocha-primary);
+  position: absolute;
+  font-size: 24px;
+  font-weight: bold;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  padding: 12px 20px;
+  cursor: pointer;
+}
+.modal-search-btn:hover {
+  color: var(--light-indigo);
+}
+
+.modal-p{
+    font-size: 30px;
+}
+
+.modal-area-list{
+    display: flex;
+    font-size: 20px;
+}
+
+.arealist-btn{
+    margin-left: 380px;
+    color: blue;
+    border-color: blue;
+    border-radius: 10px;
+    font-size: 20px;
+}
+

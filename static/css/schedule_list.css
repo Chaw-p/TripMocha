@@ -1,0 +1,74 @@
+
+body { 
+        font-family: Arial, sans-serif; 
+        background-color: white; 
+        padding: 20px; }
+.container { 
+        max-width: 800px; 
+        margin: 0 auto; 
+        background-color: white; 
+        padding: 30px; 
+        border-radius: 10px; 
+        box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+h1, h2 { 
+        color: #333; }
+table { 
+        width: 100%; 
+        border-collapse: collapse; }
+td { 
+        padding: 5px; }
+.header-logo { 
+        font-size: 28px; 
+        font-weight: bold; 
+        color: #97bca4; }
+.trip-item { 
+        border: 1px solid #ddd; 
+        margin-bottom: 15px; 
+        border-radius: 8px; 
+        overflow: hidden; 
+        position: relative; }
+        
+.trip-image {
+        width: 100px; 
+        height: 100px; 
+        object-fit: cover; 
+        border-radius: 5px; }
+.new-trip-button { 
+        width: 100%; 
+        padding: 15px; 
+        background-color: white; 
+        border: 1px solid #ccc; 
+        border-radius: 5px; 
+        margin-bottom: 20px; 
+        font-size: 25px;
+        cursor: pointer; }
+.trip-title { 
+        font-size: 1.2em; 
+        font-weight: bold; 
+        color: #333; }
+.trip-info { 
+        font-size: 0.9em; 
+        color: #666; }
+.trip-tags span { 
+        display: inline-block; 
+        background-color: #4ca17e5b; 
+        color: #000000; 
+        padding: 3px 8px; 
+        border-radius: 3px; 
+        margin-right: 5px; 
+        font-size: 0.8em; }
+.menu-dots { 
+        font-size: 1.5em; 
+        cursor: pointer; }
+.floating-menu { 
+        position: absolute; 
+        top: 50px; right: 20px; 
+        background: white; 
+        border: 1px solid #ddd; 
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        padding: 5px; z-index: 10; 
+        font-size: 0.9em; }
+#no-travle{
+        font-size: 50px;
+        text-align: center;
+}

@@ -1,0 +1,191 @@
+
+/* info */
+.travel_list {
+  list-style: none;
+  padding: 0;
+}
+.travel_list h3 {
+  margin: 0px 0px 3px 0px;
+}
+.travel_list a {
+  color: var(--mocha-font-color);
+}
+
+.travel_list> li {
+  padding: 5px 0px 5px 5px;
+  border-bottom: 1px solid var(--mocha-border);
+  display: flex;
+}
+.travel_list img {
+  border-radius: 10px;
+  width: 160px;
+  height: 100%;
+  object-fit: cover;
+}
+.list_cont {
+  margin-left: 10px;
+}
+.list_cont p {
+ margin: 2px;
+}
+.hash {
+  margin-top: 10px !important;
+  display: flex;
+}
+.hash > a {
+  margin-right: 5px;
+}
+
+.head {
+  position: relative;
+  height: 320px;
+  margin-bottom: 40px;
+
+  display: flex; /* Flex 컨테이너로 지정 */
+  flex-direction: column; /* 세로(열) 방향으로 아이템 배치 */
+  justify-content: flex-end;
+}
+.head .title{
+  font-size: 70px;
+  margin: 0;
+}
+.head .intro{
+  font-size: 50px;
+  margin: 0;
+}
+.head .intro span {
+  font-size: 30px;
+  color: #fff;
+  background-color: var(--mocha-primary);
+}
+#contents h2{
+  border-bottom: 2px solid var(--mocha-primary);
+}
+
+.hash a {
+  color: #fff;
+  background-color: #85b5ae;
+  filter: graysclae(20%);
+  border-radius: 5px;
+  padding: 0px 5px 0px 5px;
+}
+
+.hash a:hover {
+  background-color: #639890;
+}
+.detail_img {
+  top:0;
+  right: 0;
+  z-index: -20;
+  position: absolute;
+  width: 630px;
+  height: 320px;
+  border-top-left-radius: 200px;
+  border-bottom-left-radius: 200px;
+  overflow: hidden;
+}
+.detail_img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detail_btn {
+  display: flex;
+  width: 135px;
+  height: 35px;
+  border: 2px solid var(--mocha-font-color);
+  border-radius: 5px;
+  color: var(--mocha-font-color);
+  background-color: transparent;
+
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* festival */
+
+/* festival_back은 이미 제공됨 */
+.festival_back {
+ background-color: rgb(41, 87, 126);
+ width: 100%;
+ height: 100%;
+}
+
+/* ul에 대한 스타일 (li가 세로로 쌓이도록 보장) */
+.festival_list ul {
+  width: 90%;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none; /* 리스트 스타일 명시 */
+  display: block; /* 다른 곳에서 flex가 적용되는 것을 방지 */
+}
+
+/* li: Flex Container 설정 및 너비 보장 */
+.festival_list li {
+ display: flex;
+ justify-content: center; 
+ align-items: center; 
+ margin: 30px 0; /* 좌우 마진을 없애고 li를 100%로 활용 */
+ padding: 20px;
+ background-color: aliceblue;
+ /* 지그재그 정렬을 위해 li가 부모 너비를 완전히 차지하도록 보장 */
+ width: 100%; 
+ box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 */
+}
+
+/* 짝수 번째 li만 순서를 반전시켜 [글 | 이미지]로 만듭니다. */
+.festival_list li:nth-child(even) {
+ flex-direction: row-reverse;
+}
+
+/* ------------------ 내부 아이템 크기 및 간격 설정 ------------------ */
+
+/* 이미지 컨테이너 크기 설정 */
+.festival_list .poster_wrap {
+ flex-basis: 35%; 
+ flex-shrink: 0; /* 이미지 영역 축소 방지 */
+}
+
+/* 글 컨테이너 크기 설정 */
+.festival_list li > div:not(.poster_wrap) {
+ flex-basis: 40%; 
+}
+
+/* 포스터 내부 이미지 스타일 */
+.festival_list .poster_wrap img {
+ width: 100%;
+ height: auto;
+ display: block;
+}
+
+/* ------------------ 마진으로 포스터/글 간격 조정 ------------------ */
+
+/* 홀수 번째: 이미지 오른쪽에 마진 적용 */
+.festival_list li:nth-child(odd) .poster_wrap {
+ margin-right: 40px;
+ margin-left: 0;
+}
+
+/* 짝수 번째: 이미지 왼쪽에 마진 적용 */
+.festival_list li:nth-child(even) .poster_wrap {
+ margin-left: 40px;
+ margin-right: 0;
+}
+
+/* ------------------ 텍스트 스타일 ------------------ */
+
+.festival_list p{
+ font-size: large;
+  margin: 5px 0;
+}
+
+.festival_list .title {
+  font-size: 40px;
+  font-weight: bolder;
+  margin-bottom: 10px;
+}
+
+

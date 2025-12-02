@@ -1,0 +1,145 @@
+/* 1. 전체 페이지 중앙 정렬 (flexbox 사용) */
+body {
+    display: flex;
+    /* Flexbox 활성화 */
+    justify-content: center;
+    /* 수평 중앙 정렬 */
+    align-items: center;
+    /* 수직 중앙 정렬 */
+    min-height: 100vh;
+    /* 뷰포트 전체 높이 사용 */
+    margin: 0;
+    background-color: #f4f4f4;
+    /* 배경색 (디자인에 맞게 조정) */
+}
+
+/* 2. 로그인 박스 스타일 */
+.login-box {
+    width: 400px;
+    padding: 80px;
+    background: white;
+    border-radius: 12px;
+    /* Figma의 모서리 둥글기에 맞춰 지정 */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    /* 텍스트 중앙 정렬 (선택 사항) */
+}
+
+/* 3. 입력 그룹 간격 조정 */
+.input-group {
+    margin-bottom: 20px;
+}
+
+/* 로그인 버튼 스타일 */
+.login-btn {
+    height: 40px;
+    width: 60%;
+    /* 부모 요소(400px)에 꽉 채우기 */
+    margin-top: 30px;
+}
+
+/* 찾기/회원가입 링크 스타일 */
+.find-links {
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.find-links a {
+    color: #666;
+    text-decoration: none;
+    /* 밑줄 제거 */
+}
+
+.input-group input {
+    /* (1) 높이 키우기 */
+    height: 60px;
+
+    /* (2) 너비 늘리기 */
+    width: 90%;
+    padding: 0 18px;
+
+    /* 기타 스타일은 유지 */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    /* 텍스트 크기도 조금 키울 수 있습니다. */
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    /* 세로로 쌓기 */
+    align-items: center;
+    /* 수평 중앙 정렬 */
+
+    /* 로고와 로그인 박스 사이의 간격 (디자인에 맞춰 조정) */
+    gap: 30px;
+}
+
+/* ================================================= */
+/* 5. 회원가입: 성별/국적 선택 버튼 스타일 (최종 수정) */
+/* ================================================= */
+
+/* 🚨 수정된 .input-group 스타일을 재정의하여 버튼 그룹 전체를 감싸는 컨테이너로 사용 */
+.input-group.select-container {
+    /* 기존 스타일 유지: 초록 테두리, 둥근 모서리, 패딩 */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+
+    /* 성별 그룹과 국적 그룹을 수평으로 배치 */
+    display: flex;
+    justify-content: space-between;
+    /* 그룹 간 공간 확보 */
+    align-items: center;
+    
+    width: 90%;
+    /* 부모에 맞춰 너비 재확인 */
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+/* 성별 그룹과 국적 그룹 스타일 */
+.select-container .select-buttons {
+    display: flex;
+    width: 49%;
+    /* 공간을 거의 반으로 나눔 */
+    justify-content: space-between;
+}
+
+/* 🚨 구분선 추가: 성별 그룹과 국적 그룹 사이 구분선 추가 */
+.select-container .select-buttons:first-child {
+    border-right: 1px solid #ddd;
+    /* 연한 회색 구분선 */
+    padding-right: 10px;
+    /* 구분선과 여자 버튼 사이 간격 */
+    margin-right: 5px;
+    /* 전체 그룹 간격 조정 */
+    width: calc(49% - 15px);
+    /* 테두리와 패딩만큼 너비 축소 */
+}
+
+/* 국적 그룹의 왼쪽 여백 설정 */
+.select-container .select-buttons:last-child {
+    padding-left: 10px;
+    /* 구분선과 내국인 버튼 사이 간격 */
+}
+
+/* 개별 선택 버튼 스타일 (미선택 상태) */
+.select-btn {
+    width: 48%;
+    height: 40px;
+
+    background-color: white;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s;
+}
+
