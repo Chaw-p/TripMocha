@@ -40,7 +40,7 @@
                     <p class="loc">{{item.addr1}}</p>
                     <p>조용히 나를 돌아보는 사찰</p>
                     <p class="hash">
-                      <a href="{{ url_for('info.info',query='관광지') }}">#관광지</a>
+                      <a href="{{ url_for('info.info',query='관광지') }}">#{{item.contenttypeid}}</a>
                       <a href="{{ url_for('info.info',query='광명선원') }}">#광명선원</a>
                     </p>
                   </div>
