@@ -21,7 +21,6 @@ def main():
         CityCounty.sigungu
     ).all()
     
-    # 템플릿에 전달할 때, city_name을 sido와 sigungu를 합친 이름으로 만듭니다.
     processed_destinations = [
         {
             'city_name': f"{d.sido} {d.sigungu}", 
