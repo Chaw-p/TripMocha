@@ -1,46 +1,7 @@
-// =======================================================
-// A. 유틸리티 함수 (Global Scope)
-// =======================================================
-
-/**
- * 휴대전화 번호에 자동 하이픈을 삽입합니다.
- */
-function autoHyphenate(input) {
-    //  [수정] input 객체와 value 속성이 있는지 먼저 확인하여 undefined 오류 방지
-    if (!input || !input.value) return; 
-    
-    let number = input.value.replace(/[^0-9]/g, "");
-    let temp = "";
-    
-    if (number.length < 4) {
-        temp += number;
-    } else if (number.length < 8) {
-        temp += number.substr(0, 3);
-        temp += "-";
-        temp += number.substr(3);
-    } else {
-        temp += number.substr(0, 3);
-        temp += "-";
-        temp += number.substr(3, 4);
-        temp += "-";
-        temp += number.substr(7, 4);
-    }
-    input.value = temp;
-}
-
-/**
- * 입력값에서 숫자만 허용하고 나머지는 제거합니다. (인증번호용)
- */
+const $newPasswordGroup = $("#newPasswordGroup");
 function filterNumberOnly(input) {
-    //  [수정] input 객체와 value 속성이 있는지 먼저 확인하여 undefined 오류 방지
-    if (!input || !input.value) return; 
-    
-    let filteredValue = input.value.replace(/[^0-9]/g, '');
-    if (input.value !== filteredValue) {
-        input.value = filteredValue;
-    }
+    input.value = input.value.replace(/[^0-9]/g, '');
 }
-
 
 // =======================================================
 // B. 인증 상태 변수 및 타이머 및 UI 관리
@@ -135,10 +96,10 @@ $(document).ready(function() {
     const $form = $('#find-password-form'); //  [추가] 폼 ID 가정
     const $userId = $('input[name="user_id"]');
     const $name = $('input[name="name"]');
-    const $phone = $('#phone_number');
+    const $email = $('#email');
     const $authBtn = $('#send_auth_btn');
     const $authCodeInput = $('#auth_code');
-    const $submitBtn = $('#submit_btn');
+    const $submitBtn = $('#reset_btn');
     const $newPasswordInput = $('#new_password'); //  [추가] 새 비밀번호 입력 필드 ID 가정
 
     // 초기 상태: 인증번호 입력 필드와 제출 버튼 비활성화
@@ -147,11 +108,6 @@ $(document).ready(function() {
     $newPasswordInput.prop('disabled', true); //  [추가] 새 비밀번호 필드 초기 비활성화
     $messageArea.hide();
 
-    // 1. 휴대전화 필드에 자동 하이픈 및 숫자 필터링 기능 연결
-    $phone.on('input', function() {
-        filterNumberOnly(this);
-        autoHyphenate(this); 
-    });
     
     // 2. 인증번호 입력 필드에 숫자 필터링 및 6자리 검증
     $authCodeInput.on('input', function() {
@@ -166,7 +122,7 @@ $(document).ready(function() {
              
              // 서버에 인증번호 검증 요청 (AJAX)
              $.post('/api/verify_auth_code', {
-                 phone_number: $phone.val(), // 휴대전화 번호도 함께 보냄
+                 email: $email.val(),
                  auth_code: code
              }, function(response) {
                  
@@ -211,18 +167,18 @@ $(document).ready(function() {
     $authBtn.on('click', function() {
         $messageArea.hide();
         // 필수 필드 유효성 검사
-        if ($userId.val().length < 1 || $name.val().length < 1 || $phone.val().length !== 13) {
-            showMessage('아이디, 이름, 휴대폰 번호를 정확히 입력해주세요.', 'error'); // 📢 alert 대신 showMessage 사용
+        if ($userId.val().length < 1 || $name.val().length < 1 || $email.val().length < 5) {
+            showMessage('아이디, 이름, 이메일을 정확히 입력해주세요.', 'error');
             return;
-        }
+        }   
 
         showButtonLoading($authBtn, '발송 중...'); 
         
         // 서버에 인증번호 발송 요청 (AJAX)
         $.post('/api/send_auth_code', {
-            user_id: $userId.val(), 
-            name: $name.val(), 
-            phone_number: $phone.val()
+            user_id: $userId.val(),
+            name: $name.val(),
+            email: $email.val()
         }, function(response) {
             
             //  [추가] 서버 응답 유효성 검사
@@ -233,7 +189,7 @@ $(document).ready(function() {
             }
             
             if (response.success) {
-                showMessage('테스트 인증번호(999999)가 발송되었습니다. 3분 안에 입력해주세요.', 'success'); // 📢 alert 대신 showMessage 사용
+                showMessage('인증번호가 이메일로 발송되었습니다. 3분 안에 입력해주세요.', 'success');
                 
                 // 인증번호 입력 필드 활성화 및 포커스
                 $authCodeInput.val('').prop('disabled', false).focus();
@@ -261,7 +217,7 @@ $(document).ready(function() {
         e.preventDefault(); // 기본 폼 제출을 막고 AJAX로 처리
 
         if (!$form.data('verified')) {
-            showMessage("먼저 휴대전화 인증을 완료해주세요.", 'error');
+            showMessage("먼저 이메일 인증을 완료해주세요.", 'error');
             return;
         }
 
@@ -276,13 +232,13 @@ $(document).ready(function() {
         // 서버로 보낼 데이터 준비
         const postData = {
             user_id: $userId.val(), 
-            name: $name.val(), 
-            phone_number: $phone.val().replace(/-/g, ''),
+            name: $name.val(),
+            email: $email.val(),    
             new_password: newPassword
         };
 
         // 서버에 비밀번호 재설정 요청 (AJAX)
-        $.post('/user/reset_password', postData, function(response) { // 📢 [추가] 엔드포인트 가정
+        $.post('/user/reset_password', postData, function(response) { 
             
             //  [추가] response 유효성 검사
             if (!response || response === null) {
