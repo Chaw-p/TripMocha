@@ -2,7 +2,7 @@
   <div class="cont">
     <div id="logo">
       <a href="{{ url_for('index') }}">
-        <img src={{ url_for('static', filename='img/logo.png') }}>
+        <img src="{{ url_for('static', filename='img/logo.png') }}">
       </a>
     </div>
     <div id="nav_search_wrap">
@@ -29,9 +29,9 @@
       <!-- <a class="profile_wrap"><img src={{ url_for('static', filename='img/profile.png') }}></a> -->
        홍길동 님
       {% else %}
-      <button class="mocha_btn_1" onclick = "location.href = '/login'">
-        로그인
-      </button>
+      <a href="{{ url_for('login_bp.login_page') }}">
+          <button class="mocha_btn_1">로그인</button>
+      </a>
       {% endif %}
     </div>
   </div>

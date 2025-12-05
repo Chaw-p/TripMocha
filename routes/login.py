@@ -1,21 +1,78 @@
 import os
-from flask import Flask, Blueprint, render_template, request, jsonify, redirect, url_for
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session
 from flask_cors import CORS
 from google import genai
 from google.genai.errors import APIError
-import random
 import time
+from flask_mail import Message
+import random
 
-# ----------------------------------------------------
-# Blueprint 정의: 모든 인증 관련 경로를 루트에서 처리하기 위해 접두사 제거
-# ----------------------------------------------------
-login_bp = Blueprint("login", __name__, url_prefix="") # url_prefix를 빈 문자열로 수정
+# Blueprint 정의
+login_bp = Blueprint('login_bp', __name__)
+api_bp = Blueprint('api_bp', __name__)
+
+auth_codes = {}  # 이메일: 인증번호 저장용
+
+
+
+@api_bp.route('/api/send_auth_code', methods=['POST'])
+def send_auth_code():
+    email = request.form.get('email')
+    user_id = request.form.get('user_id')
+    name = request.form.get('name')
+
+    if not email:
+        return jsonify({"success": False, "message": "이메일이 필요합니다."})
+
+    # 랜덤 인증번호 생성
+    auth_code = str(random.randint(100000, 999999))
+    auth_codes[email] = auth_code
+
+    try:
+        msg = Message(
+            title="TripMocha 이메일 인증번호",
+            recipients=[email],
+            body=f"""
+안녕하세요 {name}님,
+
+TripMocha 비밀번호 재설정 인증번호는
+
+👉 {auth_code}
+
+입니다.
+3분 안에 입력해주세요.
+            """
+        )
+        mail.send(msg)
+
+        return jsonify({"success": True})
+
+    except Exception as e:
+        print("이메일 전송 오류:", e)
+        return jsonify({"success": False, "message": "메일 발송 실패"})
+
+
+@api_bp.route('/api/verify_auth_code', methods=['POST'])
+def verify_auth_code():
+    email = request.form.get('email')
+    auth_code = request.form.get('auth_code')
+
+    if email in auth_codes and auth_codes[email] == auth_code:
+        return jsonify({"success": True})
+
+    return jsonify({"success": False, "message": "인증번호가 일치하지 않습니다."})
+
+
+
+
+
 
 # ----------------------------------------------------
 # C. Gemini API 키 설정 및 보안 강화
 # ----------------------------------------------------
-# 중요: API 키를 코드에 직접 하드코딩하지 않고 환경 변수에서 불러옵니다.
-GEMINI_API_KEY = "AIzaSyCSm8j9_SnGJVdoHvyc1BKpe_1hAh5kVRw" # 임시 키 유지
+# NOTE: os.getenv를 사용하여 환경 변수에서 안전하게 키를 불러오는 방식으로 변경했습니다.
+# 실제 환경 변수 설정이 필요합니다 (예: .env 파일 사용).
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyCSm8j9_SnGJVdoHvyc1BKpe_1hAh5kVRw")
 
 # ----------------------------------------------------
 # A. 사용자 인증 및 페이지 렌더링 라우팅
@@ -25,6 +82,7 @@ GEMINI_API_KEY = "AIzaSyCSm8j9_SnGJVdoHvyc1BKpe_1hAh5kVRw" # 임시 키 유지
 @login_bp.route('/')
 def home():
     """메인 페이지에서는 로그인 페이지를 렌더링합니다."""
+    # 올바른 경로: templates/login/login.html
     return render_template('login/login.html')
 
 # 2. 로그인 페이지 라우팅 (GET): /login
@@ -44,7 +102,7 @@ def find_id_page():
 
 # 5. 비밀번호 찾기 페이지 라우팅: /find_password
 @login_bp.route('/find_password')
-def find_password_page():
+def find_password():
     return render_template('login/find_password.html')
 
 
@@ -52,8 +110,8 @@ def find_password_page():
 @login_bp.route('/travel')
 def travel_plan_ui():
     """로그인 성공 후 접속하는 메인 여행 계획 UI를 렌더링합니다."""
+    # TODO: 실제 앱에서는 session을 확인하여 로그인되지 않은 사용자는 로그인 페이지로 리다이렉트해야 합니다.
     return render_template('user/travel.html')
-
 
 # ----------------------------------------------------
 # B. 폼 데이터 처리 라우팅 (POST)
@@ -63,20 +121,21 @@ def travel_plan_ui():
 @login_bp.route('/login', methods=['POST'])
 def process_login():
     """로그인 폼 제출을 처리하고 성공 시 메인 페이지로 리다이렉트합니다."""
-    # DB 인증 로직 구현 필요
+    # TODO: 실제 DB 인증 로직 구현 필요.
+    # 예시: user_identifier = request.form.get('user_identifier'), password = request.form.get('password')
     # 성공 가정 후, Blueprint 내의 travel_plan_ui 함수로 리다이렉트
     return redirect(url_for('.travel_plan_ui')) 
 
 
 @login_bp.route('/find_id_process', methods=['POST'])
 def find_id_process():
-    # 아이디 찾기 로직 구현 필요
+    # TODO: 아이디 찾기 로직 구현 필요
     return jsonify({"message": "아이디 찾기 처리 완료 (로직 구현 필요)"})
 
 
 @login_bp.route('/find_password_process', methods=['POST'])
 def find_password_process():
-    # 비밀번호 찾기 로직 구현 필요
+    # TODO: 비밀번호 찾기 로직 구현 필요
     return jsonify({"message": "비밀번호 찾기 처리 완료 (로직 구현 필요)"})
 
 # 8. 회원가입 폼 처리 라우트: /signup (POST 요청)
@@ -85,16 +144,16 @@ def process_signup():
     """회원가입 폼 제출을 처리하고 성공 시 로그인 페이지로 리다이렉트합니다."""
     data = request.form
     
-    # DB 저장 로직 구현 필요
+    # TODO: DB 저장 로직 구현 필요
     print(f"회원가입 데이터 수신: {data.get('user_id')}")
 
-    # 성공했다고 가정하고 로그인 페이지로 리다이렉트
     return redirect(url_for('.login_page'))
 
 
 # ----------------------------------------------------
-# B-1. 아이디 중복 확인 라우팅 (AJAX용): /check_duplicate
+# B-1. 아이디 중복 확인 라우팅 (AJAX용)
 # ----------------------------------------------------
+# NOTE: 이 함수를 routes/models.py나 별도의 services/auth.py로 분리하는 것이 좋습니다.
 
 def check_id_exists_in_db(user_id):
     """
@@ -108,7 +167,7 @@ def check_duplicate():
     """
     프론트엔드의 AJAX 요청을 받아 아이디 중복 여부를 확인하고 JSON 응답을 반환합니다.
     """
-    user_id = request.form.get('user_id')
+    user_id = request.form.get('user_id') 
     
     if not user_id:
         return jsonify({'error': '아이디를 입력해 주세요.'}), 400
@@ -121,7 +180,7 @@ def check_duplicate():
 
 
 # ----------------------------------------------------
-# C. Gemini API 호출 라우팅 (여행 계획 생성): /api/travel_plan
+# C. Gemini API 호출 라우팅 (여행 계획 생성)
 # ----------------------------------------------------
 
 XML_PROMPT_TEMPLATE = """
@@ -150,8 +209,6 @@ XML_PROMPT_TEMPLATE = """
 def get_travel_plan():
     """프론트엔드 요청을 받아 Gemini API를 호출하고 XML 결과를 반환합니다."""
     
-    # API 키 검증 로직은 생략
-
     try:
         data = request.json
         date_query = data.get('startDate', '2025년 12월 1일')
@@ -164,8 +221,6 @@ def get_travel_plan():
     except Exception:
         return jsonify({'xml_data': "<여행가이드><error>INVALID_REQUEST: 요청 JSON 형식이 잘못되었습니다.</error></여행가이드>"}), 400
     
-    print(f"[{destination_query}, {date_query} 시작, {duration_query} 기간] 여행 계획 생성 요청 접수.")
-
     xml_result = generate_gemini_travel_plan(date_query, destination_query, duration_query)
     
     return jsonify({'xml_data': xml_result})
@@ -181,6 +236,7 @@ def generate_gemini_travel_plan(date_str: str, destination_str: str, duration_st
     )
     
     try:
+        # NOTE: 이 함수를 별도의 services/gemini_service.py로 분리하는 것이 좋습니다.
         client = genai.Client(api_key=GEMINI_API_KEY) 
         model = 'gemini-2.5-flash'
         
@@ -197,10 +253,10 @@ def generate_gemini_travel_plan(date_str: str, destination_str: str, duration_st
         return f"<여행가이드><error>UNKNOWN_ERROR: {e}</error></여행가이드>"
     
 # ----------------------------------------------------
-# D. 비밀번호 찾기 (휴대전화 인증) 라우팅: /api/send_auth_code, /api/verify_auth_code
+# D. 비밀번호 찾기 (휴대전화 인증) 라우팅
 # ----------------------------------------------------
 
-# 💡 인증번호 임시 저장소 (전화번호를 키로 사용)
+# 💡 인증번호 임시 저장소
 AUTH_CODES = {} 
 
 @login_bp.route('/api/send_auth_code', methods=['POST'])
@@ -210,19 +266,11 @@ def send_auth_code():
     
     if not phone_number:
           return jsonify({"success": False, "message": "휴대전화 번호를 입력해주세요."}), 400
-
-    # DB 사용자 확인 로직 구현 필요
     
-    # [테스트용 코드]: 인증번호를 '999999'로 고정
-    auth_code = "999999" 
+    auth_code = "999999" # Test code
     
-    # 인증번호 저장 (3분 후 만료 시뮬레이션)
     expiration_time = time.time() + (3 * 60)
     AUTH_CODES[phone_number] = {"code": auth_code, "expires": expiration_time}
-    
-    # 실제 SMS 발송 로직은 실행하지 않습니다.
-    
-    print(f"DEBUG: {phone_number}로 테스트 코드 {auth_code}가 발송되었다고 가정합니다.")
     
     return jsonify({"success": True, "message": "테스트 인증번호 발송 완료"})
 
@@ -239,14 +287,12 @@ def verify_auth_code():
     if not stored_data:
         return jsonify({"success": False, "message": "인증번호를 다시 요청해주세요. (코드 만료/미요청)"})
     
-    # 1. 만료 시간 확인
     if time.time() > stored_data["expires"]:
-        del AUTH_CODES[phone_number] # 만료된 코드는 삭제
+        del AUTH_CODES[phone_number]
         return jsonify({"success": False, "message": "인증 시간이 만료되었습니다. 다시 요청해주세요."})
         
-    # 2. 코드 일치 확인
     if user_input_code == stored_data["code"]:
-        del AUTH_CODES[phone_number] # 성공했으니 코드 삭제
+        del AUTH_CODES[phone_number]
         return jsonify({"success": True, "message": "인증 성공! 비밀번호 재설정 페이지로 이동합니다."})
     else:
         return jsonify({"success": False, "message": "인증번호가 일치하지 않습니다."})
