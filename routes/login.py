@@ -5,15 +5,16 @@ from google import genai
 from google.genai.errors import APIError
 import time
 from flask_mail import Message
+from flask import current_app
 import random
+
+mail = None
 
 # Blueprint 정의
 login_bp = Blueprint('login_bp', __name__)
 api_bp = Blueprint('api_bp', __name__)
 
-auth_codes = {}  # 이메일: 인증번호 저장용
-
-
+auth_codes = {}
 
 @api_bp.route('/api/send_auth_code', methods=['POST'])
 def send_auth_code():
@@ -21,16 +22,17 @@ def send_auth_code():
     user_id = request.form.get('user_id')
     name = request.form.get('name')
 
-    if not email:
-        return jsonify({"success": False, "message": "이메일이 필요합니다."})
+    print("받은 데이터:", email, user_id, name)
 
-    # 랜덤 인증번호 생성
+    if not email:
+        return jsonify({"success": False, "message": "이메일이 필요합니다."}), 400
+
     auth_code = str(random.randint(100000, 999999))
     auth_codes[email] = auth_code
 
     try:
         msg = Message(
-            title="TripMocha 이메일 인증번호",
+            subject="TripMocha 이메일 인증번호",
             recipients=[email],
             body=f"""
 안녕하세요 {name}님,
@@ -41,32 +43,19 @@ TripMocha 비밀번호 재설정 인증번호는
 
 입니다.
 3분 안에 입력해주세요.
-            """
+"""
         )
+
         mail.send(msg)
 
         return jsonify({"success": True})
 
     except Exception as e:
         print("이메일 전송 오류:", e)
-        return jsonify({"success": False, "message": "메일 발송 실패"})
+        return jsonify({"success": False, "message": "메일 발송 실패"}), 500
+    
 
-
-@api_bp.route('/api/verify_auth_code', methods=['POST'])
-def verify_auth_code():
-    email = request.form.get('email')
-    auth_code = request.form.get('auth_code')
-
-    if email in auth_codes and auth_codes[email] == auth_code:
-        return jsonify({"success": True})
-
-    return jsonify({"success": False, "message": "인증번호가 일치하지 않습니다."})
-
-
-
-
-
-
+    
 # ----------------------------------------------------
 # C. Gemini API 키 설정 및 보안 강화
 # ----------------------------------------------------
@@ -107,11 +96,11 @@ def find_password():
 
 
 # 6. 여행 계획 메인 UI 페이지 라우팅: /travel
-@login_bp.route('/travel')
+@login_bp.route('/index')
 def travel_plan_ui():
     """로그인 성공 후 접속하는 메인 여행 계획 UI를 렌더링합니다."""
     # TODO: 실제 앱에서는 session을 확인하여 로그인되지 않은 사용자는 로그인 페이지로 리다이렉트해야 합니다.
-    return render_template('user/travel.html')
+    return render_template('index.html')
 
 # ----------------------------------------------------
 # B. 폼 데이터 처리 라우팅 (POST)
