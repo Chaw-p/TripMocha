@@ -19,11 +19,14 @@
 .travel_list img {
   border-radius: 10px;
   width: 160px;
-  height: 100%;
+  height: 127px;
   object-fit: cover;
 }
 .list_cont {
   margin-left: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
 }
 .list_cont p {
  margin: 2px;
@@ -41,38 +44,85 @@
   height: 320px;
   margin-bottom: 40px;
 
-  display: flex; /* Flex 컨테이너로 지정 */
-  flex-direction: column; /* 세로(열) 방향으로 아이템 배치 */
-  justify-content: flex-end;
+  display: flex; 
+  flex-direction: column; 
+  justify-content: flex-start; 
+ 
 }
 .head .title{
-  font-size: 70px;
-  margin: 0;
+  font-size: 40px;
+  bottom: 4px;
 }
 .head .intro{
   font-size: 50px;
   margin: 0;
 }
+.head .type span {
+  top: 0;
+  font-size: 20px;
+  padding: 0 15px;
+  box-shadow: inset 6px 0 0 rgb(6, 64, 43, 0.7);
+}
+.head .title span {
+  color: #fff;
+  padding: 0 10px;
+  /* box-shadow: inset 0 -6px 0 rgb(6, 64, 43, 0.7); */
+  background-color: rgb(6, 64, 43, 0.7);
+}
 .head .intro span {
-  font-size: 30px;
+  font-size: 20px;
   color: #fff;
   background-color: var(--mocha-primary);
+}
+.head .addr1 span {
+  color: #666;
 }
 #contents h2{
   border-bottom: 2px solid var(--mocha-primary);
 }
 
 .hash a {
-  color: #fff;
-  background-color: #85b5ae;
-  filter: graysclae(20%);
   border-radius: 5px;
-  padding: 0px 5px 0px 5px;
+  padding: 0 5px;
+  
+  /* position, overflow, z-index 등 ::before 관련 속성 유지 */
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+
+  color: #fff;
+  /* background-color는 이제 그라데이션 아래에 숨겨지게 됩니다. */
+  background-color: #85b5ae; 
+  filter: grayscale(20%);
+
+  /* 🌟 1. 아래에서 위로 진행하는 그라데이션 정의 */
+  background-image: linear-gradient(
+    to right top, /* 아래에서 위로 */
+    rgb(236, 101, 68) 50%, /* 50%는 보라색 */
+    #85b5ae 80%, /* 나머지 50%는 초록색 */
+    #85b5ae 100% /* 나머지 50%는 초록색 */
+  );
+  
+  /* 🌟 2. 배경 크기를 200%로 설정하여 애니메이션 공간 확보 */
+  background-size: 400% 400%;
+  
+  /* 🌟 3. 초기 위치: 배경의 맨 아래(초록색 영역)만 보이도록 설정 */
+  background-position: 100% 0%;
+  
+  /* 🌟 4. 배경 위치만 트랜지션 설정 */
+  transition: background-position 0.5s ease;
+  
+  /* ::before 관련 스타일 제거 (주석 처리 또는 삭제) */
 }
 
+/* ::before, ::hover::before 스타일은 모두 제거 */
+/* 텍스트의 z-index 스타일도 제거 */
+
 .hash a:hover {
-  background-color: #639890;
+  /* 🌟 5. 호버 시: 배경을 맨 위로 올려 보라색 영역이 보이도록 설정 */
+  background-position: 0 40%; 
 }
+
 .detail_img {
   top:0;
   right: 0;
@@ -188,4 +238,7 @@
   margin-bottom: 10px;
 }
 
-
+.detail_map {
+  width: 100%;
+  height: 400px;
+}

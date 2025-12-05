@@ -12,9 +12,9 @@
     {% include 'config/header.html' %}
     <div id="container">
       <div class="head">
-        <p>충북 음성군</p>
-        <p class="title"><span>{{item.title}}</span></p>
-        <p class="intro"><span>영원한 안식처, 국내 최대 영탑 공원이 공존하는 특별한 도량</span></p>
+        <p class="type"><span >{{item.contenttype}}</span></p>
+        <p><span class="addr1">{{item.addr1}}</span></p>
+        <p class="title"><span>"{{item.title}}"</span></p>
         <div class="detail_img">
           <img src="{{item.image}}">
         </div>
@@ -25,6 +25,10 @@
           {{item.intro}}
         </p>
         <div id="map" class="detail_map"></div>
+        <script>
+          var itemMapX = "{{ item.mapx }}"; 
+          var itemMapY = "{{ item.mapy }}";
+        </script>
         <script type=text/javascript src="{{url_for('static', filename='js/map.js') }}"></script>    
         <h2>해쉬</h2>    
         <p class="hash">

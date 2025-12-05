@@ -19,17 +19,6 @@ $(document).ready(function() {
   });
 
   Scroll(isIndexPage);
- 
-  //지도가 있는 경우면 지도 크기를 조정한다.
-  
-  //var mapContainer = document.getElementById("map");
-  var mapContainer = document.getElementById("map");
-    if( mapContainer != null)
-  {
-    mapContainer.style.width = "100%";
-    mapContainer.style.height = "650px";
-    map.relayout();
-  }
 
 });
 
@@ -42,7 +31,6 @@ function Scroll(isIndexPage){
         
         // 2. 클래스를 추가할 기준 스크롤 값 (Threshold)을 설정합니다.
         // 예를 들어, 50px 이상 스크롤 했을 때 border가 나타나게 설정합니다.
-        console.log("isIndexPage:" + isIndexPage);
         if(isIndexPage) {
           scrollThreshold = 50;
         }else

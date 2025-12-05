@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, session
+from flask import Flask, request, g, render_template, redirect, session
 #라우터 파일
 # from routes.basic import basic_bp
 from routes.info import info_bp
@@ -12,6 +12,15 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://tripmocha:ezen@192.168.
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
+#쿼리 받아오기
+@app.before_request
+def get_query():
+  query = session.get("query")
+  g.query = query if query is not None else ""
+
+@app.context_processor
+def inject_query():
+  return {"query" : g.query}
 
 @app.route("/", methods=["GET"])
 def index():
