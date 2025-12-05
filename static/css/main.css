@@ -167,7 +167,7 @@ a {
 #nav ul li::after {
     content: '';
     position: absolute;
-    bottom: 0;       /* li의 하단에 위치 */
+    bottom: -5px;       /* li의 하단에 위치 */
     left: 0;         /* li의 왼쪽 끝 */
     
     height: 3px;     /* 밑줄의 두께 */

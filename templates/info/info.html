@@ -4,22 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TripMocha</title>
-  <style>
-    
-  </style>
-  <!-- css -->
-  <link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
+  {% include 'config/config.html' %}
   <link rel="stylesheet" href="{{url_for('static', filename='css/info.css')}}">
-  <!-- stylesheet -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  <!-- js -->
-  <script type=text/javascript src="{{url_for('static', filename='js/jquery-3.7.1.js') }}"></script>
-  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-  <script type=text/javascript src="{{url_for('static', filename='js/main.js') }}"></script>
-  <!-- etc -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
 </head>
 <body>
   <div id="wrap">
@@ -30,16 +16,14 @@
             <div id="menu">
               <span class="menu_title">검색 조건</span>
               <ul>
-                  <li><a>전체 결과</a></li>
-                  <li><a>여행지</a></li>
-                  <li><a>축제</a></li>
+                <li><a href="/info?sort=k">전체</a></li>
+                <li><a href="/info?sort=h">해쉬</a></li>
               </ul>
             </div>
             <div id="section">
+              <span id="waitMsg" style="display:none;color:red;">여행지를 조회중입니다. 잠시 기다려 주세요.....</span>
               <h2>
-                {% for q in query %}
-                  #{{q}}
-                {% endfor %}
+                # {{query}}
               </h2>
               <ul class="travel_list">
                 {% for item in items %}
@@ -52,10 +36,9 @@
                       <a href="/info/{{item.id}}">{{item.title}}</a>
                     </h3>
                     <p class="loc">{{item.addr1}}</p>
-                    <p>조용히 나를 돌아보는 사찰</p>
                     <p class="hash">
-                      <a href="{{ url_for('info.info',query='관광지') }}">#관광지</a>
-                      <a href="{{ url_for('info.info',query='광명선원') }}">#광명선원</a>
+                      <a href="{{ url_for('info.info',query='#%s' % item.contenttypeid) }}"><span>#{{item.contenttypeid}}</span></a>
+                      <a href="{{ url_for('info.info',query='#%s' % item.areacode) }}"><span>#{{item.areacode}}</span></a>
                     </p>
                   </div>
                 </li>

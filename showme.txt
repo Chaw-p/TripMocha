@@ -1,7 +1,9 @@
 
-[ 이거 추가해서 캐시 충돌 방지해주세요!]
 .gitignore
 
+#[API_KEY 노출 방지]
+static/js/config.js
+#[ 이거 추가해서 캐시 충돌 방지해주세요!]
 __pycache__/
 *.pyc
 
