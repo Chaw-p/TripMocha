@@ -50,9 +50,9 @@ class APIService :
     params.update(param)
     # print("params:",params,", url:", url)
     response = requests.get(url,headers=self.headers, params=params)
-    print(response.status_code)
+    # print(response.status_code)
     contents = response.text
-    print(contents)
+    # print(contents)
 
     #json.loads()를 사용하여 문자열을 파이썬 딕셔너리로 변환
     data_dict = json.loads(contents)
@@ -83,7 +83,6 @@ class APIService :
       mapping_data = self.rcontent_type_list.get(value, value)
     else:
       mapping_data = value
-    print("CONTENT_TYPE_MAPPING",mapping_data)
     return mapping_data
   
   
@@ -123,12 +122,9 @@ class APIService :
 
   def AREA_NAME_MAPPING(self,areaname) :
     items = self.area_code_list
-    print("@@@@@@@@@@@@@",areaname)
 
     item = next((i for i in items if i.get("name") == str(areaname)), None)
 
-    print("############",item)
-    
     if item is not None:
             item_code = item.get("code")
             return item_code
@@ -195,7 +191,6 @@ class APIService :
       }
       for i in items
     ]
-    print(datas)
 
     #print(data)
     return datas
@@ -211,10 +206,8 @@ class APIService :
       param["contentTypeId"] = type
     
     item_data = self.AccessData(url = url_key, param = param)  
-    print("item_data:", item_data)
     
     items = item_data.get("item", [])
-    print("items:", items)
     datas = [
       {
        "id" : i.get("contentid"),
@@ -229,7 +222,6 @@ class APIService :
       }
       for i in items
     ]
-    print("datas:", datas)
     return datas
 
   def SearchHash(self, hash) :
