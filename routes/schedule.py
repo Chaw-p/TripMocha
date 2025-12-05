@@ -1,5 +1,5 @@
 from flask import jsonify, request, Blueprint, render_template
-from routes.models import db, CityCounty 
+from .models import db, CityCounty 
 from dotenv import load_dotenv
 import os
 
