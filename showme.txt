@@ -19,5 +19,6 @@ pip install Flask-Mail
 테스트용 제미나이 여행일정추천 파일 
 pip install google-genai
 
+pip install flask_cors
 
 
