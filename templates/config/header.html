@@ -11,14 +11,16 @@
     <div id="nav">
       <ul>
         <li>
-          <a href="#">
-            <span class="material-symbols-outlined">kid_star</span>축제 보기
+          <a href="{{ url_for('info.festival') }}">
+            <span class="material-symbols-outlined">kid_star</span>
+            축제 보기
           </a>
           <div class="nav_balloon">이 달의 축제에 대해서 알아봅시다.</div>
         </li>
         <li>
-          <a href="#">
-            <span class="material-symbols-outlined">travel_explore</span>나의 여행계획
+          <a href="{{ url_for('schedule.list') }}">
+            <span class="material-symbols-outlined">travel_explore</span>
+            나의 여행계획
           </a>
           <div class="nav_balloon">테마를 고르고, ai 추천으로 여행을 떠나봅시다.</div>
         </li>
