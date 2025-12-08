@@ -1,161 +1,221 @@
-/* 1. 전체 페이지 중앙 정렬 (flexbox 사용) */
+/* =============================
+   기본 레이아웃
+============================= */
+
 body {
-    display: flex;
-    /* Flexbox 활성화 */
-    justify-content: center;
-    /* 수평 중앙 정렬 */
-    align-items: center;
-    /* 수직 중앙 정렬 */
-    min-height: 100vh;
-    /* 뷰포트 전체 높이 사용 */
     margin: 0;
-    background-color: #f4f4f4;
-    /* 배경색 (디자인에 맞게 조정) */
+    padding: 0;
+    background: #ffffff; /* 배경 흰색 유지 */
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
-/* 2. 로그인 박스 스타일 */
-.login-box {
-    width: 400px;
-    padding: 80px;
-    background: white;
-    border-radius: 12px;
-    /* Figma의 모서리 둥글기에 맞춰 지정 */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    /* 텍스트 중앙 정렬 (선택 사항) */
-}
-
-/* 3. 입력 그룹 간격 조정 */
-.input-group {
-    margin-bottom: 20px;
-}
-
-/* 로그인 버튼 스타일 */
-.login-btn {
-    height: 40px;
-    width: 60%;
-    /* 부모 요소(400px)에 꽉 채우기 */
-    margin-top: 30px;
-}
-
-/* 찾기/회원가입 링크 스타일 */
-.find-links {
-    margin-top: 20px;
-    font-size: 14px;
-}
-
-.find-links a {
-    color: #666;
-    text-decoration: none;
-    /* 밑줄 제거 */
-}
-
-.input-group input {
-    /* (1) 높이 키우기 */
-    height: 60px;
-
-    /* (2) 너비 늘리기 */
-    width: 90%;
-    padding: 0 18px;
-
-    /* 기타 스타일은 유지 */
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 16px;
-    /* 텍스트 크기도 조금 키울 수 있습니다. */
-}
+/* =============================
+   로고 / 화면 중앙 배치
+============================= */
 
 .login-container {
     display: flex;
     flex-direction: column;
-    /* 세로로 쌓기 */
     align-items: center;
-    /* 수평 중앙 정렬 */
-
-    /* 로고와 로그인 박스 사이의 간격 (디자인에 맞춰 조정) */
-    gap: 30px;
+    gap: 24px;
 }
 
-/* ================================================= */
-/* 5. 회원가입: 성별/국적 선택 버튼 스타일 (최종 수정) */
-/* ================================================= */
+.tripmocha-logo {
+    width: 160px;
+}
 
-/*  수정된 .input-group 스타일을 재정의하여 버튼 그룹 전체를 감싸는 컨테이너로 사용 */
-.input-group.select-container {
-    /* 기존 스타일 유지: 초록 테두리, 둥근 모서리, 패딩 */
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 10px;
+/* =============================
+   메인 박스 (로그인/회원가입/찾기 페이지 공통)
+============================= */
 
-    /* 성별 그룹과 국적 그룹을 수평으로 배치 */
+.login-box {
+    width: 420px;
+    padding: 40px 32px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0px 8px 22px rgba(0, 0, 0, 0.08);
+}
+
+/* =============================
+   입력 폼
+============================= */
+
+.input-group {
+    margin-bottom: 18px;
     display: flex;
-    justify-content: space-between;
-    /* 그룹 간 공간 확보 */
+    flex-direction: column;
     align-items: center;
-    
-    width: 90%;
-    /* 부모에 맞춰 너비 재확인 */
-    margin-bottom: 20px;
-    box-sizing: border-box;
 }
 
-/* 성별 그룹과 국적 그룹 스타일 */
-.select-container .select-buttons {
-    display: flex;
-    width: 49%;
-    /* 공간을 거의 반으로 나눔 */
-    justify-content: space-between;
+.input-group input {
+    width: 100%;
+    height: 52px;
+    padding: 0 16px;
+    border: 1.6px solid #dcdcdc;
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+    transition: 0.2s ease;
+    background: #fafafa;
 }
 
-/*  구분선 추가: 성별 그룹과 국적 그룹 사이 구분선 추가 */
-.select-container .select-buttons:first-child {
-    border-right: 1px solid #ddd;
-    /* 연한 회색 구분선 */
-    padding-right: 10px;
-    /* 구분선과 여자 버튼 사이 간격 */
-    margin-right: 5px;
-    /* 전체 그룹 간격 조정 */
-    width: calc(49% - 15px);
-    /* 테두리와 패딩만큼 너비 축소 */
+.input-group input:focus {
+    border-color: #006600;
+    background: #ffffff;
+    box-shadow: 0 0 6px rgba(0, 102, 0, 0.2);
 }
 
-/* 국적 그룹의 왼쪽 여백 설정 */
-.select-container .select-buttons:last-child {
-    padding-left: 10px;
-    /* 구분선과 내국인 버튼 사이 간격 */
-}
+/* =============================
+   버튼 스타일 (공통)
+============================= */
 
-/* 개별 선택 버튼 스타일 (미선택 상태) */
-.select-btn {
-    width: 48%;
-    height: 40px;
-
-    background-color: white;
-    color: #333;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
+button,
+.login-btn {
+    width: 100%;
+    height: 52px;
+    background: #006600;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 17px;
+    font-weight: 600;
     cursor: pointer;
+    transition: 0.2s;
+}
 
+button:hover,
+.login-btn:hover {
+    background: #00994a;
+    transform: translateY(-2px);
+}
+
+/* =============================
+   링크 (비밀번호 찾기/아이디 찾기/회원가입)
+============================= */
+
+.find-links {
+    margin-top: 16px;
     display: flex;
     justify-content: center;
-    align-items: center;
-    transition: all 0.2s;
+    gap: 12px;
+    font-size: 14px;
 }
 
-/* 선택된 버튼 효과 */
-.select-btn.selected {
-    background-color: #4F46E5;   /* 진한 인디고 */
-    color: white;
-    border-color: #4F46E5;
-    font-weight: bold;
-    box-shadow: 0 0 6px rgba(79, 70, 229, 0.4);
-    transform: scale(1.05);
-    transition: all 0.2s ease;
+.find-links a {
+    color: #444;
+    text-decoration: none;
 }
 
-/* 기본 버튼 hover 효과 */
+.find-links a:hover {
+    color: #006600;
+    text-decoration: underline;
+}
+
+/* =============================
+   성별 / 국적 선택
+============================= */
+
+
+.input-group .select-container {
+    flex-direction: row !important;
+    align-items: center !important;
+    display: flex !important;
+}
+
+/* 선택 영역 전체 */
+.select-container {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 12px;
+
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+/* 버튼 스타일 */
+.select-btn {
+    flex: 1; /* 버튼 4개가 동일 너비 */
+    height: 42px;
+    border: 1.4px solid #ccc;
+    border-radius: 10px;
+    background: #fbfbfb;
+    color: #000;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+/* 호버 효과 */
 .select-btn:hover {
-    background-color: #f3f3f3;
+    background: #eee;
 }
 
+/* 선택된 버튼 스타일 (선택 시 JS로 클래스 추가하면 됨) */
+.select-btn.selected {
+    background: #006600;
+    color: white;
+    border-color: #006600;
+    transform: scale(1.05);
+    box-shadow: 0 0 8px rgba(0, 168, 74, 0.4);
+}
+
+
+/* =============================
+   여행 스타일 선택
+============================= */
+
+.style-label {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    width: 100%;
+    text-align: left;
+}
+
+#style-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.style-btn {
+    padding: 8px 14px;
+    border: 1.8px solid #ccc;
+    border-radius: 30px;
+    background: #fafafa;
+    color: #000000;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.style-btn:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+}
+
+.style-btn.selected {
+    background: linear-gradient(135deg, #00a84a, #2ecc71);
+    border-color: #006600;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 168, 74, 0.4);
+    transform: translateY(-2px);
+}
+
+/* =============================
+   메시지 박스 (비밀번호 찾기 등)
+============================= */
+
+#message_area {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    display: none;
+}

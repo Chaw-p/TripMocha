@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원가입</title>
-    <link rel="stylesheet" href="{{url_for('static', filename='css/login.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 
 <body>
@@ -53,6 +55,9 @@
                     <input type="text" name="birthday" id="birthday" placeholder="생년월일 8자리 (YYYYMMDD)"
                         maxlength="8" required class="px-4 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 transition duration-150">
                 </div>
+                <div class="input-group">
+                    <input type="text" name="email" placeholder="이메일" required>
+                </div>
 
                 <div>
                     <div class="flex space-x-2 mb-2">
@@ -76,50 +81,46 @@
                     </div>
                 </div>
 
-                <!-- 성별 및 국적 선택 그룹 -->
-                <div class="input-group select-container">
-
-                    <!-- 성별 그룹 -->
-                    <div class="select-buttons" id="gender-buttons">
-                        <button type="button" class="select-btn" data-value="M">남자</button>
-                        <button type="button" class="select-btn" data-value="F">여자</button>
-                        <input type="hidden" name="gender" id="selected-gender" required>
-                    </div>
-
-                    <!-- 국적 그룹 -->
-                    <div class="select-buttons" id="nation-buttons">
-                        <button type="button" class="select-btn" data-value="domestic">내국인</button>
-                        <button type="button" class="select-btn" data-value="foreign">외국인</button>
-                        <input type="hidden" name="nation" id="selected-nation" required>
-                    </div>
-
+                <div class="input-group">
+                    <label>성별</label>
                 </div>
 
-                <!-- <div class="input-group">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">여행 테마 선택 (최대 3개 필수)</label>
-                    
-                    <div class="select-buttons flex flex-wrap gap-2" id="theme-buttons">
-                        <button type="button" class="theme-select-btn select-btn" data-value="산">산</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="바다">바다</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="실내">실내</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="액티비티">액티비티</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="체험">체험</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="사진">사진</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="테마파크">테마파크</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="문화">문화</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="맛집">맛집</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="축제">축제</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="힐링">힐링</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="AI추천">AI추천</button>
+                <div id="gender-buttons" class="select-container">
+                    <button type="button" class="select-btn" data-value="M">남자</button>
+                    <button type="button" class="select-btn" data-value="F">여자</button>
+                </div>
+                <input type="hidden" id="selected-gender" name="gender" required>
+
+
+                <div class="input-group">
+                    <label>국적</label>
+                </div>
+
+                <div id="nation-buttons" class="select-container">
+                    <button type="button" class="select-btn" data-value="K">내국인</button>
+                    <button type="button" class="select-btn" data-value="F">외국인</button>
+                </div>
+                <input type="hidden" id="selected-nation" name="nation" required>
+                <!-- 선호 여행 스타일 선택 (최대 4개) -->
+                <div class="input-group">
+                    <label class="style-label">선호 여행 스타일 (최대 4개 선택)</label>
+
+                    <div id="style-container">
+                        <button type="button" class="style-btn" data-value="spring_flower">🌸 봄꽃</button>
+                        <button type="button" class="style-btn" data-value="summer_sea">☀️ 여름바다</button>
+                        <button type="button" class="style-btn" data-value="autumn_leaf">🍁 가을단풍</button>
+                        <button type="button" class="style-btn" data-value="winter_snow">❄️ 겨울눈</button>
+                        <button type="button" class="style-btn" data-value="water_play">🏊 물놀이</button>
+                        <button type="button" class="style-btn" data-value="trekking">🏃 운동/트레킹</button>
+                        <button type="button" class="style-btn" data-value="food_tour">🍜 맛집</button>
+                        <button type="button" class="style-btn" data-value="healing">🌿 힐링</button>
+                        <button type="button" class="style-btn" data-value="night_view">🌙 야경</button>
+                        <button type="button" class="style-btn" data-value="activity">🎢 체험/액티비티</button>
                     </div>
-                    
-                    <input type="hidden" name="themes" id="selected-themes" required> 
 
-                    <p id="theme-message" class="mt-2 text-sm text-red-500 hidden">최소 3개의 테마를 선택해주세요.</p>
-                </div> -->
-
-                
-                    
+                    <!-- 여기 값이 "spring_flower,summer_sea" 이런 식으로 들어감 -->
+                    <input type="hidden" name="travel_style" id="travel_style">
+                </div>
 
                 <!-- 휴대전화 번호 -->
                 <div class="input-group">
@@ -133,11 +134,15 @@
                      가입하기
                 </button>
             </form> 
+                <div class="find-links">
+                    <a href="{{ url_for('login_bp.login_page') }}">로그인</a>
+                </div>
         </main>
     </div>
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="{{ url_for('static', filename='js/signup.js') }}"></script>
+    
 </body>
 
 </html>

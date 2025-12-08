@@ -1,3 +1,6 @@
+let isIdChecked = false;    // 아이디 중복확인 버튼 눌렀는가
+let isIdAvailable = false;  // 사용 가능한 아이디인가
+
 // --- 전화번호 자동 하이픈 포맷팅 함수 ---
 function autoHyphenate(input) {
     // 숫자만 추출합니다.
@@ -138,7 +141,7 @@ function updateSubmitButtonState() {
     }
 
 
-    // 3. 최종 상태 결정 (ID 확인은 jQuery 스크립트의 전역 변수 isIdAvailable 사용)
+    // 3. 최종 상태 결정 
     const canSubmit = requiredFieldsFilled && isIdAvailable && isPasswordMatch;
     const $submitBtn = $('#submit_btn');
 
@@ -432,3 +435,62 @@ function setupThemeSelection() {
         updateSubmitButtonState();
     });
 }
+
+
+// ===============================
+// 선호 여행 스타일 선택 (최대 4개)
+// ===============================
+function setupTravelStyleSelection() {
+    const maxCount = 4;
+    const selectedSet = new Set();  // 중복 방지용
+
+    $(".style-btn").on("click", function () {
+        const value = $(this).data("value");
+
+        // 이미 선택된 버튼이면 해제
+        if ($(this).hasClass("selected")) {
+            $(this).removeClass("selected");
+            selectedSet.delete(value);
+        } else {
+            // 새로 선택인데 이미 4개면 막기
+            if (selectedSet.size >= maxCount) {
+                alert("최대 4개까지만 선택할 수 있습니다.");
+                return;
+            }
+            $(this).addClass("selected");
+            selectedSet.add(value);
+        }
+
+        // hidden input에 "a,b,c" 형태로 저장
+        $("#travel_style").val(Array.from(selectedSet).join(","));
+    });
+}
+
+// 여행 테마
+document.addEventListener("DOMContentLoaded", function () {
+    const buttons = document.querySelectorAll(".style-btn");
+    let selectedCount = 0;
+    const maxSelect = 4;
+
+    buttons.forEach(btn => {
+        btn.addEventListener("click", function () {
+
+            // 선택 해제
+            if (btn.classList.contains("selected")) {
+                btn.classList.remove("selected");
+                selectedCount--;
+                return;
+            }
+
+            // 선택 제한
+            if (selectedCount >= maxSelect) {
+                alert("4개까지만 선택할 수 있어요!");
+                return;
+            }
+
+            // 새로 선택
+            btn.classList.add("selected");
+            selectedCount++;
+        });
+    });
+});

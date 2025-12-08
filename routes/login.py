@@ -9,6 +9,24 @@ from email.mime.text import MIMEText
 from email.header import Header
 from email.utils import formataddr
 import random
+from flask import g
+import pymysql
+
+# -------------------------------------------------
+# MySQL 직접 연결용 함수 (get_db)
+# -------------------------------------------------
+def get_db():
+    if "db" not in g:
+        g.db = pymysql.connect(
+            host="192.168.60.133",
+            user="tripmocha",
+            password="ezen",
+            database="tripmocha",
+            charset="utf8mb4",
+            cursorclass=pymysql.cursors.Cursor
+        )
+    return g.db
+
 
 # Blueprint 정의
 login_bp = Blueprint('login_bp', __name__)
@@ -156,36 +174,84 @@ def travel_plan_ui():
     return render_template('index.html')
 
 
-
-
-@login_bp.route('/find_id_process', methods=['POST'])
-def find_id_process():
-    # TODO: 아이디 찾기 로직 구현 필요
-    return jsonify({"message": "아이디 찾기 처리 완료 (로직 구현 필요)"})
-
-
 @login_bp.route('/find_password_process', methods=['POST'])
 def find_password_process():
-    # TODO: 비밀번호 찾기 로직 구현 필요
-    return jsonify({"message": "비밀번호 찾기 처리 완료 (로직 구현 필요)"})
+    user_id = request.form.get("user_id")
+    new_pw = request.form.get("new_password")
+
+    try:
+        db = get_db()
+        cursor = db.cursor()
+
+        cursor.execute("""
+            UPDATE users
+            SET password = %s
+            WHERE user_id = %s
+        """, (new_pw, user_id))
+
+        db.commit()
+
+        return """
+            <script>
+                alert("비밀번호가 성공적으로 변경되었습니다!");
+                window.location.href = "/login";
+            </script>
+        """
+
+    except Exception as e:
+        print("비밀번호 변경 오류:", e)
+        return """
+            <script>
+                alert("서버 오류가 발생했습니다.");
+                history.back();
+            </script>
+        """
+
 
 # 8. 회원가입 폼 처리 라우트: /signup (POST 요청)
 @login_bp.route('/signup', methods=['POST'])
 def process_signup():
-    """회원가입 폼 제출을 처리하고 성공 시 로그인 페이지로 리다이렉트합니다."""
-    data = request.form
-    
-    # TODO: DB 저장 로직 구현 필요
-    print(f"회원가입 데이터 수신: {data.get('user_id')}")
+    """회원가입 처리 + DB 저장"""
 
-    return redirect(url_for('.login_page'))
+    user_id = request.form.get("user_id")
+    password = request.form.get("password")
+    name = request.form.get("name")
+    birthday = request.form.get("birthday")
+    email = request.form.get("email")  # ⭐ 이메일 추가됨
+    phone = request.form.get("phone")
+    travel_style = request.form.get("travel_style")
+
+    print(" 회원가입 데이터 확인:", user_id, email)
+
+    try:
+        db = get_db()
+        cursor = db.cursor()
+
+        # 실제 저장
+        cursor.execute("""
+        INSERT INTO users (user_id, password, name, birthday, email, phone, travel_style)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (user_id, password, name, birthday, email, phone, travel_style))
+
+        db.commit()
+        print(" DB 저장 완료")
+
+    except Exception as e:
+        print(" 회원가입 DB 저장 중 오류:", e)
+        return """
+            <script>
+                alert("회원가입 중 오류가 발생했습니다.");
+                history.back();
+            </script>
+        """
+
+    # 가입 성공 → 로그인 페이지 이동
+    return redirect(url_for("login_bp.login_page"))
 
 @login_bp.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('login_bp.login_page'))
-
-
+    return redirect(url_for('index'))
 
 # ----------------------------------------------------
 # B-1. 아이디 중복 확인 라우팅 (AJAX용)
@@ -214,6 +280,75 @@ def check_duplicate():
     return jsonify({
         'is_duplicate': is_duplicate 
     })
+
+
+@login_bp.route('/find_id_process', methods=['POST'])
+def find_id_process():
+    name = request.form.get("name")
+    birthday = request.form.get("birthday")
+    phone_number = request.form.get("phone_number")
+
+    print("아이디 찾기 요청:", name, birthday, phone_number)
+
+    try:
+        db = get_db()
+        cursor = db.cursor()
+
+        cursor.execute("""
+            SELECT user_id 
+            FROM users
+            WHERE name = %s AND birthday = %s AND phone = %s
+        """, (name, birthday, phone_number))
+
+        result = cursor.fetchone()
+
+        if result:
+            user_id = result[0]
+            return f"""
+                <script>
+                    alert("고객님의 아이디는 '{user_id}' 입니다!");
+                    window.location.href = "/login";
+                </script>
+            """
+        else:
+            return """
+                <script>
+                    alert("일치하는 정보를 찾을 수 없습니다.");
+                    history.back();
+                </script>
+            """
+
+    except Exception as e:
+        print(" 아이디 찾기 오류:", e)
+        return """
+            <script>
+                alert("서버 오류가 발생했습니다.");
+                history.back();
+            </script>
+        """
+
+@login_bp.route('/reset_password', methods=['POST'])
+def reset_password():
+    user_id = request.form.get("user_id")
+    new_password = request.form.get("new_password")
+
+    try:
+        db = get_db()
+        cursor = db.cursor()
+
+        cursor.execute("""
+            UPDATE users
+            SET password = %s
+            WHERE user_id = %s
+        """, (new_password, user_id))
+
+        db.commit()
+
+        return jsonify({"success": True})
+
+    except Exception as e:
+        print("비밀번호 변경 오류:", e)
+        return jsonify({"success": False, "message": "비밀번호 변경 실패"}), 500
 
 
 # ----------------------------------------------------

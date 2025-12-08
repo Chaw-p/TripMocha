@@ -1,0 +1,79 @@
+/* ======= 회원가입 박스 ======= */
+.signup-box {
+    width: 500px;
+    padding: 40px 45px;
+}
+
+/* ======= 성별/국적 선택 ======= */
+
+.select-container {
+    display: flex;
+    border: 1.5px solid #ddd;
+    border-radius: 10px;
+    padding: 14px;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.select-buttons {
+    width: 48%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.select-btn {
+    width: 48%;
+    height: 42px;
+    background: #fff;
+    border: 1.5px solid #ccc;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+.select-btn:hover {
+    background: #f1f1f1;
+}
+
+.select-btn.selected {
+    background: #006600;
+    color: white;
+    border-color: #006600;
+    transform: scale(1.03);
+    box-shadow: 0 2px 8px #006600(0,150,70,0.3);
+}
+
+/* ======= 여행 스타일 선택 ======= */
+
+.style-label {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+}
+
+#style-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.style-btn {
+    padding: 8px 18px;
+    background: #f4f4f4;
+    border: 2px solid #ccc;
+    border-radius: 30px;
+    transition: 0.2s;
+    font-size: 14px;
+}
+
+.style-btn:hover {
+    background: #ececec;
+}
+
+.style-btn.selected {
+    background: linear-gradient(135deg, #00a84a, #2ecc71);
+    border-color: #006600;
+    color: white;
+    box-shadow: 0 3px 10px rgba(0,150,70,0.3);
+    transform: translateY(-2px);
+}
