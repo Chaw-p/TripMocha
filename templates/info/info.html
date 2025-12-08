@@ -16,8 +16,8 @@
             <div id="menu">
               <span class="menu_title">검색 조건</span>
               <ul>
-                <li><a href="/info?sort=k">전체</a></li>
-                <li><a href="/info?sort=h">해쉬</a></li>
+                <li><a href="/info?query=#전체">키워드</a></li>
+                <li><a href="{{ url_for('info.info',query='#%s' % query) }}">해쉬</a></li>
               </ul>
             </div>
             <div id="section">
