@@ -617,7 +617,6 @@ $(document).ready(function() {
                 <button class="reload-btn">추천 다시 받기</button>
             </div>
             `;
-            listHtml += '<div class="trip-list-grid">'; 
 
             finalTripData.forEach(trip => {
             
@@ -631,14 +630,20 @@ $(document).ready(function() {
             const displayCity = savedCity || trip.city;
           
             listHtml += `
-                <div class="trip-item">
-                    <h4>${newTitle}</h4>
-                    <p class="trip-meta">${displayCity} | ${trip.period}</p> 
-                    <div class="trip-tags">
-                        ${trip.tags.map(tag => `<span>#${tag}</span>`).join('')}
+               <div class="trip-item">
+            
+                    <div class="trip-header-line"> <h4>${newTitle}</h4>
+                        <p class="trip-meta">${displayCity} | ${trip.period}</p> 
+                        <p class="trip-rating">⭐ ${trip.rating}</p>
                     </div>
-                    <p class="trip-rating">⭐ ${trip.rating}</p>
-                    <button class="detail-btn">자세히 보기</button>
+                    <div class="trip-schedule">1.여수 오동도 -> 여수횟집 -> 아쿠아리움 -> 여수카페 -> 여수호텔</div>
+                    <div class="trip-tags">
+                        <div class="tag-group"> 
+                            ${trip.tags.map(tag => `<span>#${tag}</span>`).join('')}
+                        </div>
+                        <a href="/schedule/view" class="detail-btn">선택</a>
+                    </div>
+                    
                 </div>
             `;
         });
@@ -649,47 +654,6 @@ $(document).ready(function() {
 
     }, 1000); 
 });
-   // 임시 상세 일정 데이터
-const dummyItinerary = "1. 여수 오동도 → 여수횟집 → 여수아쿠아리움 → 낭만포차거리";
-
-$('#result-area').on('click', '.detail-btn, .detail-btn-hide', function() {
-    const $clickedButton = $(this);
-    const $tripItem = $clickedButton.closest('.trip-item');
-    const $tripGrid = $tripItem.closest('.trip-list-grid');
-    
-    let $detailRow = $tripGrid.find('.trip-detail-row');
-    const dummyItinerary = '1. 여수 오동도 → 여수횟집 → 여수아쿠아리움 → 낭만포차거리'; 
-    
-    if ($detailRow.length === 0) {
-       const detailHtml = `
-        <div class="trip-detail-row">
-            <div class="trip-detail-schedule">
-                <div class="schedule-content">
-                    ${dummyItinerary}
-                </div>
-                <a href="/schedule/view" class="create-trip-btn">선택</a>
-                </div>
-        </div>
-`;
-        $tripGrid.append(detailHtml);
-        $detailRow = $tripGrid.find('.trip-detail-row');
-    }
-
-    if ($clickedButton.hasClass('detail-btn-hide')) {
-        $detailRow.hide();
-        $clickedButton.text('자세히 보기').removeClass('detail-btn-hide').addClass('detail-btn');
-        return;
-    }
-
-    $tripGrid.find('.detail-btn-hide').text('자세히 보기').removeClass('detail-btn-hide').addClass('detail-btn');
-    $detailRow.hide();
-    
-    const itemTop = $tripItem.position().top;
-    const itemHeight = $tripItem.outerHeight();
-    
-    $detailRow.css('top', itemTop + itemHeight + 10 + 'px').show();
- 
-    $clickedButton.text('닫기 ↑').removeClass('detail-btn').addClass('detail-btn-hide');
-});
+  
 
 });
