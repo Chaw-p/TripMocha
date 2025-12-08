@@ -326,8 +326,9 @@ input[type="search"]::-webkit-search-cancel-button {
   border-bottom: 1px solid var(--mocha-border);
 }
 
-.tolist_btn {
-  text-align: center;
+.center_btn {
+  display: flex;
+  justify-content: center;
 }
 
 .tolist_btn button {
