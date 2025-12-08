@@ -35,7 +35,10 @@
             <div class="h22-and-input">
                 <div class="travel-name-outer-container"></div>
                 <div class="mytravel">
-                    <h1>나의 여행 만들기</h1>
+                    <div class="trip-container">
+                        <h1 class="image-text">나의 여행 만들기</h1>
+                        <img id="trip_photo" src="{{ url_for('static', filename='img/겨울메인2.jpg') }}">
+                    </div>
                 </div>
                 <!-- <div class="input-wrapper">
                     <div class="input-container"> 
@@ -147,81 +150,82 @@
                 <div class="h22-and-input">
                     <h2>여행 테마</h2>
                     <p class="input-wrapper2">원하는 여행 테마 2가지 선택해주세요. (최대 4개 선택)
+                 </div>
 
-                </div>
                 <table id="theme-selection-table">
                     <tr>
                         <td class="theme-icon-container select-btn" data-theme="ai">
-                            <div class="theme-icon">📸<div class="selection-overlay">
+                            <div class="theme-icon"><img src="{{ url_for('static', filename='img/ai.jpg') }}"><div class="selection-overlay">
                                     <span class="check-icon">✔</span>
                                 </div>
                             </div><br>AI 추천
                         </td>
                         <td class="theme-icon-container select-btn" data-theme="mountain">
-                            <div class="theme-icon">⛰️<div class="selection-overlay">
+                            <div class="theme-icon"><img src="{{ url_for('static', filename='img/산1.jpg') }}"><div class="selection-overlay">
                                     <span class="check-icon">✔</span>
-                                </div>
+                                </div></div>
                             </div><br>산
                         </td>
                         <td class="theme-icon-container select-btn" data-theme="sea">
-                            <div class="theme-icon">🏖️<div class="selection-overlay">
+                            <div class="theme-icon"><img src="{{ url_for('static', filename='img/바다1.jpg') }}"><div class="selection-overlay">
                                     <span class="check-icon">✔</span>
-                                </div>
+                                </div></div>
                             </div><br>바다
                         </td>
                         <td class="theme-icon-container select-btn" data-theme="indoor">
-                            <div class="theme-icon">🏠<div class="selection-overlay">
+                            <div class="theme-icon"><img src="{{ url_for('static', filename='img/실내1.jpg') }}"><div class="selection-overlay">
                                     <span class="check-icon">✔</span>
-                                </div>
+                                </div></div>
                             </div><br>실내
                         </td>
                         <td class="theme-icon-container select-btn" data-theme="activity">
-                            <div class="theme-icon">🧗<div class="selection-overlay">
+                            <div class="theme-icon"><img src="{{ url_for('static', filename='img/액티비티1.jpg') }}"><div class="selection-overlay">
                                     <span class="check-icon">✔</span>
-                                </div>
+                                </div></div>
                             </div><br>액티비티
                         </td>
                         <td class="theme-icon-container select-btn" data-theme="experience">
-                            <div class="theme-icon">🧑‍🎨<div class="selection-overlay">
+                            <div class="theme-icon"><img src="{{ url_for('static', filename='img/체험2.jpg') }}"><div class="selection-overlay">
                                     <span class="check-icon">✔</span>
-                                </div>
+                                </div></div>
                             </div><br>체험
                         </td>
                     </tr>
                     <tr>
                         <td class="theme-icon-container select-btn" data-theme="themepark">
-                            <div class="theme-icon">🎡<div class="selection-overlay">
+                            <div class="theme-icon"><img src="{{ url_for('static', filename='img/테마파크1.jpg') }}"><div class="selection-overlay">
                                     <span class="check-icon">✔</span>
-                                </div>
+                                </div></div>
                             </div><br>테마파크
                         </td>
                         <td class="theme-icon-container select-btn" data-theme="market">
-                            <div class="theme-icon">🛍️<div class="selection-overlay">
+                            <div class="theme-icon"><img src="{{ url_for('static', filename='img/시장1.jpg') }}"><div class="selection-overlay">
                                     <span class="check-icon">✔</span>
-                                </div>
+                                </div></div>
                             </div><br>전통시장
                         </td>
                         <td class="theme-icon-container select-btn" data-theme="food">
-                            <div class="theme-icon">🍽️<div class="selection-overlay">
+                            <div class="theme-icon"><img src="{{ url_for('static', filename='img/맛집2.jpg') }}"><div class="selection-overlay">
                                     <span class="check-icon">✔</span>
-                                </div>
+                                </div></div>
                             </div><br>맛집
                         </td>
                         <td class="theme-icon-container select-btn" data-theme="festival">
-                            <div class="theme-icon">🎉<div class="selection-overlay">
+                            <div class="theme-icon"><img src="{{ url_for('static', filename='img/축제1.jpg') }}"><div class="selection-overlay">
                                     <span class="check-icon">✔</span>
-                                </div>
+                                </div></div>
                             </div><br>축제
                         </td>
                         <td class="theme-icon-container select-btn" data-theme="healing">
-                            <div class="theme-icon">🧘<div class="selection-overlay">
+                            <div class="theme-icon"><img src="{{ url_for('static', filename='img/힐링2.jpg') }}"><div class="selection-overlay">
                                     <span class="check-icon">✔</span>
-                                </div>
+                                </div></div>
                             </div><br>힐링
                         </td>
                         <td class="theme-icon-container select-btn" data-theme="photo">
-                            <div class="theme-icon">📸<div class="selection-overlay">
+                            <div class="theme-icon"><img src="{{ url_for('static', filename='img/사진1.jpg') }}"><div class="selection-overlay">
                                     <span class="check-icon">✔</span>
+                                </div>
                                 </div>
                             </div><br>사진
                         </td>

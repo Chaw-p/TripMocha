@@ -269,53 +269,32 @@ function updateSubmitButtonState() {
 // ---------------------------------------------
 // 6. 주소 검색 기능 (행정안전부 API 방식)
 // ---------------------------------------------
-$('#search_address_btn').on('click', function() {
-    // ⚠️ [중요] 여기에 발급받은 실제 승인키(CONFIRM KEY)를 입력해야 합니다.
-        const CONFIRM_KEY = "devU01TX0FVVEgyMDI1MTEyODE0Mjg0MTExNjUwNzk="; 
-    
-    // API를 로드한 후, Postcode 객체를 실행하는 함수를 정의합니다.
-    const openPostcode = () => {
-        new daum.Postcode({
-            oncomplete: function(data) {
-                // ... (이전의 주소 처리 로직은 동일합니다)
-                let addr = ''; 
-                let extraAddr = ''; 
-                
-                if (data.userSelectedType === 'R') {
-                    addr = data.roadAddress;
-                } else {
-                    addr = data.jibunAddress;
-                }
-                
-                // 참고항목 처리 로직은 그대로 유지
-                if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
-                    extraAddr += data.bname;
-                }
-                if (data.buildingName !== '' && data.apartment === 'Y') {
-                    extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-                }
-                if (extraAddr !== '') {
-                    addr += ' (' + extraAddr + ')';
-                }
+$('#search_address_btn').on('click', function () {
+    new daum.Postcode({
+        oncomplete: function (data) {
+            let addr = data.userSelectedType === 'R'
+                ? data.roadAddress
+                : data.jibunAddress;
 
-                $('#postcode').val(data.zonecode);
-                $('#address').val(addr);
-                $('#detail_address').focus();
-            },
-            // [핵심] 행정안전부 연동을 위한 옵션: 승인키와 API 버전 명시
-            confirmKey: CONFIRM_KEY, 
-            v2: true 
-        }).open();
-    };
-    
-    // daum.Postcode 객체가 로드되어 있다면 바로 실행, 아니라면 load 함수로 호출
-    if (typeof daum.Postcode !== 'undefined') {
-        openPostcode();
-    } else {
-        // Postcode 라이브러리가 아직 로드되지 않은 경우 수동으로 로드 후 실행
-        daum.postcode.load(openPostcode);
-    }
+            let extraAddr = '';
+
+            if (data.bname !== '' && /[동|로|가]$/.test(data.bname)) {
+                extraAddr += data.bname;
+            }
+            if (data.buildingName !== '' && data.apartment === 'Y') {
+                extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+            }
+            if (extraAddr !== '') {
+                addr += ' (' + extraAddr + ')';
+            }
+
+            $('#postcode').val(data.zonecode);
+            $('#address').val(addr);
+            $('#detail_address').focus();
+        }
+    }).open();
 });
+
 
     // 3-3. 폼 제출 시 최종 유효성 검사 (가입하기 버튼 클릭 시)
     $('.signup-form').on('submit', function(e) {

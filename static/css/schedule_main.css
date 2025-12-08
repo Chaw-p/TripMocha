@@ -119,14 +119,6 @@ td {
             font-weight: bold;
         }
        
-.theme-icon { 
-            display: inline-block; 
-            width: 60px; height: 60px; 
-            border-radius: 50%; 
-            background-color: #eee; 
-            margin: 5px; 
-            line-height: 60px; 
-            font-size: 24px; }
         
 .ai-recommend-box { 
             border: 1px solid #ddd; 
@@ -692,7 +684,9 @@ body {  font-family: 'Malgun Gothic', 'Arial', sans-serif;
     align-items: center;
      margin-bottom: 10px; 
      font-weight: bold; 
-     color: #030303; }
+     color: #030303; 
+    font-size: 20px;
+    }
 .calendar-controls span { cursor: pointer; font-size: 18px; padding: 5px; }
 
 table { border-collapse: collapse; width: 100%; text-align: center; font-size: 13px; }
@@ -705,16 +699,13 @@ th, td { padding: 8px 0; width: 14.28%; cursor: pointer; border-radius: 5px; }
 }
 
 /* 토요일 (마지막 자식) */
-#calendarDropdown table th:last-child, 
-#calendarDropdown table td:last-child { 
-    color: rgb(51, 51, 245); 
+#calendarDropdown table th:nth-child(7), 
+#calendarDropdown table td:nth-child(7){ 
+    color: rgb(51, 51, 245) !important; 
 }
 
 /* 여행테마 영역 */
 
-
-
-/* 기본 스타일 (원래 제공된 스타일이 있다고 가정) */
 .theme-icon-container {
     text-align: center;
     cursor: pointer;
@@ -725,18 +716,14 @@ th, td { padding: 8px 0; width: 14.28%; cursor: pointer; border-radius: 5px; }
 .theme-icon {
     display: inline-flex; 
     justify-content: center;
-    align-items: center;
-    width: 60px; 
-    height: 60px; 
+    /* align-items: center; */
+    width: 70px; 
+    height: 70px; 
     border-radius: 50%;
     background-color: #f0f0f0;
     font-size: 24px;
     margin-bottom: 5px;
-    
-    /* 🚨 오버레이의 위치 기준점 */
     position: relative; 
-    
-    /* 🚨 오버레이가 아이콘 밖으로 나가지 않도록 설정 */
     overflow: hidden; 
 }
 
@@ -746,7 +733,6 @@ th, td { padding: 8px 0; width: 14.28%; cursor: pointer; border-radius: 5px; }
     top: 0;
     left: 0;
     
-    /* 🚨 부모(.theme-icon)의 크기에 맞춰 덮음 */
     width: 100%;
     height: 100%;
     
@@ -767,8 +753,6 @@ th, td { padding: 8px 0; width: 14.28%; cursor: pointer; border-radius: 5px; }
     transition: opacity 0.3s ease;
 }
 
-/* 4. 선택된 상태일 때 오버레이를 보이게 함 */
-/* 'selected' 클래스는 여전히 td.theme-icon-container에 있습니다. */
 .theme-icon-container.selected .selection-overlay {
     opacity: 1;
 }
@@ -783,10 +767,9 @@ th, td { padding: 8px 0; width: 14.28%; cursor: pointer; border-radius: 5px; }
 /* 선택되었을 때 유지할 스타일 (핵심) */
 .theme-icon-container.selected { 
     border-radius: 200px; 
-    border-color: rgb(19, 77, 43); /* 선택된 항목을 구분하기 위해 색상 변경 */
+    border-color: rgb(19, 77, 43); 
   
 }
-
 
 .calendar-footer { display: flex; justify-content: space-between; margin-top: 15px; }
 .calendar-footer button {
@@ -805,9 +788,6 @@ th, td { padding: 8px 0; width: 14.28%; cursor: pointer; border-radius: 5px; }
     margin-right: 20px;
     font-size: 18px;
 }
-
-
-
 
 /* --- 3. 여행 타입 드롭다운 --- */
 #tourDropdown {
@@ -874,19 +854,15 @@ th, td { padding: 8px 0; width: 14.28%; cursor: pointer; border-radius: 5px; }
     font-size: 30px;
 }
 
-
-
-
 /* 여행일정 리스트 */
-/* 여행 리스트 그리드 레이아웃 */
-.trip-list-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* 반응형 3열 레이아웃 */
-    gap: 20px;
+.trip-header-line {
+    display: flex;
+    align-items: center; 
+    margin-bottom: 0px; 
 }
 
-/* 개별 여행 아이템 카드 스타일 */
 .trip-item {
+    
     background: #fff;
     border: 1px solid #eee;
     border-radius: 12px;
@@ -894,11 +870,13 @@ th, td { padding: 8px 0; width: 14.28%; cursor: pointer; border-radius: 5px; }
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.trip-item h4 {
+.trip-item .trip-header-line h4 {
     color: #333;
     font-size: 18px;
     margin-top: 0;
-    margin-bottom: 10px;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
 }
 
 .trip-meta {
@@ -909,46 +887,56 @@ th, td { padding: 8px 0; width: 14.28%; cursor: pointer; border-radius: 5px; }
 
 .trip-tags span {
     display: inline-block;
-    background: #f0f8f0; /* 연한 녹색 배경 */
-    color: #5B8B7B;
+    
+    background: #f0f8f0; 
     font-size: 12px;
     padding: 3px 8px;
     border-radius: 15px;
     margin-right: 5px;
     margin-bottom: 5px;
 }
-
-.trip-rating {
-    font-size: 15px;
-    font-weight: bold;
-    color: #FFC107; /* 별점 색상 */
-    margin-top: 10px;
+.trip-tags{
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
     margin-bottom: 15px;
 }
 
+/* 도시/기간 정보 */
+.trip-item .trip-meta {
+    margin: 0;
+    flex-basis: 12%;
+    text-align: center;
+}
+
+/* 별점(Rating) */
+.trip-item .trip-rating {
+    margin: 0;
+    flex-basis: 5%;
+    text-align: right;
+    color: #FFC107; 
+    font-weight: bold;
+}
+
 .detail-btn {
-    width: 100%;
+    width: 40px;
     padding: 10px;
     background: #ffffff;
-    color: rgb(57, 109, 50);
-    border: 1px solid ;
-    border-radius: 8px;
-    border-color: rgb(57, 109, 50);
+    color: rgb(43, 96, 47);
+    border: 1px solid rgb(43, 96, 47);
+    border-radius: 10px;
     cursor: pointer;
     font-weight: bold;
     transition: background-color 0.2s;
+    text-align: center;
 }
 .detail-btn:hover {
     background-color: #39774d;
+    color: white;
 }
-
-
 
 /* 여행 리스트 그리드 레이아웃 */
 .trip-list-grid {
-    display: grid;
-    /* grid-template-columns: repeat(3, 1fr); */
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
     margin-bottom: 20px;
     position: relative;
@@ -976,17 +964,6 @@ th, td { padding: 8px 0; width: 14.28%; cursor: pointer; border-radius: 5px; }
     margin-bottom: 10px;
 }
 
-.trip-tags span {
-    display: inline-block;
-    background: #f0f8f0; /* 연한 녹색 배경 */
-    color: #5B8B7B;
-    font-size: 12px;
-    padding: 3px 8px;
-    border-radius: 15px;
-    margin-right: 5px;
-    margin-bottom: 5px;
-}
-
 .trip-rating {
     font-size: 15px;
     font-weight: bold;
@@ -995,85 +972,9 @@ th, td { padding: 8px 0; width: 14.28%; cursor: pointer; border-radius: 5px; }
     margin-bottom: 15px;
 }
 
-.detail-btn:hover {
-    background-color: #39774d;
-    color: white;
-}
-
-/* 일정 상세 정보 컨테이너 스타일 */
-.trip-detail-row {
-    position: absolute; 
-    top: 0;
-    left: 0; 
-    width: 1200px;
-    
-    z-index: 10; 
-
-    background: white; 
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-   
-    display: none;
-}
-
-.trip-detail-schedule {
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    
-    background-color: #ffffff; 
-    border-radius: 10px;
-    padding: 15px 20px;
-    margin-top: 20px; 
-    margin-bottom: 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-/* 일정 내용 스타일 */
-.schedule-content {
-    flex-grow: 1; 
-    font-size: 16px;
-    color: #333;
-    font-weight: bold;
-    line-height: 1.5;
-    margin-right: 20px; 
-}
-
-/* 선택 버튼 스타일 */
-.create-trip-btn {
-    background-color: #1b6f36; 
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    white-space: nowrap; 
-}
-
-
-/* 닫기 버튼 */
-.detail-btn-hide {
-    width: 100%;
-    padding: 10px;
-    background: #1b6f36; /* 기본 배경색 유지 */
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    text-align: center; /* 텍스트 정렬 */
-    transition: background-color 0.2s;
-}
-
-/* 닫기 버튼 호버 */
-.detail-btn-hide:hover {
-    background-color: #1f422a; 
-}
-
 /* 추천다시받기버튼 */
 .reload-btn{
-    background-color: #126d4c; 
+    background-color: #3b8469; 
     color: white;
     padding: 10px 15px;
     border: none;
@@ -1081,13 +982,15 @@ th, td { padding: 8px 0; width: 14.28%; cursor: pointer; border-radius: 5px; }
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;
+
 }
+
 
 /* 여행만들기 이미지 호버효과 */
 .button-area img{
-  --g: 0.1em;     /* the gap */
-  --b: 5px;    /* border thickness*/
-  --c: #1c7237; /* the color */
+  --g: 0.1em;    
+  --b: 5px;   
+  --c: #1c7237; 
   height: 100%;
   width: 100%;
   margin-left: 350px;
@@ -1113,3 +1016,24 @@ th, td { padding: 8px 0; width: 14.28%; cursor: pointer; border-radius: 5px; }
   filter: grayscale(0%);
 }
 
+#trip_photo{
+    width: 1200px;
+    height: 400px;
+    overflow: hidden;
+}
+.trip-container{
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+}
+
+.image-text{
+    position: absolute; 
+    top: 20%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+    color: white; 
+    text-align: center;
+    padding: 10px;
+    z-index: 10;
+}

@@ -26,15 +26,17 @@
         </li>
       </ul>
     </div>
-    <div id="header_profile">
-      {% if session["user"] %}
-      <!-- <a class="profile_wrap"><img src={{ url_for('static', filename='img/profile.png') }}></a> -->
-       홍길동 님
-      {% else %}
-      <a href="{{ url_for('login_bp.login_page') }}">
-          <button class="mocha_btn_1">로그인</button>
-      </a>
-      {% endif %}
+      <div id="header_profile">
+        {% if session.get('user_id') %}
+            <span class="user_name">{{ session['user_id'] }} 님</span>
+            <a href="{{ url_for('login_bp.logout') }}">
+              <button class="mocha_btn_1">로그아웃</button>
+            </a>
+        {% else %}
+            <a href="{{ url_for('login_bp.login_page') }}">
+                <button class="mocha_btn_1">로그인</button>
+            </a>
+        {% endif %}
     </div>
   </div>
 </div>
