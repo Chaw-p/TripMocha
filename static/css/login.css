@@ -156,7 +156,7 @@ button:hover,
     background: #eee;
 }
 
-/* 선택된 버튼 스타일 (선택 시 JS로 클래스 추가하면 됨) */
+/* 선택된 버튼 스타일  */
 .select-btn.selected {
     background: #006600;
     color: white;

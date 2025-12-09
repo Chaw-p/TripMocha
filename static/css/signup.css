@@ -1,53 +1,58 @@
-/* ======= 회원가입 박스 ======= */
+/* ==============================
+   회원가입 박스
+============================== */
 .signup-box {
     width: 500px;
     padding: 40px 45px;
+    margin: 0 auto;
 }
 
-/* ======= 성별/국적 선택 ======= */
+/* ==============================
+   성별 / 국적 선택
+============================== */
 
 .select-container {
     display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px;
     border: 1.5px solid #ddd;
     border-radius: 10px;
-    padding: 14px;
-    justify-content: space-between;
     margin-bottom: 20px;
-}
-
-.select-buttons {
-    width: 48%;
-    display: flex;
-    justify-content: space-between;
+    background: #fafafa;
 }
 
 .select-btn {
-    width: 48%;
+    flex: 1;
     height: 42px;
     background: #fff;
     border: 1.5px solid #ccc;
-    border-radius: 6px;
-    transition: 0.2s;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-size: 15px;
+    font-weight: 600;
 }
 
 .select-btn:hover {
-    background: #f1f1f1;
+    background: #f2f2f2;
 }
 
 .select-btn.selected {
-    background: #006600;
+    background: #00a84a;
     color: white;
-    border-color: #006600;
-    transform: scale(1.03);
-    box-shadow: 0 2px 8px #006600(0,150,70,0.3);
+    border-color: #008a3c;
+    transform: scale(1.04);
+    box-shadow: 0 3px 8px rgba(0, 150, 70, 0.25);
 }
 
-/* ======= 여행 스타일 선택 ======= */
+/* ==============================
+   여행 스타일 선택
+============================== */
 
 .style-label {
     font-size: 15px;
-    font-weight: 600;
-    margin-bottom: 8px;
+    font-weight: 700;
+    margin-bottom: 10px;
     display: block;
 }
 
@@ -59,11 +64,12 @@
 
 .style-btn {
     padding: 8px 18px;
-    background: #f4f4f4;
-    border: 2px solid #ccc;
     border-radius: 30px;
-    transition: 0.2s;
+    border: 2px solid #ccc;
+    background: #f4f4f4;
+    transition: all 0.2s ease;
     font-size: 14px;
+    cursor: pointer;
 }
 
 .style-btn:hover {
@@ -72,8 +78,8 @@
 
 .style-btn.selected {
     background: linear-gradient(135deg, #00a84a, #2ecc71);
-    border-color: #006600;
+    border-color: #009744;
     color: white;
-    box-shadow: 0 3px 10px rgba(0,150,70,0.3);
+    box-shadow: 0 3px 10px rgba(0, 150, 70, 0.3);
     transform: translateY(-2px);
 }
