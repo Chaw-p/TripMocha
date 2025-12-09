@@ -5,139 +5,155 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원가입</title>
-    <link rel="stylesheet" href="{{url_for('static', filename='css/login.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 
 <body>
-    <div class="login-container">
-        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="TripMocha 로고" class="tripmocha-logo">
+<div class="login-container">
+    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="TripMocha 로고" class="tripmocha-logo">
 
-        <main class="login-box w-full bg-white p-8 md:p-10 rounded-xl shadow-2xl">
-            <h2 class="text-2xl font-bold mb-8 text-gray-800">회원가입</h2>
+    <main class="login-box w-full bg-white p-8 md:p-10 rounded-xl shadow-2xl">
+        <h2 class="text-2xl font-bold mb-8 text-gray-800">회원가입</h2>
 
-            <form action="/signup" method="post" class="signup-form space-y-4">
+        <form action="/signup" method="post" class="signup-form space-y-4">
 
-                <!-- 아이디 (중복 확인 버튼 추가) -->
-                    <div class="input-group id-check-group flex space-x-2"> <input type="text" name="user_id" id="user_id" placeholder="아이디" required
-                        class="flex-grow px-4 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 transition duration-150"> <button type="button" id="check_duplicate_btn" class="id-check-btn whitespace-nowrap">
-                        중복 확인
-                        </button>
-                    </div>
-                <!-- 중복 확인 메시지 출력 영역 -->
-                <p id="id_check_message" class="text-sm mt-[-10px] mb-4 text-left pl-1 text-gray-500">
-                    아이디를 입력하고 중복 확인을 눌러주세요.
-                </p>
+            <!-- 아이디 -->
+            <div class="input-group id-check-group flex space-x-2">
+                <input type="text" name="user_id" id="user_id" placeholder="아이디" required
+                       class="flex-grow px-4 border border-gray-300 rounded-lg text-lg">
+                <button type="button" id="check_duplicate_btn" class="id-check-btn">중복 확인</button>
+            </div>
 
+            <p id="id_check_message" class="text-sm text-gray-500">
+                아이디를 입력하고 중복 확인을 눌러주세요.
+            </p>
 
-                <!-- 비밀번호 -->
-                <div class="input-group">
-                    <input type="password" name="password" id="password" placeholder="비밀번호" required
-                        class="px-4 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 transition duration-150"> 
-                </div>
+            <!-- 비밀번호 -->
+            <div class="input-group">
+                <input type="password" name="password" id="password" placeholder="비밀번호" required
+                       class="px-4 border border-gray-300 rounded-lg text-lg">
+            </div>
 
-                <div class="input-group">
-                    <input type="password" name="password_confirm" id="password_confirm" placeholder="비밀번호 확인" required
-                        class="px-4 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 transition duration-150">
-                </div>
-                <p id="password_match_message" class="text-sm mt-[-10px] mb-4 text-left pl-1 text-red-500 hidden">
-                    </p>
+            <div class="input-group">
+                <input type="password" name="password_confirm" id="password_confirm" placeholder="비밀번호 확인" required
+                       class="px-4 border border-gray-300 rounded-lg text-lg">
+            </div>
 
-                <!-- 이름 -->
-                <div class="input-group">
-                    <input type="text" name="name" placeholder="이름"
-                        class="px-4 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 transition duration-150">
-                </div>
+            <p id="password_match_message" class="text-sm mt-[-10px] mb-4 text-red-500 hidden"></p>
 
-                <!-- 생년월일 -->
-                <div class="input-group">
-                    <input type="text" name="birthday" id="birthday" placeholder="생년월일 8자리 (YYYYMMDD)"
-                        maxlength="8" required class="px-4 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 transition duration-150">
-                </div>
+            <!-- 이름 -->
+            <div class="input-group">
+                <input type="text" name="name" placeholder="이름" required
+                       class="px-4 border border-gray-300 rounded-lg text-lg">
+            </div>
 
-                <div>
-                    <div class="flex space-x-2 mb-2">
-                        <input type="text" id="postcode" name="postcode" placeholder="우편번호" readonly
-                            class="w-1/3 px-4 py-2 border border-gray-300 rounded-lg text-lg bg-gray-100" />
-                        
-                        <button type="button" id="search_address_btn"
-                            class="w-2/3 px-4 py-2 bg-blue-500 text-white rounded-lg text-lg hover:bg-blue-600 transition duration-150">
-                            주소 검색
-                        </button>
-                    </div>
+            <!-- 생년월일 -->
+            <div class="input-group">
+                <input type="text" name="birthday" id="birthday" maxlength="8" placeholder="생년월일 (YYYYMMDD)" required
+                       class="px-4 border border-gray-300 rounded-lg text-lg">
+            </div>
 
-                    <div class="input-group mb-2">
-                        <input type="text" id="address" name="address" placeholder="기본 주소" readonly
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 transition duration-150 bg-gray-100">
-                    </div>
+            <!-- 이메일 -->
+            <div class="input-group">
+                <input type="email" name="email" placeholder="이메일" required
+                       class="px-4 border border-gray-300 rounded-lg text-lg">
+            </div>
 
-                    <div class="input-group">
-                        <input type="text" id="detail_address" name="detail_address" placeholder="상세 주소 (예: 동/호수)"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 transition duration-150">
-                    </div>
-                </div>
+            <!-- 주소 -->
+            <div class="flex space-x-2 mb-2">
+                <input type="text" id="postcode" name="postcode" placeholder="우편번호" readonly class="w-1/3 px-4 py-2 border rounded bg-gray-100">
+                <button type="button" id="search_address_btn" class="w-2/3 px-4 py-2 bg-blue-500 text-white rounded-lg">주소 검색</button>
+            </div>
 
-                <!-- 성별 및 국적 선택 그룹 -->
-                <div class="input-group select-container">
+            <div class="input-group mb-2">
+                <input type="text" id="address" name="address" placeholder="기본 주소" readonly
+                       class="w-full px-4 py-2 border rounded bg-gray-100">
+            </div>
 
-                    <!-- 성별 그룹 -->
-                    <div class="select-buttons" id="gender-buttons">
-                        <button type="button" class="select-btn" data-value="M">남자</button>
-                        <button type="button" class="select-btn" data-value="F">여자</button>
-                        <input type="hidden" name="gender" id="selected-gender" required>
-                    </div>
+            <div class="input-group">
+                <input type="text" id="detail_address" name="detail_address" placeholder="상세 주소"
+                       class="w-full px-4 py-2 border rounded">
+            </div>
 
-                    <!-- 국적 그룹 -->
-                    <div class="select-buttons" id="nation-buttons">
-                        <button type="button" class="select-btn" data-value="domestic">내국인</button>
-                        <button type="button" class="select-btn" data-value="foreign">외국인</button>
-                        <input type="hidden" name="nation" id="selected-nation" required>
-                    </div>
+            <!-- 성별 -->
+            <label>성별</label>
+            <div id="gender-buttons" class="select-container">
+                <button type="button" class="select-btn" data-value="M">남자</button>
+                <button type="button" class="select-btn" data-value="F">여자</button>
+            </div>
+            <input type="hidden" id="selected-gender" name="gender" required>
 
-                </div>
+            <!-- 국적 -->
+            <label>국적</label>
+            <div id="nation-buttons" class="select-container">
+                <button type="button" class="select-btn" data-value="K">내국인</button>
+                <button type="button" class="select-btn" data-value="F">외국인</button>
+            </div>
+            <input type="hidden" id="selected-nation" name="nation" required>
 
-                <!-- <div class="input-group">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">여행 테마 선택 (최대 3개 필수)</label>
-                    
-                    <div class="select-buttons flex flex-wrap gap-2" id="theme-buttons">
-                        <button type="button" class="theme-select-btn select-btn" data-value="산">산</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="바다">바다</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="실내">실내</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="액티비티">액티비티</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="체험">체험</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="사진">사진</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="테마파크">테마파크</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="문화">문화</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="맛집">맛집</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="축제">축제</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="힐링">힐링</button>
-                        <button type="button" class="theme-select-btn select-btn" data-value="AI추천">AI추천</button>
-                    </div>
-                    
-                    <input type="hidden" name="themes" id="selected-themes" required> 
+            <!-- 여행 스타일 -->
+            <label class="style-label">선호 여행 스타일 (최대 4개)</label>
 
-                    <p id="theme-message" class="mt-2 text-sm text-red-500 hidden">최소 3개의 테마를 선택해주세요.</p>
-                </div> -->
+            <div id="style-container">
+                <button type="button" class="style-btn" data-value="spring_flower">🌸 봄꽃</button>
+                <button type="button" class="style-btn" data-value="summer_sea">☀️ 여름바다</button>
+                <button type="button" class="style-btn" data-value="autumn_leaf">🍁 가을단풍</button>
+                <button type="button" class="style-btn" data-value="winter_snow">❄️ 겨울눈</button>
+                <button type="button" class="style-btn" data-value="water_play">🏊 물놀이</button>
+                <button type="button" class="style-btn" data-value="trekking">🏃 운동/트레킹</button>
+                <button type="button" class="style-btn" data-value="food_tour">🍜 맛집</button>
+                <button type="button" class="style-btn" data-value="healing">🌿 힐링</button>
+                <button type="button" class="style-btn" data-value="night_view">🌙 야경</button>
+                <button type="button" class="style-btn" data-value="activity">🎢 체험/액티비티</button>
+            </div>
+                        <!-- 약관 동의 영역 -->
+            <div class="terms-box">
+                <!-- 전체 동의 -->
+                <label class="terms-all">
+                    <input type="checkbox" id="term_all">
+                    전체 동의
+                </label>
+                <hr>
+                <!-- (필수) 서비스 이용약관 -->
+                <label class="terms-item">
+                    <input type="checkbox" class="term-check required-term">
+                    [필수] 서비스 이용약관 동의
+                </label>
 
-                
-                    
+                <!-- (필수) 개인정보 수집·이용 -->
+                <label class="terms-item">
+                    <input type="checkbox" class="term-check required-term">
+                    [필수] 개인정보 수집 및 이용 동의
+                </label>
 
-                <!-- 휴대전화 번호 -->
-                <div class="input-group">
-                    <input type="text" name="phone" id="phone_number" placeholder="휴대전화 번호(010-1234-5678)"
-                        maxlength="13" required class="px-4 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 transition duration-150">
-                </div>
-                
-                <!-- 가입하기 버튼 -->
-                <button type="submit"
-                    class="login-btn w-full h-12 bg-indigo-600 text-white font-semibold text-lg rounded-lg shadow-md hover:bg-indigo-700 transition duration-200">
-                     가입하기
-                </button>
-            </form> 
-        </main>
-    </div>
-    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    <script src="{{ url_for('static', filename='js/signup.js') }}"></script>
+                <!-- (선택) 마케팅 수신 동의 -->
+                <label class="terms-item">
+                    <input type="checkbox" class="term-check optional-term">
+                    [선택] 마케팅 정보 수신 동의
+                </label>
+            </div>
+
+            <input type="hidden" name="travel_style" id="travel_style">
+
+            <!-- 가입하기 버튼 -->
+            <button type="submit" id="submit_btn"
+                    class="login-btn w-full h-12 bg-indigo-400 text-white font-semibold text-lg rounded-lg shadow-md">
+                가입하기
+            </button>
+
+        </form>
+
+        <div class="find-links">
+            <a href="{{ url_for('login_bp.login_page') }}">로그인</a>
+        </div>
+    </main>
+</div>
+
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="{{ url_for('static', filename='js/signup.js') }}"></script>
+
 </body>
-
 </html>
