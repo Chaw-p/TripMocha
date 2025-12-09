@@ -29,3 +29,6 @@ pip install bcrypt
 
 이메일
 ayj0519@gmail.com
+
+id : test
+pw : qwer1234
