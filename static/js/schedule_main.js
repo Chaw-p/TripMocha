@@ -15,7 +15,7 @@ $(function(){
     const $dateDropdown = $("#calendarDropdown");
     const $tourDropdown = $("#tourDropdown");
 
-    // ============================
+    // ============================+
     // 드롭다운 공통 처리
     // ============================
     function hideAllDropdowns() {
@@ -50,31 +50,61 @@ $(function(){
     // ============================
     // 1. 여행지 드롭다운 처리
     // ============================
-    $(".destination-item").on("click", function(){
-        const selectedText = $(this).data('destination');
-        const [city, province] = selectedText.split(' ');
+   $(".destination-item").on("click", function(){
+    const $item = $(this);
+    const selectedText = $item.data('destination'); // 예: "경주시 경상북도"
+    const selectedAdmCode = $item.data('code');     // 📌 ADM Code 추출 (추가됨)
+    const [city, province] = selectedText.split(' ');
+    
+    // 1. 상단 표시 업데이트 (기존 로직 유지)
+    $("#destinationItem .selected-city").text(city.replace('', ''));
+    $("#destinationItem .selected-province").text(province);
+    $("#destinationItem .sub-label").text("");
+
+    // 2. 🔑 세션 스토리지 업데이트 (ADM Code 및 도시 정보 저장)
+    const currentDataJson = sessionStorage.getItem('currentSearchData') || '{}';
+    let searchData;
+    
+    try {
+        searchData = JSON.parse(currentDataJson);
+    } catch (e) {
+        console.error("세션 데이터 파싱 오류:", e);
+        searchData = {}; // 파싱 실패 시 초기화
+    }
+    
+    // 필수 키 (adm_code)와 구조화된 정보 (destination) 업데이트
+    searchData.adm_code = selectedAdmCode;
+    searchData.destination = {
+        city: city.replace('', ''),
+        province: province
+    };
+    
+    // 세션에 저장
+    try {
+        sessionStorage.setItem('currentSearchData', JSON.stringify(searchData));
+        console.log("✅ ADM Code가 세션에 저장됨:", selectedAdmCode);
         
-        // 상단 표시 업데이트
-        $("#destinationItem .selected-city").text(city.replace('', ''));
-        $("#destinationItem .selected-province").text(province);
-        $("#destinationItem .sub-label").text("");
-
-        // ✅ 여행지 변경 시 버튼 활성화
-        activateAddButton();
-        // 드롭다운 닫기
-        hideAllDropdowns();
-    });
-
+        // **중요:** 이 항목에 .selected 클래스를 추가하여 'search-button'에서 읽을 수 있도록 합니다.
+        // 하지만 세션에 직접 저장했으므로, 이 클릭 이벤트는 DOM 클래스 대신 세션 저장이 주 목표가 됩니다.
+        
+    } catch (e) {
+        console.error("ADM Code 세션 저장 오류:", e);
+    }
+    
+    // 3. UI 제어 (기존 로직 유지)
+    activateAddButton();
+    hideAllDropdowns();
+});
 
     // ============================
     // 2. 날짜 (2개 달력) 처리
     // ============================
     let today = new Date();
-let currentMonth = today.getMonth();
-let currentYear = today.getFullYear();
-let startDate = null;
-let endDate = null;
-const $dateDropdownn = $("#calendarDropdown"); // 드롭다운 변수 선언
+    let currentMonth = today.getMonth();
+    let currentYear = today.getFullYear();
+    let startDate = null;
+    let endDate = null;
+    const $dateDropdownn = $("#calendarDropdown"); // 드롭다운 변수 선언
 
 function formatDate(year, month, day) {
     // ... (기존 formatDate 함수 유지) ...
@@ -249,38 +279,58 @@ function applySelectedDatesToSearchUI() {
 // ============================
 $(".search-button").on("click", function() {
     const $addButton = $(this);
+  
+    const $selectedDestination = $("#destinationDropdown .destination-item.selected");
+    const admCode = $selectedDestination.length ? $selectedDestination.data('code') : null;
     
-    // 1. 현재 검색창에 표시된 모든 데이터 수집
+    
+    const durationText = $("#dateItem .selected-duration").text();
+    let durationDays = 0;
+    
+    if (durationText) {
+        const parts = durationText.split(' ');
+        if (parts.length > 1 && parts[1].endsWith('일')) {
+            try {
+                durationDays = parseInt(parts[1].replace('일', ''), 10);
+            } catch (e) {
+                durationDays = 1;
+            }
+        } else if (durationText.includes('당일')) {
+            durationDays = 1;
+        }
+    }
+    
+    const themeTags = Array.from(document.querySelectorAll('.select-btn.selected'))
+                          .map(el => el.getAttribute('data-theme'));
+
     const searchData = {
-        
+        adm_code: admCode, 
+        duration_days: durationDays, 
+        theme_tags: themeTags, 
         destination: {
             city: $("#destinationItem .selected-city").text(),
             province: $("#destinationItem .selected-province").text()
         },
         
-        // 날짜 정보 수집 (#dateItem)
         date: {
             startDate: startDate, 
-            endDate: endDate,     
+            endDate: endDate, 
             display: $("#dateItem .selected-dates").text(),
-            duration: $("#dateItem .selected-duration").text()
+            durationText: durationText 
         },
         
-        // 인원 정보 수집 (#tourTypeItem)
         personnel: {
             type: selectedPersonnelType, 
-            count: personnelCount,       
+            count: personnelCount, 
             display: `${selectedPersonnelType} ${personnelCount}인`
         }
     };
     
-    // 2. 모든 필수 필드가 선택되었는지 확인 (선택 사항)
-    if (!searchData.destination.city || !searchData.date.startDate || searchData.personnel.count < 1) {
-        alert("여행지, 여행일, 인원을 모두 선택해주세요.");
+    if (!searchData.adm_code || searchData.duration_days < 1 || searchData.personnel.count < 1 || searchData.theme_tags.length < 2) {
+        alert("⚠️ 여행지, 여행일(최소 1일), 인원, 테마(최소 2개)를 모두 선택해주세요.");
         return; 
     }
-    
-    // 3. 데이터를 JSON 문자열로 변환하여 세션 스토리지에 저장
+
     try {
         sessionStorage.setItem('currentSearchData', JSON.stringify(searchData));
         console.log("검색 데이터가 세션에 저장되었습니다:", searchData);
@@ -290,15 +340,14 @@ $(".search-button").on("click", function() {
         return;
     }
 
-    // 4. 저장 성공 시, 추가 버튼 비활성화 및 스타일 변경 (선택 사항)
+    // 7. 저장 성공 후 피드백
     $addButton.prop("disabled", true).text("완료").css({
         "opacity": 1,
         "cursor": "default"
     });
     
-    alert("검색 조건이 저장되었습니다.");
+    alert("검색 조건이 저장되었습니다. 이제 '여행 만들기' 버튼을 눌러주세요.");
 });
-
 
 
 // ============================
@@ -528,17 +577,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const maxSelection = 4;
     const messageElement = document.getElementById('selection-message');
 
+    // 세션에 테마 데이터를 저장/업데이트하는 함수
+    const saveThemesToSession = () => {
+        // 현재 선택된 모든 테마의 data-theme 값을 배열로 수집
+        const selectedThemes = Array.from(document.querySelectorAll('.select-btn.selected'))
+                                    .map(el => el.getAttribute('data-theme'));
+
+        // 기존의 세션 데이터를 불러옵니다. (없으면 빈 객체)
+        const currentDataJson = sessionStorage.getItem('currentSearchData') || '{}';
+        let searchData;
+        try {
+            searchData = JSON.parse(currentDataJson);
+        } catch (e) {
+            console.error("세션 데이터 파싱 오류:", e);
+            searchData = {};
+        }
+
+        searchData.theme_tags = selectedThemes;
+
+        try {
+            sessionStorage.setItem('currentSearchData', JSON.stringify(searchData));
+            console.log("테마 정보가 세션에 업데이트되었습니다:", searchData.theme_tags);
+        } catch (e) {
+            console.error("세션 스토리지 저장 오류:", e);
+        }
+        
+        return selectedThemes.length;
+    };
+
     buttons.forEach(button => {
         button.addEventListener('click', () => {
             const isSelected = button.classList.contains('selected');
             const currentSelected = document.querySelectorAll('.select-btn.selected').length;
+            let finalSelected;
 
             if (isSelected) {
                 button.classList.remove('selected');
+                finalSelected = saveThemesToSession(); 
                 messageElement.textContent = ''; 
             } else {
                 if (currentSelected < maxSelection) {
                     button.classList.add('selected');
+                    finalSelected = saveThemesToSession(); 
                     messageElement.textContent = ''; 
                 } else {
                     messageElement.textContent = `⚠️ 테마는 최대 ${maxSelection}개까지만 선택할 수 있습니다.`;
@@ -546,9 +626,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            const finalSelected = document.querySelectorAll('.select-btn.selected').length;
+            // 메시지 업데이트 로직
             if (finalSelected > 0 && finalSelected < minSelection) {
                 messageElement.textContent = `⚠️ 테마는 최소 ${minSelection}개 이상 선택해야 합니다. (현재 ${finalSelected}개)`;
+                messageElement.style.color = 'red'; // 색상 강조
             } else if (finalSelected >= minSelection) {
                 messageElement.textContent = `✅ ${finalSelected}개의 테마가 선택되었습니다.`;
                 messageElement.style.color = 'green';
@@ -581,79 +662,129 @@ $(document).ready(function() {
     const cityPrefix = savedCity ? `[${savedCity}] ` : '추천 ';
 
 
-    // 2. 임시 여행 리스트 데이터 
-    const dummyTripData = [
-        { id: 1, title: "추천여행", city: "전주시", period: "2박 3일", tags: ["역사", "맛집", "산책"], rating: 4.5 },
-        { id: 2, title: "추천여행", city: "전주시", period: "1박 2일", tags: ["힐링", "전통시장", "맛집"], rating: 4.8 },
-        { id: 3, title: "추천여행", city: "전주시", period: "3박 4일", tags: ["액티비티", "바다", "사진"], rating: 4.2 }
-    ];
+    // // 3. '여행 만들기' 버튼 클릭 이벤트 내에서 제목 수정 적용
+$('.button-make-travel').on('click', function(e) {
+    e.preventDefault(); 
 
-    // 3. '여행 만들기' 버튼 클릭 이벤트 내에서 제목 수정 적용
-    $('.button-make-travel').on('click', function(e) {
-        e.preventDefault(); 
+    const $resultArea = $('#result-area');
+    // 로딩 메시지 표시
+    $resultArea.html('<p style="text-align: center; color: #5B8B7B; font-weight: bold;">여행을 만드는 중입니다...</p>');
 
-        const $resultArea = $('#result-area');
-        $resultArea.html('<p style="text-align: center; color: #5B8B7B; font-weight: bold;">여행을 만드는 중입니다...</p>');
+    // 1. 세션 스토리지에서 검색 데이터 불러오기
+    const searchDataJson = sessionStorage.getItem('currentSearchData');
+    if (!searchDataJson) {
+        $resultArea.html('<p style="text-align: center; color: red;">⚠️ 검색 데이터가 세션에 없습니다. 다시 선택해주세요.</p>');
+        return;
+    }
+    
+    let requestData;
+    try {
+        requestData = JSON.parse(searchDataJson);
+    } catch (error) {
+        $resultArea.html('<p style="text-align: center; color: red;"> 데이터 로드 중 오류가 발생했습니다.</p>');
+        console.error("세션 데이터 파싱 오류:", error);
+        return;
+    }
 
-        
-        // 가짜 AJAX 요청 
-        setTimeout(function() {
-            const finalTripData = savedCity 
-            ? dummyTripData.filter(trip => trip.city === savedCity)
-            : dummyTripData;
-            
-        // 필터링 결과가 없으면 (전주를 선택했는데 전주 관련 데이터가 없다면)
-        if (finalTripData.length === 0 && savedCity) {
-            // 임시로 더미 데이터를 사용하되, city 정보를 savedCity로 강제 덮어씁니다.
-             finalTripData.push(...dummyTripData.map(trip => ({ 
-                ...trip, 
-                city: savedCity 
-            })));
+    // 2. ADM 코드 유효성 검사 (필수 입력값)
+    const admCode = requestData.adm_code; 
+    if (!admCode) {
+        $resultArea.html('<p style="text-align: center; color: red;"> 여행지가 선택되지 않았습니다.</p>');
+        return;
+    }
+    
+    const cityPrefix = requestData.destination && requestData.destination.city 
+                       ? requestData.destination.city 
+                       : '추천';
+    
+    // 3. 실제 AJAX 요청 (fetch API 사용 , 비동기)
+    fetch('/schedule/recommend', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => {
+        // HTTP 응답 상태 확인
+        if (!response.ok) {
+            throw new Error(`서버 응답 오류: ${response.status}`);
         }
-
-            let listHtml = `
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                <h3 style="color: #333; margin: 0;">${cityPrefix} 추천 여행 리스트</h3>
-                <button class="reload-btn">추천 다시 받기</button>
-            </div>
-            `;
-
-            finalTripData.forEach(trip => {
+        return response.json();
+    })
+    .then(data => {
+        // 4. 응답 데이터 처리 및 HTML 렌더링
+        if (data.success && data.recommended_trips) {
             
-            let baseTitle = trip.title;
-            if (savedCity) {
-               
-                baseTitle = baseTitle.replace('군산 ', '').replace('전주 ', '').replace('군산', '').replace('전주', '').trim();
+            const recommendedTrips = data.recommended_trips;
+            
+            if (recommendedTrips.length === 0) {
+                 $resultArea.html(`
+                    <p style="text-align: center; color: #333; font-weight: bold;">
+                        선택하신 조건(${cityPrefix})에 맞는 여행지를 찾지 못했습니다.
+                    </p>
+                `);
+                return;
             }
-            const newTitle = savedCity ? `${savedCity} ${baseTitle}` : trip.title;
-            
-            const displayCity = savedCity || trip.city;
-          
-            listHtml += `
-               <div class="trip-item">
-            
-                    <div class="trip-header-line"> <h4>${newTitle}</h4>
-                        <p class="trip-meta">${displayCity} | ${trip.period}</p> 
-                        <p class="trip-rating">⭐ ${trip.rating}</p>
-                    </div>
-                    <div class="trip-schedule">1.여수 오동도 -> 여수횟집 -> 아쿠아리움 -> 여수카페 -> 여수호텔</div>
-                    <div class="trip-tags">
-                        <div class="tag-group"> 
-                            ${trip.tags.map(tag => `<span>#${tag}</span>`).join('')}
-                        </div>
-                        <a href="/schedule/view" class="detail-btn">선택</a>
-                    </div>
-                    
+
+            // 5. HTML 리스트 생성 시작
+            let listHtml = `
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                    <h3 style="color: #333; margin: 0;">${cityPrefix} 추천 여행 리스트 (${recommendedTrips.length}개)</h3>
+                    <button class="reload-btn">추천 다시 받기</button>
                 </div>
             `;
-        });
+            
+            recommendedTrips.forEach(trip => {
+                // travel_df의 컬럼명과 일치
+                
+                const title = `${cityPrefix}` + "여행";
+                const displayCity = `${trip.SIDO_NM || ''} ${cityPrefix || ''}`; 
+                
+                // 별점
+                const rating = (trip.SCORE ).toFixed(1); 
+                
+                // trip.TAGS 
+                const tags = trip.TAGS ? trip.TAGS.split(',') : ['추천', '여행']; 
+                
+                const scheduleItems = trip.RELATED_PLACES; 
+                const scheduleHtml = scheduleItems.map(place => {
+                return `<div class="trip-schedule">${place}</div>`;
+                }).join('');
 
-        listHtml += '</div>'; 
-        
-        $resultArea.html(listHtml);
+            
+                listHtml += `
+                    <div class="trip-item">
+                        <div class="trip-header-line"> 
+                            <h4>${title}</h4>
+                            <p class="trip-meta">${displayCity} | ${trip.DURATION}일</p> 
+                            <p class="trip-rating">⭐ ${rating}</p>
+                        </div>
+                        
+                        <div class="trip-schedule">${scheduleHtml} </div>
+                        
+                        <div class="trip-tags">
+                            <div class="tag-group"> 
+                                ${tags.map(tag => `<span>#${tag}</span>`).join('')}
+                            </div>
+                            <a href="/schedule/view/${trip.CONTENT_ID}" class="detail-btn">선택</a>
+                        </div>
+                    </div>
+                `;
+            });
 
-    }, 1000); 
+            listHtml += '</div>'; 
+            $resultArea.html(listHtml);
+            
+        } else {
+            $resultArea.html(`<p style="text-align: center; color: red;">추천 실패: ${data.error || data.message || '알 수 없는 오류'}</p>`);
+        }
+    })
+    .catch(error => {
+        // 통신 오류 처리
+        $resultArea.html('<p style="text-align: center; color: red;">서버 통신 중 심각한 오류가 발생했습니다.</p>');
+        console.error('Fetch Error:', error);
+    });
 });
-  
 
 });
