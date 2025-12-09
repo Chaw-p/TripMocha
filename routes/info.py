@@ -38,9 +38,18 @@ def info():
         items = []
         items = APIService().SearchArea(tag)
     else:
-      items = APIService().SearchKeyword(keyword=query)
+      # lclsSystm1_list = [ "AC", "C01", "EV", "EX", "FD", "HS", "LS", "NA", "SH", "VE" ]
+      lclsSystm1_list = ["EX", "FD", "HS", "LS", "NA", "SH", "VE" ]
+      all_items = []
+
+      for lclsSystm1 in  lclsSystm1_list :
+        dicts = {}
+        dicts["name"] = lclsSystm1
+        items = APIService().SearchKeyword(keyword=query, lclsSystm1 = lclsSystm1)
+        dicts["value"] = items
+        all_items.append(dicts)
   
-  return render_template("info/info.html", query=query, items = items)
+  return render_template("info/info.html", query=query, items = all_items)
 
 @info_bp.route("/<int:info_no>")
 def detail(info_no):

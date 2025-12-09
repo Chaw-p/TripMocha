@@ -27,21 +27,24 @@
               </h2>
               <ul class="travel_list">
                 {% for item in items %}
-                <li>
-                  <a href="/info/{{item.id}}">
-                    <img src="{{item.image}}">
-                  </a>
-                  <div class="list_cont">
-                    <h3 class="title">
-                      <a href="/info/{{item.id}}">{{item.title}}</a>
-                    </h3>
-                    <p class="loc">{{item.addr1}}</p>
-                    <p class="hash">
-                      <a href="{{ url_for('info.info',query='#%s' % item.contenttypeid) }}"><span>#{{item.contenttypeid}}</span></a>
-                      <a href="{{ url_for('info.info',query='#%s' % item.areacode) }}"><span>#{{item.areacode}}</span></a>
-                    </p>
-                  </div>
-                </li>
+                  <p>{{item.name}}</p>
+                  {% for i in item.value %}
+                  <li>
+                    <a href="/info/{{i.id}}">
+                      <img src="{{i.image}}">
+                    </a>
+                    <div class="list_cont">
+                      <h3 class="title">
+                        <a href="/info/{{i.id}}">{{i.title}}</a>
+                      </h3>
+                      <p class="loc">{{i.addr1}}</p>
+                      <p class="hash">
+                        <a href="{{ url_for('info.info',query='#%s' % i.contenttypeid) }}"><span>#{{i.contenttypeid}}</span></a>
+                        <a href="{{ url_for('info.info',query='#%s' % i.areacode) }}"><span>#{{i.areacode}}</span></a>
+                      </p>
+                    </div>
+                  </li>
+                  {% endfor %}
                 {% endfor %}
                 <li>
                   <a href="/info/1">

@@ -116,8 +116,10 @@ class APIService :
     #item = [item for item in item_data if item_data.get("code") == areaCode]
     if item is not None:
       item_name = item.get("name")
+      print("지역:", areacode)
       return item_name
     else:
+      print("지역:", areacode)
       return "지역 미확인"
 
   def AREA_NAME_MAPPING(self,areaname) :
@@ -164,11 +166,14 @@ class APIService :
     return data
 
   # 키워드로 조회
-  def SearchKeyword(self, keyword="") :
+  def SearchKeyword(self, keyword="", lclsSystm1="AC") :
     url_key = f"searchKeyword2"
     param = {
       "pageNo": "1",
       "arrange": "O",
+      "numOfRows": "5",
+      #"lclsSystm1" : {"AC", "EV", "EX", "FD", "HS", "LS", "NA", "SH", "VE"},
+      "lclsSystm1" : lclsSystm1,
       "keyword": keyword
     }
     
@@ -195,6 +200,7 @@ class APIService :
     #print(data)
     return datas
 
+  #지역으로 찾기
   def SearchArea(self, area=None, type=None) :
     url_key = f"areaBasedList2"
     param = {

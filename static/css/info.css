@@ -145,7 +145,7 @@
 
   width: 135px;
   height: 35px;
-  border: 2px solid var(--mocha-font-color);
+  border: 2px solid rgb(107, 187, 212);
   border-radius: 5px;
   color: var(--mocha-font-color);
   background-color: transparent;
@@ -237,7 +237,7 @@
 /* 포스터 내부 이미지 스타일 */
 .festival_list .poster_wrap img {
  width: 100%;
- height: auto;
+ height: 460px;
  display: block;
 }
 
