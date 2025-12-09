@@ -22,3 +22,9 @@ pip install google-genai
 pip install flask_cors
 
 
+2025-12-09 이거 하나 설치 하면 됌
+pip install bcrypt
+
+
+이메일
+ayj0519@gmail.com

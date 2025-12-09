@@ -9,6 +9,26 @@ from email.mime.text import MIMEText
 from email.header import Header
 from email.utils import formataddr
 import random
+from flask import g
+import bcrypt
+import traceback
+import pymysql
+
+# -------------------------------------------------
+# MySQL 직접 연결용 함수 (get_db)
+# -------------------------------------------------
+def get_db():
+    if "db" not in g:
+        g.db = pymysql.connect(
+            host="192.168.60.133",
+            user="tripmocha",
+            password="ezen",
+            database="tripmocha",
+            charset="utf8mb4",
+            cursorclass=pymysql.cursors.Cursor
+        )
+    return g.db
+
 
 # Blueprint 정의
 login_bp = Blueprint('login_bp', __name__)
@@ -141,51 +161,117 @@ def index_page():
 # 7. 로그인 폼 처리 라우트: /login (POST 요청)
 @login_bp.route('/login', methods=['POST'])
 def process_login():
-    print("=== 로그인 라우트 실행됨 ===")  # 추가
-
     user_id = request.form.get("user_id")
-    print("받은 아이디:", user_id)  # 추가
+    password = request.form.get("password")
 
-    session["user_id"] = user_id
-    print("세션 저장됨:", session.get("user_id"))  # 추가
+    try:
+        db_conn = get_db()
+        cursor = db_conn.cursor()
 
-    return redirect(url_for('login_bp.index_page'))
+        # 해당 아이디의 비밀번호 해시 가져오기
+        cursor.execute("""
+            SELECT password
+            FROM users
+            WHERE user_id = %s
+        """, (user_id,))
+        row = cursor.fetchone()
 
-@login_bp.route('/index')
-def travel_plan_ui():
-    return render_template('index.html')
+        if not row:
+            return """
+                <script>
+                    alert("존재하지 않는 아이디입니다.");
+                    history.back();
+                </script>
+            """
+
+        stored_hashed_pw = row[0]
+
+        #  입력 비번 vs 해시 비교
+        if bcrypt.checkpw(password.encode('utf-8'),
+                          stored_hashed_pw.encode('utf-8')):
+            session['user_id'] = user_id
+            print(" 로그인 성공:", user_id)
+            return redirect(url_for('login_bp.index_page'))
+        else:
+            return """
+                <script>
+                    alert("비밀번호가 일치하지 않습니다.");
+                    history.back();
+                </script>
+            """
+
+    except Exception as e:
+        print("로그인 오류:", e)
+        return """
+            <script>
+                alert("서버 오류가 발생했습니다.");
+                history.back();
+            </script>
+        """
 
 
 
-
-@login_bp.route('/find_id_process', methods=['POST'])
-def find_id_process():
-    # TODO: 아이디 찾기 로직 구현 필요
-    return jsonify({"message": "아이디 찾기 처리 완료 (로직 구현 필요)"})
-
-
-@login_bp.route('/find_password_process', methods=['POST'])
-def find_password_process():
-    # TODO: 비밀번호 찾기 로직 구현 필요
-    return jsonify({"message": "비밀번호 찾기 처리 완료 (로직 구현 필요)"})
 
 # 8. 회원가입 폼 처리 라우트: /signup (POST 요청)
 @login_bp.route('/signup', methods=['POST'])
 def process_signup():
-    """회원가입 폼 제출을 처리하고 성공 시 로그인 페이지로 리다이렉트합니다."""
-    data = request.form
-    
-    # TODO: DB 저장 로직 구현 필요
-    print(f"회원가입 데이터 수신: {data.get('user_id')}")
+    user_id = request.form.get("user_id")
+    password = request.form.get("password")
+    name = request.form.get("name")
+    birthday = request.form.get("birthday")
+    email = request.form.get("email")
+    phone = request.form.get("phone")
+    gender = request.form.get("gender")
+    nation = request.form.get("nation")
+    postcode = request.form.get("postcode")
+    address = request.form.get("address")
+    detail_address = request.form.get("detail_address")
+    travel_style = request.form.get("travel_style")
 
-    return redirect(url_for('.login_page'))
+    try:
+        # 🔐 비밀번호 암호화
+        hashed_pw = bcrypt.hashpw(password.encode('utf-8'),
+                                  bcrypt.gensalt()).decode('utf-8')
+
+        db_conn = get_db()
+        cursor = db_conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO users
+            (user_id, password, name, birthday, email, phone, gender, nation,
+             postcode, address, detail_address, travel_style)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            user_id, hashed_pw, name, birthday, email, phone,
+            gender, nation, postcode, address, detail_address, travel_style
+        ))
+
+        db_conn.commit()
+        print(" 회원가입 & 비밀번호 암호화 저장 완료")
+
+        # 회원가입 후 자동 로그인
+        session['user_id'] = user_id
+        return redirect(url_for("login_bp.index_page"))
+
+    except Exception as e:
+        print("===== 회원가입 오류 발생! =====")
+        traceback.print_exc()   # 🔥 전체 에러 로그 출력
+        print("===== 오류 끝 =====")
+
+        return """
+            <script>
+                alert("회원가입 중 오류가 발생했습니다.");
+                history.back();
+            </script>
+        """
+
+
+
 
 @login_bp.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('login_bp.login_page'))
-
-
+    return redirect(url_for('index'))
 
 # ----------------------------------------------------
 # B-1. 아이디 중복 확인 라우팅 (AJAX용)
@@ -199,21 +285,108 @@ def check_id_exists_in_db(user_id):
     # 예시: 'admin', 'testuser' 아이디는 이미 존재한다고 가정
     return user_id in ['admin', 'testuser']
 
-@login_bp.route('/check_duplicate', methods=['POST'])
-def check_duplicate():
-    """
-    프론트엔드의 AJAX 요청을 받아 아이디 중복 여부를 확인하고 JSON 응답을 반환합니다.
-    """
-    user_id = request.form.get('user_id') 
-    
-    if not user_id:
-        return jsonify({'error': '아이디를 입력해 주세요.'}), 400
+@api_bp.route('/api/check_userid', methods=['POST'])
+def check_userid():
+    user_id = request.form.get("user_id")
 
-    is_duplicate = check_id_exists_in_db(user_id)
-    
-    return jsonify({
-        'is_duplicate': is_duplicate 
-    })
+    if not user_id:
+        return jsonify({"exists": True})
+
+    try:
+        db_conn = get_db()
+        cursor = db_conn.cursor()
+
+        cursor.execute("SELECT user_id FROM users WHERE user_id = %s", (user_id,))
+        row = cursor.fetchone()
+
+        if row:
+            return jsonify({"exists": True})  # 이미 존재
+        else:
+            return jsonify({"exists": False}) # 사용 가능
+
+    except Exception as e:
+        print("아이디 중복확인 오류:", e)
+        return jsonify({"exists": True})  # 오류 시 안전하게 '중복' 처리
+
+
+
+@login_bp.route('/find_id_process', methods=['POST'])
+def find_id_process():
+    name = request.form.get("name")
+    birthday = request.form.get("birthday")
+    email = request.form.get("email")
+
+    print("아이디 찾기 요청:", name, birthday, email)
+
+    try:
+        db = get_db()
+        cursor = db.cursor()
+
+        cursor.execute("""
+            SELECT user_id 
+            FROM users
+            WHERE name = %s AND birthday = %s AND email = %s
+        """, (name, birthday, email))
+
+        result = cursor.fetchone()
+
+        if result:
+            user_id = result[0]
+            return f"""
+                <script>
+                    alert("고객님의 아이디는 '{user_id}' 입니다!");
+                    window.location.href = "/login";
+                </script>
+            """
+        else:
+            return """
+                <script>
+                    alert("일치하는 정보를 찾을 수 없습니다.");
+                    history.back();
+                </script>
+            """
+
+    except Exception as e:
+        print("아이디 찾기 오류:", e)
+        return """
+            <script>
+                alert("서버 오류가 발생했습니다.");
+                history.back();
+            </script>
+        """
+
+
+
+@login_bp.route('/reset_password', methods=['POST'])
+def reset_password():
+    user_id = request.form.get("user_id")
+    new_password = request.form.get("new_password")
+
+    try:
+        # 🔐 비밀번호 해싱 (회원가입과 동일하게)
+        hashed_pw = bcrypt.hashpw(new_password.encode('utf-8'),
+                                  bcrypt.gensalt()).decode('utf-8')
+
+        db = get_db()
+        cursor = db.cursor()
+
+        cursor.execute("""
+            UPDATE users
+            SET password = %s
+            WHERE user_id = %s
+        """, (hashed_pw, user_id))
+
+        db.commit()
+
+        return jsonify({"success": True})
+
+    except Exception as e:
+        print("비밀번호 변경 오류:", e)
+        return jsonify({"success": False, "message": "비밀번호 변경 실패"}), 500
+
+
+
+
 
 
 # ----------------------------------------------------

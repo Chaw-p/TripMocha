@@ -238,7 +238,7 @@ $(document).ready(function() {
         };
 
         // 서버에 비밀번호 재설정 요청 (AJAX)
-        $.post('/user/reset_password', postData, function(response) { 
+        $.post('/reset_password', postData, function(response) { 
             
             //  [추가] response 유효성 검사
             if (!response || response === null) {
@@ -263,4 +263,21 @@ $(document).ready(function() {
             hideButtonLoading($submitBtn, true);
         });
     });
+});
+
+
+$("#reset_btn").on("click", function () {
+    let pw = $("#new_password").val();
+    let pw2 = $("#new_password_check").val();
+
+    if (pw.length < 8) {
+        alert("비밀번호는 8자 이상이어야 합니다.");
+        return;
+    }
+    if (pw !== pw2) {
+        alert("비밀번호가 일치하지 않습니다.");
+        return;
+    }
+
+    $("#find-password-form").submit();  // ← 비밀번호 변경 API 호출
 });
