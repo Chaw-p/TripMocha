@@ -1,12 +1,3 @@
-<script>
-function DoSearch()
-{
-  $("#waitMsg").html("[" + $("#query").val() + "]에 대해서 검색중입니다. 잠시만 기다려 주세요.......^^;")
-  $("#waitMsg").css("display","");
-  return true;
-}
-
-</script>
 <div id="search_wrap">
   <div id="search_area">
     <form id="sform" name="search" method="get" action="/info" onsubmit="return DoSearch();">

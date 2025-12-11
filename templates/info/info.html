@@ -6,43 +6,71 @@
   <title>TripMocha</title>
   {% include 'config/config.html' %}
   <link rel="stylesheet" href="{{url_for('static', filename='css/info.css')}}">
+  <script src="{{url_for('static', filename='js/info.js')}}"></script>
 </head>
 <body>
+  <style>
+    div > p.hash > a.selected_hash
+    {
+      background: #568e86;
+    }
+  </style>  
   <div id="wrap">
     {% include 'config/header.html' %}
+    <div id="waitMsg">
+    <img src="../static/img/icons8-loading-96.gif">
+    </div>
     <div id="container">
+      
       <div id="contents">
         <div class="cont">
             <div id="menu">
               <span class="menu_title">검색 조건</span>
-              <ul>
-                <li><a href="/info?query=#전체">키워드</a></li>
-                <li><a href="{{ url_for('info.info',query='#%s' % query) }}">해쉬</a></li>
+              <ul class="search_condi">
+                  {% set current_type = type %}
+                  <li><a href="{{ url_for('info.info', type='AC') }}" {% if current_type == 'AC' %}class="selected_type"{% endif %}>숙박</a></li>
+                  <li><a href="{{ url_for('info.info', type='EX') }}" {% if current_type == 'EX' %}class="selected_type"{% endif %}>체험</a></li>
+                  <li><a href="{{ url_for('info.info', type='FD') }}" {% if current_type == 'FD' %}class="selected_type"{% endif %}>음식</a></li>
+                  <li><a href="{{ url_for('info.info', type='HS') }}" {% if current_type == 'HS' %}class="selected_type"{% endif %}>역사</a></li>
+                  <li><a href="{{ url_for('info.info', type='NA') }}" {% if current_type == 'NA' %}class="selected_type"{% endif %}>자연</a></li>
+                  <li><a href="{{ url_for('info.info', type='SH') }}" {% if current_type == 'SH' %}class="selected_type"{% endif %}>쇼핑</a></li>
+                  <li><a href="{{ url_for('info.info', type='VE') }}" {% if current_type == 'VE' %}class="selected_type"{% endif %}>문화</a></li>
               </ul>
             </div>
             <div id="section">
-              <span id="waitMsg" style="display:none;color:red;">여행지를 조회중입니다. 잠시 기다려 주세요.....</span>
+              
               <h2>
                 # {{query}}
               </h2>
               <ul class="travel_list">
-                {% for item in items %}
-                <li>
-                  <a href="/info/{{item.id}}">
-                    <img src="{{item.image}}">
-                  </a>
-                  <div class="list_cont">
-                    <h3 class="title">
-                      <a href="/info/{{item.id}}">{{item.title}}</a>
-                    </h3>
-                    <p class="loc">{{item.addr1}}</p>
-                    <p class="hash">
-                      <a href="{{ url_for('info.info',query='#%s' % item.contenttypeid) }}"><span>#{{item.contenttypeid}}</span></a>
-                      <a href="{{ url_for('info.info',query='#%s' % item.areacode) }}"><span>#{{item.areacode}}</span></a>
-                    </p>
-                  </div>
-                </li>
-                {% endfor %}
+                  <p>{{items.type}}</p>
+                  {% for item in items %}
+                  <li>
+                    <a href="/info/{{item.id}}">
+                      <img src="{{item.image}}">
+                    </a>
+                    <div class="list_cont">
+                      <h3 class="title">
+                        <a href="/info/{{item.id}}">{{item.title}}</a>
+                      </h3>
+                      <p class="loc">{{item.addr1}}</p>
+                      <p class="hash">
+                        <a href="{{ url_for('info.info',type='%s' % item.typecode1) }}"
+                        {% if type == item.typecode1 %}class="selected_hash"{% endif %}>
+                          <span>#{{item.type}}</span></a>
+                        <a href="{{ url_for('info.info',type='%s' % item.typecode1, area='%s' % item.areacode) }}"
+                        {% if area == item.areacode %}class="selected_hash"{% endif %}>
+                          <span>#{{item.area}}</span></a>
+                        {% if item.cat3 and item.cat3_name %}
+                        <a href="{{ url_for('info.info',type='%s' % item.typecode1, cat='%s' % item.cat3) }}"
+                        {% if cat == item.cat3 %}class="selected_hash"{% endif %}>
+                          <span>#{{item.cat3_name}}</span>
+                        </a>
+                        {% endif %}
+                      </p>
+                    </div>
+                  </li>
+                  {% endfor %}
                 <li>
                   <a href="/info/1">
                     <img src="../static/img/flower.jpg" alt="나리농원">
@@ -64,5 +92,6 @@
     </div>
     {% include 'config/footer.html' %}
   </div>
+  
 </body>
 </html>
