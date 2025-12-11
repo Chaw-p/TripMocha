@@ -154,5 +154,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
   //schedule_main 세션
   $(document).ready(function(){
-    const metaSting = sessionStorage.getItem
-  })
+    const metaSting = sessionStorage.getItem('selectedTripMeta');
+
+    if(metaSting) {
+        const tripMeta = JSON.parse(metaSting);
+
+        console.log("트립정보", tripMeta);
+
+        $('#trip-title').text(tripMeta.title);
+        $('#trip-city').text(tripMeta.city);
+        $('#trip-durattion').text(tripMeta.durattion + ' | ' + tripMeta.duration + '일');
+        $('#trip-rating').text(tripMeta.rating);
+
+        sessionStorage.removeItem('selectedTripMeta');
+    }
+    const urlParts = window.location.pathname.split('/');
+    // urlParts[2] == 'view', urlParts[3] == TripID, urlParts[4] == PlaceID
+    const tripIdFromUrl = urlParts[3];
+  });
