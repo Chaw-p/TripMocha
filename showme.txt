@@ -36,3 +36,7 @@ pw : qwer1234
 < 2025-12-11 초아 >
 import hashlib 
 schedule.py에서 여행장소 임의 ID 부여를 위해 import 함 
+
+pip install catboost
+from catboost import CatBoostRegressor
+캣부스트 모델 import
