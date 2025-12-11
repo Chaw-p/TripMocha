@@ -222,7 +222,7 @@ def recommend_schedule():
     keep='first'
     ).copy()
     
-    recommended_df = diverse_main_candidates.head(3)
+    recommended_df = diverse_main_candidates.head(3).copy()
     
     recommended_df['DURATION'] = int(duration_days)
     recommended_df['SIDO_NM'] = sido_nm
@@ -236,6 +236,7 @@ def recommend_schedule():
         main_area_nm = trip['VISIT_AREA_NM']
         target_adm_code = trip['ADM_CODE_NUMERIC']
         target_type_cd = trip.get('VISIT_AREA_TYPE_CD') or trip.get('TRAVEL_MISSION_INT')
+        trip['CONTENT_ID'] = hashlib.sha1(main_area_nm.encode('utf-8')).hexdigest()[:10]
         
         related_places = []
 
@@ -280,7 +281,7 @@ def recommend_schedule():
         final_related_places = []
         seen_names = set()
 
-        for place_name in related_places: # 👈 이제 related_places에 장소 이름이 있으므로 루프가 작동합니다.
+        for place_name in related_places:
             if place_name in seen_names:
                 continue
                 

@@ -197,3 +197,7 @@ function downloadPDF() {
         alert(error.message);
       });
   }
+
+
+  //schedule_main 세션
+  $(docu)

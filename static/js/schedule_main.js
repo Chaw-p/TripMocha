@@ -742,16 +742,29 @@ $('.button-make-travel').on('click', function(e) {
                 const tags = trip.TAGS ? trip.TAGS.split(',') : ['추천', '여행']; //태그
                 const scheduleItems = trip.RELATED_PLACES;
                 const currentTripId = trip.CONTENT_ID;
+
+                console.log("서버 데이터 CONTENT_ID:", currentTripId);
+
                 const scheduleHtml = scheduleItems.map(place => {
                 return `<div class="schedule-place-item" data-place-id="${place.id}">${place.name}</div>`; 
                 }).join(' → ');
+
+                const tripMetaData = {
+                    tripId : currentTripId,
+                    title  : title,
+                    city   : displayCity,
+                    durattion : trip.DURATION,
+                    rating : rating,
+                    tags    : tags 
+                };
 
                 listHtml += `
                     <div class="trip-item" data-trip-id="${currentTripId}">
                         <div class="trip-header-line"> 
                             <h4>${title}</h4>
-                            <p class="trip-meta">${displayCity} | ${trip.DURATION}일</p> 
-                            <p class="trip-rating">⭐ ${rating}</p>
+                            <p class="${JSON.stringify(tripMetaData)}">
+                            // ${displayCity} | ${trip.DURATION}일</p> 
+                            // <p class="trip-rating">⭐ ${rating}</p>
                         </div>
                         
                         <div class="trip-schedule-container">${scheduleHtml}  </div>
@@ -791,9 +804,11 @@ $('.button-make-travel').on('click', function(e) {
                 const $tripItem = $selectedPlace.closest('.trip-item');
                 const tripId = $tripItem.data('trip-id');
                 const selectedPlaceId = $selectedPlace.data('place-id');
-                
-                console.log("가져온 Trip ID:", tripId); 
-                console.log("가져온 Place ID:", selectedPlaceId);
+                const tripMetaData = $tripItem.data('trip-meta');
+
+                if (tripMetaData){
+                    sessionStorage.setItem('selectedTripMeta', JSON.stringify(tripMetaData));
+                }
 
                 // 3. 유효성 검사 및 이동
                 // ⭐️ tripId가 null, undefined, 0, 또는 빈 문자열이거나 'undefined' 문자열인 경우도 체크
