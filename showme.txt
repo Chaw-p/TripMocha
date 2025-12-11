@@ -40,3 +40,12 @@ schedule.py에서 여행장소 임의 ID 부여를 위해 import 함
 pip install catboost
 from catboost import CatBoostRegressor
 캣부스트 모델 import
+
+< pip show numpy > 
+초아 numpy 버전
+Name: numpy
+Version: 2.1.3 
+pip install numpy==2.1.3
+or 
+최신버전 
+pip install --upgrade numpy
