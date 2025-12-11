@@ -26,18 +26,25 @@
         </p>
         <div id="map" class="detail_map"></div>
         <script>
-          var itemMapX = "{{ item.mapx }}"; 
-          var itemMapY = "{{ item.mapy }}";
+          var MapX = "{{ item.mapx }}"; 
+          var MapY = "{{ item.mapy }}";
         </script>
         <script type=text/javascript src="{{url_for('static', filename='js/map.js') }}"></script>    
         <h2>해쉬</h2>    
         <p class="hash">
-          <a href="{{ url_for('info.info',query='관광지') }}">#관광지</a>
-          <a href="{{ url_for('info.info',query='광명선원') }}">#광명선원</a>
+          <a href="{{ url_for('info.info',type='%s' % item.typecode1) }}">
+            <span>#{{item.type}}</span></a>
+          <a href="{{ url_for('info.info',type='%s' % item.typecode1, area='%s' % item.areacode) }}">
+            <span>#{{item.area}}</span></a>
+          {% if item.cat3 and item.cat3_name %}
+          <a href="{{ url_for('info.info',type='%s' % item.typecode1, cat='%s' % item.cat3) }}">
+            <span>#{{item.cat3_name}}</span>
+          </a>
+          {% endif %}
         </p>
       </div>
       <div class="center_btn tolist_btn">
-        <button type="button" onclick = "location.href = '/info'">목록</button>
+        <button type="button" onclick = "location.href = '/info?type={{item.typecode1}}'">목록</button>
       </div>
     </div>
     {% include 'config/footer.html' %}
