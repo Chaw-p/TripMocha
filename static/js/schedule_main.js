@@ -809,6 +809,8 @@ $('.button-make-travel').on('click', function(e) {
                 if (tripMetaData){
                     sessionStorage.setItem('selectedTripMeta', JSON.stringify(tripMetaData));
                 }
+                console.log("가져온 Trip ID:", tripId); 
+                console.log("가져온 Place ID:", selectedPlaceIds);
 
                 // 3. 유효성 검사 및 이동
                 // ⭐️ tripId가 null, undefined, 0, 또는 빈 문자열이거나 'undefined' 문자열인 경우도 체크
