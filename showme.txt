@@ -23,8 +23,12 @@ pip install flask_cors
 
 
 2025-12-09 이거 하나 설치 하면 됌
+- 비밀번호를 안전하게 암호화(해싱)하기 위한 라이브러리 설치
 pip install bcrypt
 
 
 이메일
 ayj0519@gmail.com
+
+id : test
+pw : qwer1234

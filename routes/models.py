@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy() 
 
+# 여행일정 만들기 지역 검색 db
 class CityCounty(db.Model):
     __tablename__ = 'city_county'
     id = db.Column(db.Integer, primary_key=True)

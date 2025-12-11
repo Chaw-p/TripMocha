@@ -1,0 +1,151 @@
+/* -----------------------------------------------------
+   기본 프로필 드롭다운 스타일
+----------------------------------------------------- */
+
+/* 프로필 드롭다운 전체 영역 */
+.profile-wrapper {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+/* 이름 텍스트 */
+#header_profile .user_name {
+    padding: 8px 10px;
+    font-weight: 600;
+    color: #1b3b32;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+#header_profile .user_name:hover {
+    background-color: #e9f2ef;
+}
+
+/* 드롭다운 메뉴 */
+.profile-menu {
+    position: absolute;
+    top: 38px;
+    right: 0;
+    width: 180px;
+    background: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 6px 0;
+    list-style: none;
+    margin: 0;
+    display: none;
+    z-index: 9999;
+    box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+}
+
+/* 드롭다운 항목 */
+.profile-menu li a {
+    display: block;
+    padding: 10px 14px;
+    font-size: 15px;
+    color: #333;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.profile-menu li a:hover {
+    background-color: #f4f4f4;
+    font-weight: 600;
+}
+
+/* -----------------------------------------------------
+   🌙 다크모드 스타일
+----------------------------------------------------- */
+
+/* 전체 배경, 기본 글자 */
+body.dark-mode {
+    background-color: #1f1f1f !important;
+    color: #e6e6e6 !important;
+}
+
+/* 헤더 */
+body.dark-mode #header {
+    background-color: #2a2a2a !important;
+    border-bottom: 1px solid #444;
+}
+
+body.dark-mode #header a,
+body.dark-mode #header span {
+    color: #ddd !important;
+}
+
+/* -----------------------------------------------------
+   검색창 유지(다크모드에서도 input, 버튼만 밝게 유지)
+----------------------------------------------------- */
+
+/* 검색창 input 밝게 유지 */
+body.dark-mode #search_input_box input {
+    background-color: #ffffff !important;
+    color: #333 !important;
+    border: 1px solid #ccc !important;
+}
+
+/* placeholder 색 */
+body.dark-mode #search_input_box input::placeholder {
+    color: #666 !important;
+}
+
+/* 검색 버튼 밝게 유지 */
+body.dark-mode .search_btn {
+    background-color: #ffffff00 !important;
+    color: #333 !important;
+    border: 1px solid #dddddd00 !important;
+}
+
+/* 아이콘 색 */
+body.dark-mode .search_btn i {
+    color: #333 !important;
+}
+
+
+/* -----------------------------------------------------
+   카드/컨텐츠 박스
+----------------------------------------------------- */
+
+body.dark-mode .content-box,
+body.dark-mode .card,
+body.dark-mode .login-box,
+body.dark-mode .profile-container {
+    background-color: #2a2a2a !important;
+    border-color: #444 !important;
+    color: #eee !important;
+}
+
+/* 리스트 제목 */
+body.dark-mode h2,
+body.dark-mode h3 {
+    color: #f0f0f0 !important;
+}
+
+/* 슬라이더 설명 글 */
+body.dark-mode .slider-text {
+    color: #f8f8f8 !important;
+}
+
+/* 버튼 */
+body.dark-mode button,
+body.dark-mode .mocha_btn_1 {
+    background-color: #444 !important;
+    color: #fff !important;
+    border-color: #666 !important;
+}
+
+/* 드롭다운 메뉴 */
+body.dark-mode .profile-menu {
+    background-color: #2b2b2b !important;
+    border: 1px solid #444 !important;
+}
+
+body.dark-mode .profile-menu a {
+    color: #fff !important;
+}
+
+body.dark-mode .profile-menu a:hover {
+    background-color: #3c3c3c !important;
+}

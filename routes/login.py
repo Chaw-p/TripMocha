@@ -273,6 +273,38 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
+
+
+
+@login_bp.route('/profile')
+def profile_page():
+    if 'user_id' not in session:
+        return redirect(url_for('login_bp.login_page'))
+
+    try:
+        db = get_db()
+        cursor = db.cursor()
+
+        cursor.execute("""
+            SELECT user_id, name, birthday, email, phone, gender, nation, 
+                   postcode, address, detail_address, travel_style
+            FROM users
+            WHERE user_id = %s
+        """, (session['user_id'],))
+
+        user = cursor.fetchone()
+
+        return render_template('login/profile.html', user=user)
+
+    except Exception as e:
+        print("프로필 조회 오류:", e)
+        return "<script>alert('서버 오류 발생'); history.back();</script>"
+
+
+
+
+
+
 # ----------------------------------------------------
 # B-1. 아이디 중복 확인 라우팅 (AJAX용)
 # ----------------------------------------------------
@@ -383,8 +415,67 @@ def reset_password():
     except Exception as e:
         print("비밀번호 변경 오류:", e)
         return jsonify({"success": False, "message": "비밀번호 변경 실패"}), 500
+    
 
+@login_bp.route('/profile/update', methods=['POST'])
+def update_profile():
+    user_id = session.get("user_id")
 
+    name = request.form.get("name")
+    birthday = request.form.get("birthday")
+    email = request.form.get("email")
+    phone = request.form.get("phone")
+    gender = request.form.get("gender")
+    nation = request.form.get("nation")
+    postcode = request.form.get("postcode")
+    address = request.form.get("address")
+    detail_address = request.form.get("detail_address")
+    travel_style = request.form.get("travel_style")
+
+    current_pw = request.form.get("current_password")
+    new_pw = request.form.get("new_password")
+    new_pw_confirm = request.form.get("new_password_confirm")
+
+    db = get_db()
+    cursor = db.cursor()
+
+    # ⭐ 비밀번호 변경 로직 포함
+    if new_pw:
+        # 새 비밀번호 작성 + 확인 일치 여부
+        if new_pw != new_pw_confirm:
+            return "<script>alert('새 비밀번호가 일치하지 않습니다'); history.back();</script>"
+
+        # 현재 비밀번호 일치 여부 검사
+        cursor.execute("SELECT password FROM users WHERE user_id=%s", (user_id,))
+        stored_pw = cursor.fetchone()[0]
+
+        if not bcrypt.checkpw(current_pw.encode(), stored_pw.encode()):
+            return "<script>alert('현재 비밀번호가 일치하지 않습니다'); history.back();</script>"
+
+        # 비밀번호 해싱 후 업데이트
+        hashed_pw = bcrypt.hashpw(new_pw.encode(), bcrypt.gensalt()).decode("utf-8")
+
+        cursor.execute("""
+            UPDATE users
+            SET password=%s
+            WHERE user_id=%s
+        """, (hashed_pw, user_id))
+
+    # ⭐ 일반 정보 업데이트
+    cursor.execute("""
+        UPDATE users
+        SET name=%s, birthday=%s, email=%s, phone=%s,
+            gender=%s, nation=%s, postcode=%s, address=%s,
+            detail_address=%s, travel_style=%s
+        WHERE user_id=%s
+    """, (
+        name, birthday, email, phone, gender, nation,
+        postcode, address, detail_address, travel_style, user_id
+    ))
+
+    db.commit()
+
+    return redirect(url_for("index"))
 
 
 

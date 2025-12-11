@@ -78,7 +78,6 @@ let isIdAvailable = false;
 
 function setupIdCheck() {
 
-    // 아이디 입력 중이면 상태 초기화
     $('#user_id').on('input', function () {
         filterEnglishOnly(this);
         isIdChecked = false;
@@ -92,8 +91,6 @@ function setupIdCheck() {
         updateSubmitButtonState();
     });
 
-
-    // 중복확인 버튼 클릭
     $('#check_duplicate_btn').on('click', function () {
         const userId = $('#user_id').val().trim();
         const $message = $('#id_check_message');
@@ -118,11 +115,9 @@ function setupIdCheck() {
                 isIdChecked = true;
 
                 if (res.exists) {
-                    // 이미 있는 아이디
                     isIdAvailable = false;
                     $message.text("이미 사용 중인 아이디입니다.").removeClass().addClass("text-red-500");
                 } else {
-                    // 사용 가능
                     isIdAvailable = true;
                     $message.text("사용 가능한 아이디입니다!").removeClass().addClass("text-green-600");
                 }
@@ -168,15 +163,48 @@ function setupPasswordCheck() {
 
 
 /* ================================
-    가입 버튼 활성/비활성 관리
+    이용약관 체크 기능 추가 (중요)
+================================ */
+
+// 필수 약관이 모두 체크되었는지 확인
+function isRequiredTermsChecked() {
+    return $('.required-term').toArray().every(c => $(c).is(':checked'));
+}
+
+function setupTerms() {
+
+    // ⭐ 전체 선택 눌렀을 때 모든 체크박스 ON/OFF
+    $('#term_all').on('change', function () {
+        const checked = $(this).is(':checked');
+        $('.term-check').prop('checked', checked);
+        updateSubmitButtonState();
+    });
+
+    // ⭐ 개별 체크박스 변경 → 전체 선택 체크 여부 자동 업데이트
+    $('.term-check').on('change', function () {
+        const total = $('.term-check').length;
+        const checked = $('.term-check:checked').length;
+
+        // 전부 선택되면 전체 선택도 체크 / 아니면 해제
+        $('#term_all').prop('checked', total === checked);
+
+        updateSubmitButtonState();
+    });
+}
+
+
+
+/* ================================
+    가입 버튼 활성/비활성
 ================================ */
 function updateSubmitButtonState() {
     const requiredFilled = $(".signup-form [required]").toArray()
         .every(e => $(e).val().trim() !== "");
 
     const pwMatch = $('#password').val() === $('#password_confirm').val();
+    const termsOk = isRequiredTermsChecked(); // ← 약관 확인 추가됨
 
-    const canSubmit = requiredFilled && isIdAvailable && pwMatch;
+    const canSubmit = requiredFilled && isIdAvailable && pwMatch && termsOk;
 
     const $btn = $('#submit_btn');
 
@@ -253,7 +281,12 @@ function setupFormSubmit() {
             return;
         }
 
-        // 정상 제출 → 서버에서 회원가입 처리
+        if (!isRequiredTermsChecked()) {
+            e.preventDefault();
+            alertModal("필수 약관에 모두 동의해야 회원가입이 가능합니다!");
+            return;
+        }
+
     });
 }
 
@@ -263,7 +296,6 @@ function setupFormSubmit() {
 ================================ */
 $(document).ready(() => {
 
-    // 입력 이벤트 처리
     $("#phone_number").on('input', function () {
         autoHyphenate(this);
         updateSubmitButtonState();
@@ -279,8 +311,9 @@ $(document).ready(() => {
 
     setupIdCheck();
     setupPasswordCheck();
+    setupTerms();  // ← 이용약관 기능
     setupTravelStyleSelection();
     setupAddressSearch();
     setupFormSubmit();
-
 });
+

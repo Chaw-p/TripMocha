@@ -108,6 +108,32 @@
                 <button type="button" class="style-btn" data-value="night_view">🌙 야경</button>
                 <button type="button" class="style-btn" data-value="activity">🎢 체험/액티비티</button>
             </div>
+                        <!-- 약관 동의 영역 -->
+            <div class="terms-box">
+                <!-- 전체 동의 -->
+                <label class="terms-all">
+                    <input type="checkbox" id="term_all">
+                    전체 동의
+                </label>
+                <hr>
+                <!-- (필수) 서비스 이용약관 -->
+                <label class="terms-item">
+                    <input type="checkbox" class="term-check required-term">
+                    [필수] 서비스 이용약관 동의
+                </label>
+
+                <!-- (필수) 개인정보 수집·이용 -->
+                <label class="terms-item">
+                    <input type="checkbox" class="term-check required-term">
+                    [필수] 개인정보 수집 및 이용 동의
+                </label>
+
+                <!-- (선택) 마케팅 수신 동의 -->
+                <label class="terms-item">
+                    <input type="checkbox" class="term-check optional-term">
+                    [선택] 마케팅 정보 수신 동의
+                </label>
+            </div>
 
             <input type="hidden" name="travel_style" id="travel_style">
 
