@@ -61,7 +61,7 @@ $(function(){
     $("#destinationItem .selected-province").text(province);
     $("#destinationItem .sub-label").text("");
 
-    // 2. 🔑 세션 스토리지 업데이트 (ADM Code 및 도시 정보 저장)
+    // 2.  세션 스토리지 업데이트 (ADM Code 및 도시 정보 저장)
     const currentDataJson = sessionStorage.getItem('currentSearchData') || '{}';
     let searchData;
     
@@ -82,7 +82,7 @@ $(function(){
     // 세션에 저장
     try {
         sessionStorage.setItem('currentSearchData', JSON.stringify(searchData));
-        console.log("✅ ADM Code가 세션에 저장됨:", selectedAdmCode);
+        console.log(" ADM Code가 세션에 저장됨:", selectedAdmCode);
         
         // **중요:** 이 항목에 .selected 클래스를 추가하여 'search-button'에서 읽을 수 있도록 합니다.
         // 하지만 세션에 직접 저장했으므로, 이 클릭 이벤트는 DOM 클래스 대신 세션 저장이 주 목표가 됩니다.
@@ -730,51 +730,90 @@ $('.button-make-travel').on('click', function(e) {
             // 5. HTML 리스트 생성 시작
             let listHtml = `
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                    <h3 style="color: #333; margin: 0;">${cityPrefix} 추천 여행 리스트 (${recommendedTrips.length}개)</h3>
+                    <h3 style="color: #333; margin: 0;">${cityPrefix} 추천 여행 리스트</h3>
                     <button class="reload-btn">추천 다시 받기</button>
                 </div>
             `;
             
             recommendedTrips.forEach(trip => {
-                // travel_df의 컬럼명과 일치
-                
                 const title = `${cityPrefix}` + "여행";
                 const displayCity = `${trip.SIDO_NM || ''} ${cityPrefix || ''}`; 
-                
-                // 별점
-                const rating = (trip.SCORE ).toFixed(1); 
-                
-                // trip.TAGS 
-                const tags = trip.TAGS ? trip.TAGS.split(',') : ['추천', '여행']; 
-                
-                const scheduleItems = trip.RELATED_PLACES; 
+                const rating = (trip.SCORE ).toFixed(1);  // 별점
+                const tags = trip.TAGS ? trip.TAGS.split(',') : ['추천', '여행']; //태그
+                const scheduleItems = trip.RELATED_PLACES;
+                const currentTripId = trip.CONTENT_ID;
                 const scheduleHtml = scheduleItems.map(place => {
-                return `<div class="trip-schedule">${place}</div>`;
-                }).join('');
+                return `<div class="schedule-place-item" data-place-id="${place.id}">${place.name}</div>`; 
+                }).join(' → ');
 
-            
                 listHtml += `
-                    <div class="trip-item">
+                    <div class="trip-item" data-trip-id="${currentTripId}">
                         <div class="trip-header-line"> 
                             <h4>${title}</h4>
                             <p class="trip-meta">${displayCity} | ${trip.DURATION}일</p> 
                             <p class="trip-rating">⭐ ${rating}</p>
                         </div>
                         
-                        <div class="trip-schedule">${scheduleHtml} </div>
+                        <div class="trip-schedule-container">${scheduleHtml}  </div>
                         
                         <div class="trip-tags">
                             <div class="tag-group"> 
                                 ${tags.map(tag => `<span>#${tag}</span>`).join('')}
                             </div>
-                            <a href="/schedule/view/${trip.CONTENT_ID}" class="detail-btn">선택</a>
                         </div>
+
                     </div>
                 `;
             });
 
-            listHtml += '</div>'; 
+            listHtml += '<div class="detail-container" data-trip-id="${currentTripId}"><a href="/schedule/view/" class="detail-btn">선택</a></div>'; 
             $resultArea.html(listHtml);
+
+            
+            $resultArea.on('click', '.schedule-place-item', function(){
+                //선택한 요소 외에 비활성화
+                $resultArea.find('.schedule-place-item.selected').removeClass('selected');
+                $resultArea.find('.trip-item.selected').removeClass('selected');
+                //선택요소 강조
+                $(this).addClass('selected');
+                $(this).closest('.trip-item').addClass('selected');
+                alert("여행리스트가 선택되었습니다.")
+            })
+
+            $resultArea.on('click', '.detail-btn', function(e){
+                e.preventDefault();
+                const $selectedPlace = $resultArea.find('.schedule-place-item.selected');
+                   if($selectedPlace.length === 0){
+                    alert("여행리스트를 선택해주세요.")
+                    return;
+                }
+                
+                const $tripItem = $selectedPlace.closest('.trip-item');
+                const tripId = $tripItem.data('trip-id');
+                const selectedPlaceId = $selectedPlace.data('place-id');
+                
+                console.log("가져온 Trip ID:", tripId); 
+                console.log("가져온 Place ID:", selectedPlaceId);
+
+                // 3. 유효성 검사 및 이동
+                // ⭐️ tripId가 null, undefined, 0, 또는 빈 문자열이거나 'undefined' 문자열인 경우도 체크
+                if (!tripId || String(tripId).toLowerCase() === 'undefined') { 
+                    alert("트립 ID를 찾을 수 없습니다. (HTML 구조 확인 필요)");
+                    console.error("Trip ID 누락!");
+                    return;
+                }
+                
+                // 장소 ID는 해시 값(문자열)이므로, 공백이거나 없으면 안됨
+                if (!selectedPlaceId || String(selectedPlaceId).trim() === '') {
+                    alert("선택된 장소 ID가 없습니다.");
+                    console.error("Place ID 누락!");
+                    return;
+                }
+
+                const targetUrl = `/schedule/view/${tripId}/${selectedPlaceId}`;
+                console.log("페이지 이동:", targetUrl);
+                window.location.href = targetUrl;
+            })
             
         } else {
             $resultArea.html(`<p style="text-align: center; color: red;">추천 실패: ${data.error || data.message || '알 수 없는 오류'}</p>`);

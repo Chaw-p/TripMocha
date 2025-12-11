@@ -6,6 +6,7 @@ import pickle
 from catboost import CatBoostRegressor
 import pandas as pd
 import numpy as np
+import hashlib
 
 load_dotenv()
 key = os.getenv("choakey")
@@ -91,8 +92,6 @@ def main():
     return render_template("schedule/schedule_main.html", destinations=processed_destinations)
 
 # 특징생성함수
-import pandas as pd
-
 def create_catboost_input(target_df, duration_days, theme_tags, TAG_MAPPING, FINAL_MODEL_FEATURES, categorical_features_names):
 
     input_df = target_df.copy()
@@ -213,7 +212,8 @@ def recommend_schedule():
     exclude_mask = target_df['VISIT_AREA_NM'].str.contains('호텔', case=False, na=False) | \
     target_df['VISIT_AREA_NM'].str.contains('아파트', case=False, na=False) | \
     target_df['VISIT_AREA_NM'].str.contains('오피스텔', case=False, na=False) | \
-    target_df['VISIT_AREA_NM'].str.contains('점', case=False, na=False)
+    target_df['VISIT_AREA_NM'].str.contains('점', case=False, na=False) | \
+    target_df['VISIT_AREA_NM'].str.contains('펜션', case=False, na=False)
     filtered_target_df = target_df[~exclude_mask].copy()
     sorted_df = filtered_target_df.sort_values(by='SCORE', ascending=False)
 
@@ -277,7 +277,22 @@ def recommend_schedule():
         while len(related_places) < 5:
             related_places.append("추가 추천 장소 (데이터 부족)")
         
-        trip['RELATED_PLACES'] = related_places[:5]
+        final_related_places = []
+        seen_names = set()
+
+        for place_name in related_places: # 👈 이제 related_places에 장소 이름이 있으므로 루프가 작동합니다.
+            if place_name in seen_names:
+                continue
+                
+            place_hash_id = hashlib.sha1(place_name.encode('utf-8')).hexdigest()[:10]
+            
+            final_related_places.append({
+                "id": place_hash_id,
+                "name": place_name
+            })
+            seen_names.add(place_name)
+
+        trip['RELATED_PLACES'] = final_related_places[:5]
     
     return jsonify({
         "success": True,
