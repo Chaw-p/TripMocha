@@ -84,10 +84,7 @@ p {
     width: 40%; 
     text-align: right; 
 }
-.trip-title-main { 
-    font-size: 40px; 
-    font-weight: bold; 
-}
+
 .trip-dates { 
     font-size: 20px; 
     color: #666; 
@@ -97,7 +94,10 @@ p {
     line-height: 1.6; 
 }
 
-
+#container h2 {
+    font-size: 1.8rem;
+    letter-spacing: -0.02em;
+}
 /*
  * ========================================
  * 3. 메인 2열 레이아웃 (일정 목록 & 지도)
