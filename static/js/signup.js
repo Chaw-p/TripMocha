@@ -70,67 +70,81 @@ function toggleSelection($container, hiddenInputId) {
 
 
 /* ================================
-    아이디 중복 확인
+   아이디 자동 중복 확인
 ================================ */
 
+let idCheckTimer = null;
 let isIdChecked = false;
 let isIdAvailable = false;
 
 function setupIdCheck() {
 
-    $('#user_id').on('input', function () {
+    $("#user_id").on("input", function () {
+        const userId = $(this).val().trim();
+        const $msg = $("#id_check_message");
+        const $btn = $("#check_duplicate_btn");
+
+        // 입력 즉시 버튼 비활성화(굳이 안 써도 되지만 안전용)
+        $btn.prop("disabled", true);
+
+        // 영어+숫자만 허용
         filterEnglishOnly(this);
-        isIdChecked = false;
-        isIdAvailable = false;
 
-        $('#id_check_message')
-            .text("아이디는 영문+숫자만 입력하세요.")
-            .removeClass()
-            .addClass("text-gray-500");
+        // 메시지 초기화
+        $msg.text("").removeClass("text-red-500 text-green-600");
 
-        updateSubmitButtonState();
-    });
-
-    $('#check_duplicate_btn').on('click', function () {
-        const userId = $('#user_id').val().trim();
-        const $message = $('#id_check_message');
-        const $btn = $(this);
+        // 이전 타이머 제거
+        clearTimeout(idCheckTimer);
 
         if (userId.length < 3) {
-            $message.text("아이디는 최소 3글자 이상입니다.")
-                .removeClass().addClass("text-red-500");
+            $msg.text("아이디는 최소 3글자 이상입니다.")
+                .addClass("text-red-500");
+            isIdAvailable = false;
+            isIdChecked = false;
+            updateSubmitButtonState();
             return;
         }
 
-        $btn.prop("disabled", true).text("확인 중...");
+        // 0.5초 뒤 자동 검사 (Debounce)
+        idCheckTimer = setTimeout(() => {
 
-        $.ajax({
-            url: "/api/check_userid",
-            method: "POST",
-            data: { user_id: userId },
+            $.ajax({
+                url: "/api/check_userid",
+                method: "POST",
+                data: { user_id: userId },
 
-            success: function (res) {
-                $btn.prop("disabled", false).text("중복 확인");
+                success: function (res) {
+                    isIdChecked = true;
 
-                isIdChecked = true;
+                    if (res.exists) {
+                        // ❌ 중복
+                        isIdAvailable = false;
 
-                if (res.exists) {
-                    isIdAvailable = false;
-                    $message.text("이미 사용 중인 아이디입니다.").removeClass().addClass("text-red-500");
-                } else {
-                    isIdAvailable = true;
-                    $message.text("사용 가능한 아이디입니다!").removeClass().addClass("text-green-600");
+                        $msg.text("이미 사용 중인 아이디입니다.")
+                            .removeClass("text-green-600")
+                            .addClass("text-red-500");
+
+                    } else {
+                        // ⭕ 사용 가능
+                        isIdAvailable = true;
+
+                        $msg.text("사용 가능한 아이디입니다!")
+                            .removeClass("text-red-500")
+                            .addClass("text-green-600");
+
+                    }
+
+                    updateSubmitButtonState();
+                },
+
+                error: function () {
+                    $msg.text("서버 오류가 발생했습니다.")
+                        .removeClass("text-green-600")
+                        .addClass("text-red-500");
                 }
+            });
 
-                updateSubmitButtonState();
-            },
-
-            error: function () {
-                alertModal("서버 오류가 발생했습니다!");
-                $btn.prop("disabled", false).text("중복 확인");
-            }
-        });
-
+        }, 500); // 입력 후 0.5초 지나면 자동 검사
     });
 }
 
@@ -160,6 +174,19 @@ function setupPasswordCheck() {
         updateSubmitButtonState();
     });
 }
+
+function checkPasswordStrength(pw) {
+    let strength = 0;
+
+    if (pw.length >= 8) strength++;               // 길이 체크
+    if (/[A-Z]/.test(pw)) strength++;             // 대문자
+    if (/[0-9]/.test(pw)) strength++;             // 숫자
+    if (/[^A-Za-z0-9]/.test(pw)) strength++;      // 특수문자
+
+    return strength;
+}
+
+
 
 
 /* ================================
@@ -235,7 +262,7 @@ function setupTravelStyleSelection() {
             selected.delete(v);
         } else {
             if (selected.size >= max) {
-                alertModal("여행 스타일은 최대 4개까지 선택할 수 있어요!");
+                showToast("여행 스타일은 최대 4개까지 선택할 수 있어요!");
                 return;
             }
             $(this).addClass("selected");
@@ -290,6 +317,31 @@ function setupFormSubmit() {
     });
 }
 
+/* ================================
+    비밀번호 강도 표시 기능
+================================ */
+
+$("#password").on("input", function () {
+    const pw = $(this).val();
+    const $strengthMsg = $("#password_strength");
+
+    $strengthMsg.removeClass("pw-weak pw-medium pw-strong");
+
+    if (!pw) {
+        $strengthMsg.text("");
+        return;
+    }
+
+    const strength = checkPasswordStrength(pw);
+
+    if (strength <= 1) {
+        $strengthMsg.text("비밀번호 강도: 약함").addClass("pw-weak");
+    } else if (strength <= 3) {
+        $strengthMsg.text("비밀번호 강도: 보통").addClass("pw-medium");
+    } else {
+        $strengthMsg.text("비밀번호 강도: 강함").addClass("pw-strong");
+    }
+});
 
 /* ================================
     실행 구간
@@ -316,4 +368,23 @@ $(document).ready(() => {
     setupAddressSearch();
     setupFormSubmit();
 });
+
+
+function showToast(message) {
+    const $toast = $("#toast");
+
+    $toast.text(message).removeClass("hidden");
+
+    setTimeout(() => {
+        $toast.addClass("show");
+    }, 10);
+
+    setTimeout(() => {
+        $toast.removeClass("show");
+
+        setTimeout(() => {
+            $toast.addClass("hidden");
+        }, 300);
+    }, 2000);
+}
 
