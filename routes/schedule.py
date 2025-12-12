@@ -233,11 +233,11 @@ def recommend_schedule():
     # 메인 장소 추천 후 반복문
     
     for trip in recommended_trips_list:
-        main_area_nm = trip['VISIT_AREA_NM']
+        main_area_nm = str(trip['VISIT_AREA_NM'])
         target_adm_code = trip['ADM_CODE_NUMERIC']
         target_type_cd = trip.get('VISIT_AREA_TYPE_CD') or trip.get('TRAVEL_MISSION_INT')
         trip['CONTENT_ID'] = hashlib.sha1(main_area_nm.encode('utf-8')).hexdigest()[:10]
-        
+        print("현재 처리 중인 Trip 데이터:", trip)
         related_places = []
 
         # 1단계 추천 3개의 목록 (동일지역, 동일테마)
@@ -301,10 +301,12 @@ def recommend_schedule():
     })
 
 
-@schedule_bp.route("/view", methods=["GET"])
-def view():
-    return render_template("schedule/schedule_view.html", choakey=key)
+@schedule_bp.route("/view/<trip_id>/<place_id>", methods=["GET"])
+def view(trip_id,place_id):
+    print(f"Flask에서 받은 Trip ID: {trip_id}, Place ID: {place_id}")
+    return render_template("schedule/schedule_view.html",  choakey=key)
 
 @schedule_bp.route("/list", methods=["GET"])
 def list():
+
     return render_template("schedule/schedule_list.html")

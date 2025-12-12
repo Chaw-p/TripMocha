@@ -28,7 +28,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script type=text/javascript src="{{url_for('static', filename='js/main.js') }}"></script>
-
+  
     <!-- etc -->
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
 </head>
@@ -40,13 +40,13 @@
             <div class="trip-summary">
                 <div class="trip-summary-left">
 
-                    <h1 class="trip-title-main">모카님을 위한 여행코스</h1>
-
-                    <p class="trip-dates"><strong>12월 5일 → 12월 6일</strong></p>
+                    <h1 class="trip-title-main">{{user_id}}님을 위한 여행코스</h1>
+                    <div id="trip-title">타이틀</div>    
+                    <p class="trip-duration">12월 5일 → 12월 6일</p>
                     <div class="meta-info">
-                        - 1인 여행<br>
-                        - 여행지역 | 전주 ~ 군산<br>
-                        - 총 5개 여행지 / 음식점 / 숙소 추천!
+                        <div>- 1인 여행</div>
+                        <div id="trip-city">- 여행지역 |</div>
+                        <div>- 총 5개 여행지 / 음식점 / 숙소 추천!</div>
                     </div>
                 </div>
                 <div class="trip-summary-right">
