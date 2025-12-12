@@ -14,9 +14,9 @@
 <body data-toast="{{ error if error }}">
 
     <div class="login-container">
-        <img src="{{ url_for('static', filename='img/logo.png') }}" 
-             alt="TripMocha 로고" 
-             class="tripmocha-logo"> 
+        <a href="{{ url_for('index') }}">
+        <img src="{{ url_for('static', filename='img/logo.png') }}">
+      </a>
 
         <main class="login-box">
             
