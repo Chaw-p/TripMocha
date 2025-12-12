@@ -90,7 +90,7 @@ class APIService :
       "MobileApp": "AppTest",
       "serviceKey": str(self.api_key),
       "_type": "json",
-      "numOfRows": 20
+      "numOfRows": 10
     }
     params.update(param)
     try:
@@ -286,7 +286,7 @@ class APIService :
     return data
 
   # 키워드로 조회
-  def SearchKeyword(self, area=None, cat=None, keyword="", type="AC") :
+  def SearchKeyword(self, area=None, cat=None, keyword="", type="AC", page = 1) :
     url_key = f"searchKeyword2"
     param = {
       "pageNo": "1",
@@ -295,8 +295,13 @@ class APIService :
       #"lclsSystm1" : {"AC", "EV", "EX", "FD", "HS", "LS", "NA", "SH", "VE"},
       "keyword": keyword
     }
-    # if type is not None and type != "":
-    #   param["lclsSystm1"] = type
+    if page is not None and page != 1:
+      param["pageNo"] = page
+    
+    if type is not None and type != "":
+      param["lclsSystm1"] = type
+    else:
+      param["lclsSystm1"] = "AC"
 
     if area is not None and area != "":
       param["areaCode"] = area
@@ -347,36 +352,61 @@ class APIService :
     return data_dict
 
   #지역으로 찾기
-  def SearchArea(self, area=None, type=None) :
+  def SearchArea(self,  area=None, cat=None, type="AC", page = 1) :
     url_key = f"areaBasedList2"
     param = {
         "arrange" : "O",
         "lclsSystm1" : type
     }
-    if area:
+    if page is not None and page != 1:
+      param["pageNo"] = page
+    
+    if type is not None and type != "":
+      param["lclsSystm1"] = type
+    else:
+      param["lclsSystm1"] = "AC"
+
+    if area is not None and area != "":
       param["areaCode"] = area
-    if type:
-      param["contentTypeId"] = type
-    
-    item_data = self.AccessData(url = url_key, param = param)  
-    
+
+    if cat is not None and cat != "":
+      #A01010900
+      cat = cat.strip()
+      cat1 = cat[:3]   #A01
+
+      if cat1:
+        param["cat1"] = cat1
+        cat2 = cat[3:5]  #01
+        if cat2:
+          param["cat2"] = cat1 + cat2
+          cat3 = cat[5:]   #0900
+          if cat3:
+            param["cat3"] = cat
+
+    # print("param", param)
+    item_data = self.AccessData(url = url_key, param = param) 
     items = item_data.get("item", [])
     datas = [
-      {
-       "id" : i.get("contentid"),
-       "title" : i.get("title"),
-       "addr1" : i.get("addr1"),
-       "image" : i.get("firstimage"),
-       "typecode1": i.get("lclsSystm1"),
-      #  "contenttypeid": (
-      #     self.CONTENT_TYPE_MAPPING(int(i.get("contenttypeid", 0)))  
-      #     #CONTENT_TYPE_MAPPING.get(int(i.get("contenttypeid", 0)), i.get("contenttypeid"))
-      #   ),
-        "areacode" : self.AREA_CODE_MAPPING(i.get("areacode"))
-      }
-      for i in items
-    ]
-    return datas
+        {
+          "id" : i.get("contentid"),
+          "title" : i.get("title"),
+          "addr1" : i.get("addr1"),
+          "image" : i.get("firstimage"),
+          "typecode1": i.get("lclsSystm1"),
+          "type": self.TYPE_MAPPING(i.get("lclsSystm1")),
+          "area" : self.AREA_CODE_MAPPING(i.get("areacode")),
+          "areacode" : i.get("areacode"),
+          "cat3" : i.get("cat3"),
+          "cat3_name" : self.CATEGORY_CODE_MAPPING(i.get("cat3"))
+        }
+        for i in items
+      ]
+
+    data_dict = {
+      "type" : type,
+      "value": datas
+    }
+    return data_dict
 
 # api_service = APIService()
 # print(api_service.SearchKeyword(keyword="와룡산"))
