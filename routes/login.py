@@ -100,6 +100,7 @@ def send_auth_code():
     except Exception as e:
         print("이메일 전송 오류:", e)
         return jsonify({"success": False, "message": "메일 발송 실패"}), 500
+
     
     
 @api_bp.route('/api/verify_auth_code', methods=['POST'])
@@ -116,6 +117,8 @@ def verify_auth_code():
         return jsonify({"success": True, "message": "인증 성공!"})
     else:
         return jsonify({"success": False, "message": "인증번호가 일치하지 않습니다."})
+
+
     
 # ----------------------------------------------------
 # C. Gemini API 키 설정 및 보안 강화
