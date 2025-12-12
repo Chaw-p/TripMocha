@@ -154,5 +154,36 @@ document.addEventListener('DOMContentLoaded', function() {
 
   //schedule_main 세션
   $(document).ready(function(){
-    const metaSting = sessionStorage.getItem
-  })
+    const metaString = sessionStorage.getItem('selectedTripMeta');
+
+    if(metaString) {
+        try {
+            const tripMeta = JSON.parse(metaString);
+
+            console.log("트립정보", tripMeta);
+
+            $('#trip-title').text(tripMeta.title);
+            $('#trip-city').text(`- 여행지역 | ${tripMeta.city}`);
+            $('#trip-duration').text(`${tripMeta.duration}일`);
+            $('#trip-rating').text(tripMeta.rating);
+            $('#trip-startDate').text(tripMeta.startDate);
+            $('#trip-endDate').text(tripMeta.endDate);
+                        
+            } catch (e) {
+                        console.error("세션 데이터 파싱 오류:", e);
+                    }
+                    sessionStorage.removeItem('selectedTripMeta');
+        } else {
+            console.log("세션 스토리지에 'selectedTripMeta' 정보가 없습니다.");
+        }
+        
+        // URL에서 Trip ID 가져오기 (기존 로직 유지)
+        const urlParts = window.location.pathname.split('/');
+        // urlParts[2] == 'view', urlParts[3] == TripID, urlParts[4] == PlaceID
+        const tripIdFromUrl = urlParts[3];
+    
+    if (tripIdFromUrl) {
+        console.log("URL에서 가져온 Trip ID:", tripIdFromUrl);
+        // 이 ID를 사용하여 서버에서 상세 일정을 불러오는 AJAX/Fetch 로직이 추가되어야 합니다.
+    }
+  });

@@ -713,6 +713,8 @@ $('.button-make-travel').on('click', function(e) {
         return response.json();
     })
     .then(data => {
+        const startDate = requestData.date ? requestData.date.startDate : null;
+        const endDate = requestData.date ? requestData.date.endDate : null;
         // 4. 응답 데이터 처리 및 HTML 렌더링
         if (data.success && data.recommended_trips) {
             
@@ -753,9 +755,11 @@ $('.button-make-travel').on('click', function(e) {
                     tripId : currentTripId,
                     title  : title,
                     city   : displayCity,
-                    durattion : trip.DURATION,
+                    duration : trip.DURATION,
                     rating : rating,
-                    tags    : tags 
+                    tags    : tags,
+                    startDate: startDate, 
+                    endDate: endDate
                 };
 
                 listHtml += `
@@ -804,13 +808,20 @@ $('.button-make-travel').on('click', function(e) {
                 const $tripItem = $selectedPlace.closest('.trip-item');
                 const tripId = $tripItem.data('trip-id');
                 const selectedPlaceId = $selectedPlace.data('place-id');
-                const tripMetaData = $tripItem.data('trip-meta');
-
-                if (tripMetaData){
-                    sessionStorage.setItem('selectedTripMeta', JSON.stringify(tripMetaData));
+                const tripMetaDataJson = $tripItem.attr('data-trip-meta');
+                let tripMetaData = null;
+                
+                if (tripMetaDataJson) {
+                    try {
+                        tripMetaData = JSON.parse(tripMetaDataJson);
+                        sessionStorage.setItem('selectedTripMeta', JSON.stringify(tripMetaData));
+                        console.log("세션에 저장된 상세 메타데이터:", tripMetaData);
+                    } catch (err) {
+                        console.error("tripMetaData 파싱 오류:", err);
+                    }
                 }
                 console.log("가져온 Trip ID:", tripId); 
-                console.log("가져온 Place ID:", selectedPlaceIds);
+                console.log("가져온 Place ID:", selectedPlaceId);
 
                 // 3. 유효성 검사 및 이동
                 // ⭐️ tripId가 null, undefined, 0, 또는 빈 문자열이거나 'undefined' 문자열인 경우도 체크
