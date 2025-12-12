@@ -378,8 +378,8 @@ class APIService :
     ]
     return datas
 
-api_service = APIService()
-print(api_service.SearchKeyword(keyword="와룡산"))
+# api_service = APIService()
+# print(api_service.SearchKeyword(keyword="와룡산"))
 # # print(api_service.CATEGORY_CODE_MAPPING('A01010100'))
 # aa = [f'{k}: {api_service.CATEGORY_CODE_CALL(k)}' for key, val in api_service.cat2_list.items() for k in val.keys()]
 # print(aa)
