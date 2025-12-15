@@ -1,5 +1,5 @@
-from flask import jsonify, request, Blueprint, render_template
-from .models import db, CityCounty 
+from flask import jsonify, request, Blueprint, render_template,redirect, session
+from .models import db, CityCounty,TripMain, TripMapping 
 from dotenv import load_dotenv
 import os
 import pickle
@@ -7,6 +7,9 @@ from catboost import CatBoostRegressor
 import pandas as pd
 import numpy as np
 import hashlib
+import json
+from .database import save_data_to_database
+from urllib.parse import quote_plus
 
 load_dotenv()
 key = os.getenv("choakey")
@@ -90,6 +93,18 @@ def main():
         } for d in destinations
     ]
     return render_template("schedule/schedule_main.html", destinations=processed_destinations)
+
+# @schedule_bp.route("/view", methods=["POST"])
+# def tripok():
+#     # title = request.form.get("trip-title")
+#     # city  = request.form.get("trip-city")
+#     # duration  = request.form.get("trip-duration")
+#     # startDate  = request.form.get("trip-startDate")
+#     # endDate  = request.form.get("trip-endDate")
+
+
+#     return render_template("schedule/schedule_view.html")
+
 
 # 특징생성함수
 def create_catboost_input(target_df, duration_days, theme_tags, TAG_MAPPING, FINAL_MODEL_FEATURES, categorical_features_names):
@@ -301,12 +316,139 @@ def recommend_schedule():
     })
 
 
-@schedule_bp.route("/view/<trip_id>/<place_id>", methods=["GET"])
-def view(trip_id,place_id):
-    print(f"Flask에서 받은 Trip ID: {trip_id}, Place ID: {place_id}")
-    return render_template("schedule/schedule_view.html",  choakey=key)
+@schedule_bp.route("/save-draft", methods=["POST"])
+def save_draft():
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'status': 'error', 'message': '요청 본문(Body)이 비어있거나 JSON 형식이 아닙니다.'}), 400
+
+        trip_meta = data.get('tripMeta')
+        search_criteria = data.get('searchCriteria')
+        trip_schedule_plan = data.get('schedule_plan', [])
+
+        try:
+            trip_no = save_data_to_database(trip_meta, search_criteria, trip_schedule_plan)
+        except Exception as db_err:
+            print("데이터베이스 저장 오류:", str(db_err))
+            return jsonify({
+                'status': 'error', 
+                'message': '데이터베이스 저장 중 오류가 발생했습니다.'
+            }), 500
+    
+        # DB 저장 및 ID 획득 가정
+        
+        # JSON 응답으로 ID 반환
+        return jsonify({
+            'status': 'success',
+            'trip_no' : trip_no,
+            'message': '여행 계획 초안이 성공적으로 저장되었습니다.'
+        })
+
+    except Exception as e:
+        print("서버 처리 중 오류 발생:", str(e))
+        return jsonify({'status': 'error', 'message': f'서버 처리 오류: {str(e)}'}), 500
+    
+
+@schedule_bp.route("/view/<draftId>", methods=["GET"])
+def view(draftId):
+  
+    query = ""
+    url_query = request.args.get("query")
+  
+    if url_query is None:
+        query = session.get("query", "")
+    else:
+        query = url_query
+
+    # 세션에 값이 있을경우는 파라메터 값 없을 경우는 빈값을 다시 넣는다.
+    session["query"] = query
+    trip_record = TripMain.query.filter_by(trip_no=draftId).first()
+
+    if trip_record is None:
+        print("db에 id 없음")
+        
+        trip_meta_data = {}
+    else:
+        trip_meta_data = {
+            'trip_no': trip_record.trip_no, 
+            'user_id': trip_record.user_id, 
+            'title': trip_record.title, 
+            'city': trip_record.city,
+            'tags': trip_record.tags.split(',') if trip_record.tags else [],
+            'start_date': trip_record.start_date.strftime('%Y-%m-%d') if trip_record.start_date else '',
+            'end_date': trip_record.end_date.strftime('%Y-%m-%d') if trip_record.end_date else '',    
+            'people': trip_record.people,
+            'trip_type': trip_record.trip_type, 
+            'selectedPlaceId': trip_record.selectedPlaceId if trip_record.selectedPlaceId is not None else []
+        }
+    trip_mappings = TripMapping.query.filter_by(trip_no=draftId).order_by(
+    TripMapping.day_sequence, 
+    TripMapping.visit_order
+    ).all()
+
+    place_ids = [m.detail_id for m in trip_mappings]
+    place_details = TripMapping.query.filter(TripMapping.detail_id.in_(place_ids)).all()
+    place_dict = {p.detail_id: p for p in place_details} # 딕셔너리로 변환
+
+    trip_schedule_data = []
+    for mapping in trip_mappings:
+        place_info = place_dict.get(mapping.detail_id)
+        address_data = place_info.address if hasattr(place_info, 'address') and place_info.address is not None else "주소 정보 없음"
+        if place_info:
+            trip_schedule_data.append({
+                'id': mapping.detail_id,
+                'day': mapping.day_sequence,      
+                'sequence': mapping.visit_order, 
+                'name': place_info.place_name, 
+                'address': address_data 
+            })
+
+    meta_json_str = json.dumps(trip_meta_data, ensure_ascii=False)
+    schedule_json_str = json.dumps(trip_schedule_data, ensure_ascii=False) 
+    safe_meta_data = quote_plus(meta_json_str)
+    safe_schedule_data = quote_plus(schedule_json_str)
+    print(f"Flask에서 전달되는 Meta Data: {trip_meta_data}")
+     
+    return render_template("schedule/schedule_view.html",safe_meta_data=safe_meta_data, 
+    safe_schedule_data=safe_schedule_data,
+    trip_meta=trip_meta_data,search_query=query, trip_schedule=trip_schedule_data, user_id=trip_meta_data.get('user_id', 'Guest'), draft_id=draftId , choakey=key)
+
 
 @schedule_bp.route("/list", methods=["GET"])
 def list():
+    query = ""
+    url_query = request.args.get("query")
+  
+    if url_query is None:
+        query = session.get("query", "")
+    else:
+        query = url_query
+    
+    session["query"] = query
+    current_user_id = session.get('user_id', 'Guest')
+    trip_records = TripMain.query.filter_by(user_id=current_user_id).order_by(
+        TripMain.trip_no.desc()).all()
+    
+    trip_list_data = []
+    for record in trip_records:
+        trip_list_data.append({
+            'trip_no': record.trip_no, 
+            'title': record.title, 
+            'city': record.city,
+            'tags': record.tags.split(',') if record.tags else [],
+            'start_date': record.start_date.strftime('%Y-%m-%d') if record.start_date else '',
+            'end_date': record.end_date.strftime('%Y-%m-%d') if record.end_date else '', 
+            'duration': (record.end_date - record.start_date).days + 1 if record.start_date and record.end_date else 0, 
+            'people': record.people,
+            'user_id': record.user_id,
+        })
 
-    return render_template("schedule/schedule_list.html")
+    return render_template(
+        "schedule/schedule_list.html", 
+        trips=trip_list_data, 
+        search_query=query, 
+        current_user_id=current_user_id
+    )
+
