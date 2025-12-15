@@ -75,6 +75,11 @@ body.dark-mode #header span {
     color: #ddd !important;
 }
 
+
+body.dark-mode #header.header-scrolled {
+    background-color: rgba(30, 30, 30, 0.95);
+}
+
 /* -----------------------------------------------------
    검색창 유지(다크모드에서도 input, 버튼만 밝게 유지)
 ----------------------------------------------------- */
