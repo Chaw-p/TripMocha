@@ -14,6 +14,15 @@ import bcrypt
 import traceback
 import pymysql
 
+
+def mask_user_id(user_id: str) -> str:
+    if len(user_id) <= 2:
+        return user_id[0] + "*"
+    return user_id[0] + "*" * (len(user_id) - 2) + user_id[-1]
+
+
+
+
 # -------------------------------------------------
 # MySQL 직접 연결용 함수 (get_db)
 # -------------------------------------------------
@@ -78,6 +87,25 @@ TripMocha 비밀번호 재설정 인증번호는
     server.sendmail(smtp_user, [to_email], msg.as_string())
     server.quit()
 
+
+def send_simple_email(to_email, body):
+    smtp_server = "smtp.gmail.com"
+    smtp_port = 587
+
+    smtp_user = "ayj0519@gmail.com"
+    smtp_password = "앱비밀번호"   # ⚠️ 실제론 env로 빼는 게 정석
+
+    msg = MIMEText(body, "plain", "utf-8")
+    msg["Subject"] = "TripMocha 아이디 찾기 안내"
+    msg["From"] = smtp_user
+    msg["To"] = to_email
+
+    server = smtplib.SMTP(smtp_server, smtp_port)
+    server.starttls()
+    server.login(smtp_user, smtp_password)
+    server.sendmail(smtp_user, [to_email], msg.as_string())
+    server.quit()    
+
 @api_bp.route('/api/send_auth_code', methods=['POST'])
 def send_auth_code():
     email = request.form.get('email')
@@ -100,6 +128,7 @@ def send_auth_code():
     except Exception as e:
         print("이메일 전송 오류:", e)
         return jsonify({"success": False, "message": "메일 발송 실패"}), 500
+
     
     
 @api_bp.route('/api/verify_auth_code', methods=['POST'])
@@ -116,6 +145,8 @@ def verify_auth_code():
         return jsonify({"success": True, "message": "인증 성공!"})
     else:
         return jsonify({"success": False, "message": "인증번호가 일치하지 않습니다."})
+
+
     
 # ----------------------------------------------------
 # C. Gemini API 키 설정 및 보안 강화
@@ -170,7 +201,7 @@ def process_login():
 
         # 해당 아이디의 비밀번호 해시 가져오기
         cursor.execute("""
-            SELECT password
+            SELECT password, name
             FROM users
             WHERE user_id = %s
         """, (user_id,))
@@ -185,13 +216,14 @@ def process_login():
             """
 
         stored_hashed_pw = row[0]
+        user_name = row[1]
 
-        #  입력 비번 vs 해시 비교
         if bcrypt.checkpw(password.encode('utf-8'),
-                          stored_hashed_pw.encode('utf-8')):
+                        stored_hashed_pw.encode('utf-8')):
             session['user_id'] = user_id
-            print(" 로그인 성공:", user_id)
+            session['user_name'] = user_name   
             return redirect(url_for('login_bp.index_page'))
+
         else:
             return """
                 <script>
@@ -340,43 +372,42 @@ def check_userid():
         print("아이디 중복확인 오류:", e)
         return jsonify({"exists": True})  # 오류 시 안전하게 '중복' 처리
 
-
-
 @login_bp.route('/find_id_process', methods=['POST'])
 def find_id_process():
     name = request.form.get("name")
     birthday = request.form.get("birthday")
     email = request.form.get("email")
 
-    print("아이디 찾기 요청:", name, birthday, email)
-
     try:
         db = get_db()
         cursor = db.cursor()
 
         cursor.execute("""
-            SELECT user_id 
+            SELECT user_id
             FROM users
             WHERE name = %s AND birthday = %s AND email = %s
         """, (name, birthday, email))
 
-        result = cursor.fetchone()
+        results = cursor.fetchall()
 
-        if result:
-            user_id = result[0]
-            return f"""
-                <script>
-                    alert("고객님의 아이디는 '{user_id}' 입니다!");
-                    window.location.href = "/login";
-                </script>
-            """
-        else:
+        if not results:
             return """
                 <script>
                     alert("일치하는 정보를 찾을 수 없습니다.");
                     history.back();
                 </script>
             """
+
+        #  아이디 마스킹 후 화면 표시
+        masked_ids = [mask_user_id(row[0]) for row in results]
+        id_text = "\\n".join(masked_ids)
+
+        return f"""
+            <script>
+                alert("고객님의 아이디는 다음과 같습니다:\\n\\n{id_text}");
+                window.location.href = "/login";
+            </script>
+        """
 
     except Exception as e:
         print("아이디 찾기 오류:", e)
@@ -480,75 +511,4 @@ def update_profile():
 
 
 
-# ----------------------------------------------------
-# C. Gemini API 호출 라우팅 (여행 계획 생성)
-# ----------------------------------------------------
 
-# XML_PROMPT_TEMPLATE = """
-# 당신은 오직 XML 형식의 데이터만을 출력해야 합니다. 추가적인 설명이나 서론/결론 문구를 절대 포함하지 마세요.
-# {destination_str} 여행을 {duration_str} 동안 {date_str}부터 2명(남,여 각 1명) 이 여행하고 싶은데 여행 코스를 작성해줘
-# 작성된 결과는 다음 XML 문서의 {{}}안에 작성해줘. 여행코스 태그는 여행 일자에 따라서 반복해서 작성해줘
-# 숙소 태그에 내용이 없으면 "내용없음"으로 출력해줘
-
-# <여행가이드>
-#     <여행코스>
-#         <일자>{{여행일자}}</일자>
-#         <장소>{{장소}}</장소>
-#         <숙소>{{숙소}}</숙소>
-#         <비용>{{비용}}</비용>
-#         <지도위치>{{위도}},{{경도}}</지도위치>
-#         <상세설명>
-#             <오전>{{상세설명}}</오전>
-#             <점심>{{상세설명}}</점심>
-#             <오후>{{상세설명}}</오후>
-#         </상세설명>
-#     </여행코스>
-# </여행가이드>
-# """
-
-# @login_bp.route('/api/travel_plan', methods=['POST'])
-# def get_travel_plan():
-#     """프론트엔드 요청을 받아 Gemini API를 호출하고 XML 결과를 반환합니다."""
-    
-#     try:
-#         data = request.json
-#         date_query = data.get('startDate', '2025년 12월 1일')
-#         duration_query = data.get('duration', '1박 2일')
-#         destination_query = data.get('destination', '파주')
-        
-#         if not destination_query or not date_query or not duration_query:
-#             return jsonify({'xml_data': "<여행가이드><error>INVALID_INPUT: 지역, 날짜 또는 기간 정보가 누락되었습니다.</error></여행가이드>"}), 400
-    
-#     except Exception:
-#         return jsonify({'xml_data': "<여행가이드><error>INVALID_REQUEST: 요청 JSON 형식이 잘못되었습니다.</error></여행가이드>"}), 400
-    
-#     xml_result = generate_gemini_travel_plan(date_query, destination_query, duration_query)
-    
-#     return jsonify({'xml_data': xml_result})
-
-
-# def generate_gemini_travel_plan(date_str: str, destination_str: str, duration_str: str) -> str:
-#     """Gemini API를 호출하여 XML 형식의 여행 계획을 생성합니다."""
-    
-#     prompt = XML_PROMPT_TEMPLATE.format(
-#         date_str=date_str, 
-#         destination_str=destination_str,
-#         duration_str=duration_str
-#     )
-    
-#     try:
-#         # NOTE: 이 함수를 별도의 services/gemini_service.py로 분리하는 것이 좋습니다.
-#         client = genai.Client(api_key=GEMINI_API_KEY) 
-#         model = 'gemini-2.5-flash'
-        
-#         response = client.models.generate_content(
-#             model=model,
-#             contents=prompt,
-#         )
-        
-#         return response.text
-
-#     except APIError as e:
-#         return f"<여행가이드><error>API_ERROR: {e}</error></여행가이드>"
-#     except Exception as e:
-#         return f"<여행가이드><error>UNKNOWN_ERROR: {e}</error></여행가이드>"

@@ -21,7 +21,6 @@
                         placeholder="이름을 입력하세요" 
                         required>
                 </div>
-
                 <div class="input-group">
                     <input type="text" 
                         id="birthday" 
@@ -30,7 +29,6 @@
                         maxlength="8" 
                         required>
                 </div>
-
                 <div class="input-group">
                     <input type="email" 
                         id="email" 
@@ -38,11 +36,8 @@
                         placeholder="가입 시 사용한 이메일을 입력하세요"
                         required>
                 </div>
-
                 <button type="submit" class="login-btn">아이디 찾기</button>
             </form>
-
-
             <div class="find-links">
                 <a href="{{ url_for('login_bp.find_password') }}">비밀번호 찾기</a>
                 <a href="{{ url_for('login_bp.find_id_page') }}">아이디 찾기</a>

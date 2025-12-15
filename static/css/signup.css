@@ -10,7 +10,6 @@
 /* ==============================
    성별 / 국적 선택
 ============================== */
-
 .select-container {
     display: flex;
     justify-content: space-between;
@@ -28,9 +27,9 @@
     background: #fff;
     border: 1.5px solid #ccc;
     border-radius: 8px;
-    transition: all 0.2s ease;
     font-size: 15px;
     font-weight: 600;
+    transition: all 0.2s ease;
 }
 
 .select-btn:hover {
@@ -38,8 +37,8 @@
 }
 
 .select-btn.selected {
-    background: #00a84a;
-    color: white;
+    background: #06402B;
+    color: #fff;
     border-color: #008a3c;
     transform: scale(1.04);
     box-shadow: 0 3px 8px rgba(0, 150, 70, 0.25);
@@ -48,7 +47,6 @@
 /* ==============================
    여행 스타일 선택
 ============================== */
-
 .style-label {
     font-size: 15px;
     font-weight: 700;
@@ -67,9 +65,9 @@
     border-radius: 30px;
     border: 2px solid #ccc;
     background: #f4f4f4;
-    transition: all 0.2s ease;
     font-size: 14px;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .style-btn:hover {
@@ -79,12 +77,14 @@
 .style-btn.selected {
     background: linear-gradient(135deg, #00a84a, #2ecc71);
     border-color: #009744;
-    color: white;
-    box-shadow: 0 3px 10px rgba(0, 150, 70, 0.3);
+    color: #fff;
     transform: translateY(-2px);
+    box-shadow: 0 3px 10px rgba(0, 150, 70, 0.3);
 }
 
-
+/* ==============================
+   약관 박스
+============================== */
 .terms-box {
     border: 1.5px solid #ddd;
     border-radius: 10px;
@@ -96,7 +96,6 @@
 .terms-title {
     font-weight: 600;
     margin-bottom: 10px;
-    display: block;
 }
 
 .terms-item {
@@ -107,4 +106,157 @@
 
 .terms-item input {
     margin-right: 8px;
+}
+
+/* ==============================
+   토스트 메시지
+============================== */
+.toast {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    z-index: 9999;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-7px);
+}
+
+.hidden {
+    display: none;
+}
+
+/* ==============================
+   아이디 중복 메시지
+============================== */
+#id_check_message {
+    margin-top: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+#id_check_message.text-red-500 {
+    color: #e63946 !important;
+}
+
+#id_check_message.text-green-600 {
+    color: #2a9d8f !important;
+}
+
+/* ==============================
+   우편번호 + 주소 스타일
+============================== */
+
+/* 공통 input 스타일 */
+#postcode,
+#address,
+#detail_address {
+    background: #f2f4f5;
+    border: 1.5px solid #d0d4d7;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 15px;
+    color: #333;
+    transition: 0.2s ease;
+}
+
+/* 포커스 효과 */
+#postcode:focus,
+#address:focus,
+#detail_address:focus {
+    border-color: #3cb371;
+    box-shadow: 0 0 0 3px rgba(60, 179, 113, 0.25);
+}
+
+/* 주소 검색 버튼 */
+#search_address_btn {
+    background: #06402B;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px;
+    transition: 0.2s ease;
+}
+
+#search_address_btn:hover {
+    background: #006600;
+}
+
+#search_address_btn:active {
+    background: #006600;
+    transform: scale(0.98);
+}
+
+/* 가로 배치 */
+.address-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+/* flex 비율 설정 */
+.address-row #postcode {
+    flex: 1;
+}
+
+.address-row #search_address_btn {
+    flex: 1.2;
+    height: 48px;   /* 입력칸 높이와 동일하게 */
+}
+
+
+
+/* ==============================
+   비밀번호 강도 표시
+============================== */
+#password_strength {
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.pw-weak {
+    color: #e63946;
+}
+
+.pw-medium {
+    color: #f4a261;
+}
+
+.pw-strong {
+    color: #2a9d8f;
+}
+
+
+
+
+.required {
+    color: #e74c3c;
+    margin-left: 4px;
+    font-weight: bold;
+}
+
+.required-info {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 12px;
+}
+
+.input-label {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    display: block;
 }

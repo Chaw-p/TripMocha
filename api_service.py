@@ -90,29 +90,42 @@ class APIService :
       "MobileApp": "AppTest",
       "serviceKey": str(self.api_key),
       "_type": "json",
-      "numOfRows": 20
+      "numOfRows": 10
     }
     params.update(param)
-    # print("params:",params,", url:", url)
-    response = requests.get(url,headers=self.headers, params=params)
-    # print(response.status_code)
-    contents = response.text
-    # print(contents)
+    try:
+      # print("params:",params,", url:", url)
+      response = requests.get(url,headers=self.headers, params=params)
+      # print(response.status_code)
+      contents = response.text
+      # print(contents)
 
-    #json.loads()를 사용하여 문자열을 파이썬 딕셔너리로 변환
-    data_dict = json.loads(contents)
-
+      #json.loads()를 사용하여 문자열을 파이썬 딕셔너리로 변환
+      data_dict = json.loads(contents)
+    ############################
+    except requests.exceptions.RequestException as e:
+        # 네트워크 오류, 타임아웃, HTTP 오류(4xx, 5xx) 발생 시
+        print(f"API 요청 실패 (네트워크/HTTP): {e}")
+        return None  # None 반환
+    except json.JSONDecodeError as e:
+        # 응답이 JSON 형식이 아닐 때
+        print(f"API 응답 JSON 디코딩 실패: {e}")
+        return None
+    ############################
     item_data = (
       data_dict.get("response", {})
       .get("body", {})
-      .get("items", {})
+      .get("items")
     )
 
-    if not isinstance(item_data, dict):
-      item_data = {}
-
+    # item_data가 None이거나 빈 리스트/딕셔너리가 아닌지 확인
+    if item_data is None or (isinstance(item_data, (dict, list)) and not item_data):
+      return None
+    
+    if isinstance(item_data, dict):
+      return item_data
+    
     return item_data
-
   #콘텐츠 타입
   def CONTENT_TYPE_REVERSE_MAPPING(self) :
     return {value : key for key, value in self.content_type_list.items()}
@@ -273,17 +286,23 @@ class APIService :
     return data
 
   # 키워드로 조회
-  def SearchKeyword(self, area, cat, keyword="", type="AC") :
+  def SearchKeyword(self, area=None, cat=None, keyword="", type="AC", page = 1) :
     url_key = f"searchKeyword2"
     param = {
       "pageNo": "1",
       "arrange": "O",
       "numOfRows": "10",
       #"lclsSystm1" : {"AC", "EV", "EX", "FD", "HS", "LS", "NA", "SH", "VE"},
-      "lclsSystm1" : type,
       "keyword": keyword
     }
+    if page is not None and page != 1:
+      param["pageNo"] = page
     
+    if type is not None and type != "":
+      param["lclsSystm1"] = type
+    else:
+      param["lclsSystm1"] = "AC"
+
     if area is not None and area != "":
       param["areaCode"] = area
 
@@ -304,9 +323,11 @@ class APIService :
     # print("param", param)
     item_data = self.AccessData(url = url_key, param = param)
 
-    # 추출된 item_data를 사용하여 id와 title을 안전하게 추출
-    items = item_data.get("item", [])
-
+    if not item_data:
+      items = []
+    else:
+      items = item_data.get("item", [])
+ 
     datas = [
       {
         "id" : i.get("contentid"),
@@ -331,38 +352,64 @@ class APIService :
     return data_dict
 
   #지역으로 찾기
-  def SearchArea(self, area=None, type=None) :
+  def SearchArea(self,  area=None, cat=None, type="AC", page = 1) :
     url_key = f"areaBasedList2"
     param = {
         "arrange" : "O",
         "lclsSystm1" : type
     }
-    if area:
+    if page is not None and page != 1:
+      param["pageNo"] = page
+    
+    if type is not None and type != "":
+      param["lclsSystm1"] = type
+    else:
+      param["lclsSystm1"] = "AC"
+
+    if area is not None and area != "":
       param["areaCode"] = area
-    if type:
-      param["contentTypeId"] = type
-    
-    item_data = self.AccessData(url = url_key, param = param)  
-    
+
+    if cat is not None and cat != "":
+      #A01010900
+      cat = cat.strip()
+      cat1 = cat[:3]   #A01
+
+      if cat1:
+        param["cat1"] = cat1
+        cat2 = cat[3:5]  #01
+        if cat2:
+          param["cat2"] = cat1 + cat2
+          cat3 = cat[5:]   #0900
+          if cat3:
+            param["cat3"] = cat
+
+    # print("param", param)
+    item_data = self.AccessData(url = url_key, param = param) 
     items = item_data.get("item", [])
     datas = [
-      {
-       "id" : i.get("contentid"),
-       "title" : i.get("title"),
-       "addr1" : i.get("addr1"),
-       "image" : i.get("firstimage"),
-       "typecode1": i.get("lclsSystm1"),
-      #  "contenttypeid": (
-      #     self.CONTENT_TYPE_MAPPING(int(i.get("contenttypeid", 0)))  
-      #     #CONTENT_TYPE_MAPPING.get(int(i.get("contenttypeid", 0)), i.get("contenttypeid"))
-      #   ),
-        "areacode" : self.AREA_CODE_MAPPING(i.get("areacode"))
-      }
-      for i in items
-    ]
-    return datas
+        {
+          "id" : i.get("contentid"),
+          "title" : i.get("title"),
+          "addr1" : i.get("addr1"),
+          "image" : i.get("firstimage"),
+          "typecode1": i.get("lclsSystm1"),
+          "type": self.TYPE_MAPPING(i.get("lclsSystm1")),
+          "area" : self.AREA_CODE_MAPPING(i.get("areacode")),
+          "areacode" : i.get("areacode"),
+          "cat3" : i.get("cat3"),
+          "cat3_name" : self.CATEGORY_CODE_MAPPING(i.get("cat3"))
+        }
+        for i in items
+      ]
+
+    data_dict = {
+      "type" : type,
+      "value": datas
+    }
+    return data_dict
 
 # api_service = APIService()
+# print(api_service.SearchKeyword(keyword="와룡산"))
 # # print(api_service.CATEGORY_CODE_MAPPING('A01010100'))
 # aa = [f'{k}: {api_service.CATEGORY_CODE_CALL(k)}' for key, val in api_service.cat2_list.items() for k in val.keys()]
 # print(aa)

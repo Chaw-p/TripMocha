@@ -7,6 +7,7 @@
   {% include 'config/config.html' %}
   <link rel="stylesheet" href="{{url_for('static', filename='css/info.css')}}">
   <script src="{{url_for('static', filename='js/info.js')}}"></script>
+  <script src="{{url_for('static', filename='js/scroll.js')}}"></script>
 </head>
 <body>
   <style>
@@ -38,11 +39,10 @@
               </ul>
             </div>
             <div id="section">
-              
               <h2>
                 # {{query}}
               </h2>
-              <ul class="travel_list">
+              <ul class="travel_list" id="travel_list">
                   <p>{{items.type}}</p>
                   {% for item in items %}
                   <li>
@@ -86,6 +86,7 @@
                   </div>
                 </li>
               </ul>
+              <p id="sentinel"></p>
             </div>
         </div>
       </div>
