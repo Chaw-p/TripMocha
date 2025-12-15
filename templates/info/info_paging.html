@@ -1,0 +1,27 @@
+{% for item in items %}
+<li>
+  <a href="/info/{{item.id}}">
+    <img src="{{item.image}}">
+  </a>
+  <div class="list_cont">
+    <h3 class="title">
+      <a href="/info/{{item.id}}">{{item.title}}</a>
+    </h3>
+    <p class="loc">{{item.addr1}}</p>
+    <p class="hash">
+      <a href="{{ url_for('info.info',type='%s' % item.typecode1) }}"
+      {% if type == item.typecode1 %}class="selected_hash"{% endif %}>
+        <span>#{{item.type}}</span></a>
+      <a href="{{ url_for('info.info',type='%s' % item.typecode1, area='%s' % item.areacode) }}"
+      {% if area == item.areacode %}class="selected_hash"{% endif %}>
+        <span>#{{item.area}}</span></a>
+      {% if item.cat3 and item.cat3_name %}
+      <a href="{{ url_for('info.info',type='%s' % item.typecode1, cat='%s' % item.cat3) }}"
+      {% if cat == item.cat3 %}class="selected_hash"{% endif %}>
+        <span>#{{item.cat3_name}}</span>
+      </a>
+      {% endif %}
+    </p>
+  </div>
+</li>
+{% endfor %}
