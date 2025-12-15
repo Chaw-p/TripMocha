@@ -4,22 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로그인</title>
-
-    <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 
-<!-- Flask에서 에러 메시지를 전달받으면 data-toast 속성으로 넣음 -->
 <body data-toast="{{ error if error }}">
-
     <div class="login-container">
         <a href="{{ url_for('index') }}">
         <img src="{{ url_for('static', filename='img/logo.png') }}">
       </a>
-
         <main class="login-box">
-            
             <!-- 브라우저 기본 경고 막기 위해 novalidate 추가 -->
             <form action="/login" method="post" novalidate>
                 

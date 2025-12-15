@@ -37,7 +37,7 @@
 }
 
 .select-btn.selected {
-    background: #00a84a;
+    background: #006600;
     color: #fff;
     border-color: #008a3c;
     transform: scale(1.04);
@@ -237,4 +237,26 @@
 
 .pw-strong {
     color: #2a9d8f;
+}
+
+
+
+
+.required {
+    color: #e74c3c;
+    margin-left: 4px;
+    font-weight: bold;
+}
+
+.required-info {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 12px;
+}
+
+.input-label {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    display: block;
 }
