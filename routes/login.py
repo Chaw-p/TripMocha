@@ -201,7 +201,7 @@ def process_login():
 
         # 해당 아이디의 비밀번호 해시 가져오기
         cursor.execute("""
-            SELECT password
+            SELECT password, name
             FROM users
             WHERE user_id = %s
         """, (user_id,))
@@ -216,13 +216,14 @@ def process_login():
             """
 
         stored_hashed_pw = row[0]
+        user_name = row[1]
 
-        #  입력 비번 vs 해시 비교
         if bcrypt.checkpw(password.encode('utf-8'),
-                          stored_hashed_pw.encode('utf-8')):
+                        stored_hashed_pw.encode('utf-8')):
             session['user_id'] = user_id
-            print(" 로그인 성공:", user_id)
+            session['user_name'] = user_name   
             return redirect(url_for('login_bp.index_page'))
+
         else:
             return """
                 <script>

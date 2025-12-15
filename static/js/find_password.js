@@ -281,3 +281,58 @@ $("#reset_btn").on("click", function () {
 
     $("#find-password-form").submit();  // ← 비밀번호 변경 API 호출
 });
+
+
+function showButtonLoading($btn, text = "로딩중") {
+    $btn.data("original-html", $btn.html());
+
+    $btn.html(`
+        <span style="display:inline-flex; align-items:center; gap:6px;">
+            <span class="spinner"></span>
+            ${text}
+        </span>
+    `);
+
+    $btn.prop("disabled", true)
+        .css({
+            opacity: 0.7,
+            cursor: "not-allowed"
+        });
+}
+
+
+function hideButtonLoading($btn) {
+    const original = $btn.data("original-html");
+    if (original) {
+        $btn.html(original);
+    }
+
+    $btn.prop("disabled", false)
+        .css({
+            opacity: 1,
+            cursor: "pointer"
+        });
+}
+
+(function injectSpinnerStyle() {
+    if (document.getElementById("spinner-style")) return;
+
+    const style = document.createElement("style");
+    style.id = "spinner-style";
+    style.innerHTML = `
+        .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
+})();
+
