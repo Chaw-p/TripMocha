@@ -570,5 +570,5 @@ def update_profile():
     )
 
     db.commit()
-
+    session["user_name"] = name
     return redirect(url_for("index"))
