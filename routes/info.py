@@ -78,17 +78,18 @@ def tourapi_info():
   page = request.args.get("page", 1, type=int)
   print(f"query={query},stype={stype},sarea={sarea},scat={scat},page={page} ")
   if not query or query == "전체":
-    # SearchArea 함수를 수정하여 페이지 번호를 받도록 가정합니다.
     items_data = APIService().SearchArea(area=sarea, type =stype, cat=scat, page=page)
   else:
-    # SearchKeyword 함수가 페이지 번호를 처리하도록 가정합니다.
     items_data = APIService().SearchKeyword(keyword=query, type=stype, area=sarea, cat=scat, page=page)
-      
+    
   items_list = items_data.get("value", [])
   
-  # 💡 최종적으로 JSON을 반환합니다.
   return jsonify({
     'items': items_list,
     'page': page,
     'message': f'{page}페이지 데이터를 성공적으로 로드했습니다.'
   })
+
+@info_bp.route("/location")
+def location():
+  return render_template("info/add_location.html")

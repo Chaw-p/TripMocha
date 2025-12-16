@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TripMocha</title>
+  {% include 'config/config.html' %}
+  <link rel="stylesheet" href="{{url_for('static', filename='css/schedule_travel.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='css/info.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
+  <script src="{{url_for('static', filename='js/info.js')}}"></script>
+  <script src="{{url_for('static', filename='js/add_location.js')}}"></script>
+</head>
+<body>
+  <div>
+    <div id="waitMsg">
+      <img src="../static/img/icons8-loading-96.gif">
+    </div>
+    <div id="modal-search-area">
+      <form id="modalform" name="search" method="get" onsubmit="return DoSearch2(event);">
+        <select name="locType" id="locType">
+          <option value="AC">숙박</option>
+          <option value="EX">체험</option>
+          <option value="FD">음식</option>
+          <option value="HS">역사</option>
+          <option value="NA">자연</option>
+          <option value="SH">쇼핑</option>
+          <option value="VE">문화</option>
+        </select>
+        <div id="modal-search-input-box">
+          <input type="search" id="locQuery" name="locQuery" placeholder="여행지를 입력해 주세요.">
+          <button class="search_btn">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    <ul class="travel_list schedule_travel_list" id="schedule_travel_list">
+      <div class="no-result">
+        <p>
+          <span class="material-symbols-outlined">search</span>
+        </p>
+        <p>
+          검색 결과가 없습니다.
+        </p>
+      </div>
+      <li id="sentinel" style="height: 1px; margin: 0; padding: 0; visibility: hidden;"></li>
+    </ul>
+    <button onclick="SelectedLiData()">선택</button>
+  </div>
+</body>
+</html>

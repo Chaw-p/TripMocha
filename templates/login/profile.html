@@ -4,86 +4,88 @@
 <head>
     <meta charset="UTF-8" />
     <title>내 정보 수정</title>
-    
+
 </head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+
 <body>
 
-<div class="profile-container">
+    <div class="profile-container">
 
-    <h2 class="profile-title">내 정보 수정</h2>
-    <button type="button" class="back-btn" onclick="history.back()">← 뒤로가기</button>
-    
-    <form action="/profile/update" method="post" class="profile-form">
+        <h2 class="profile-title">내 정보 수정</h2>
+        <button type="button" class="back-btn" onclick="history.back()">← 뒤로가기</button>
 
-        <label>아이디 (변경 불가)</label>
-        <input type="text" value="{{ user[0] }}" disabled>
+        <form action="/profile/update" method="post" class="profile-form">
 
-        <label>현재 비밀번호</label>
-        <input type="password" name="current_password" placeholder="기존 비밀번호 입력">
+            <label>아이디 (변경 불가)</label>
+            <input type="text" value="{{ user[0] }}" disabled>
 
-        <label>새 비밀번호</label>
-        <input type="password" name="new_password" placeholder="새 비밀번호 입력">
+            <label>현재 비밀번호</label>
+            <input type="password" name="current_password" placeholder="기존 비밀번호 입력">
 
-        <label>새 비밀번호 확인</label>
-        <input type="password" name="new_password_confirm" placeholder="새 비밀번호 확인">
+            <label>새 비밀번호</label>
+            <input type="password" name="new_password" placeholder="새 비밀번호 입력">
 
-        <label>이름</label>
-        <input type="text" name="name" value="{{ user[1] }}" required>
+            <label>새 비밀번호 확인</label>
+            <input type="password" name="new_password_confirm" placeholder="새 비밀번호 확인">
 
-        <label>생년월일</label>
-        <input type="text" name="birthday" value="{{ user[2] }}" maxlength="8" required>
+            <label>이름</label>
+            <input type="text" name="name" value="{{ user[1] }}" required>
 
-        <label>이메일</label>
-        <input type="email" name="email" value="{{ user[3] }}" required>
+            <label>생년월일</label>
+            <input type="text" name="birthday" value="{{ user[2] }}" maxlength="8" required>
 
-        <label>휴대폰 번호</label>
-        <input type="text" name="phone" value="{{ user[4] }}">
+            <label>이메일</label>
+            <input type="email" name="email" value="{{ user[3] }}" required>
 
-        <label>성별</label>
-        <select name="gender">
-            <option value="M" {% if user[5]=='M' %}selected{% endif %}>남자</option>
-            <option value="F" {% if user[5]=='F' %}selected{% endif %}>여자</option>
-        </select>
+            <!-- <label>휴대폰 번호</label>
+        <input type="text" name="phone" value="{{ user[4] }}"> -->
 
-        <label>국적</label>
-        <select name="nation">
-            <option value="K" {% if user[6]=='K' %}selected{% endif %}>내국인</option>
-            <option value="F" {% if user[6]=='F' %}selected{% endif %}>외국인</option>
-        </select>
+            <label>성별</label>
+            <select name="gender">
+                <option value="M" {% if user[5]=='M' %}selected{% endif %}>남자</option>
+                <option value="F" {% if user[5]=='F' %}selected{% endif %}>여자</option>
+            </select>
 
-        <label>우편번호</label>
-        <input type="text" name="postcode" value="{{ user[7] }}">
+            <label>국적</label>
+            <select name="nation">
+                <option value="K" {% if user[6]=='K' %}selected{% endif %}>내국인</option>
+                <option value="F" {% if user[6]=='F' %}selected{% endif %}>외국인</option>
+            </select>
 
-        <label>주소</label>
-        <input type="text" name="address" value="{{ user[8] }}">
+            <label>우편번호</label>
+            <input type="text" name="postcode" value="{{ user[7] }}">
 
-        <label>상세 주소</label>
-        <input type="text" name="detail_address" value="{{ user[9] }}">
+            <label>주소</label>
+            <input type="text" name="address" value="{{ user[8] }}">
 
-        <!-- 여행 스타일 -->
-        <label>여행 스타일 (최대 4개)</label>
-        <div id="style-container">
-            <button type="button" class="style-btn" data-value="spring_flower">🌸 봄꽃</button>
-            <button type="button" class="style-btn" data-value="summer_sea">☀️ 여름바다</button>
-            <button type="button" class="style-btn" data-value="autumn_leaf">🍁 가을단풍</button>
-            <button type="button" class="style-btn" data-value="winter_snow">❄️ 겨울눈</button>
-            <button type="button" class="style-btn" data-value="water_play">🏊 물놀이</button>
-            <button type="button" class="style-btn" data-value="trekking">🏃 운동/트레킹</button>
-            <button type="button" class="style-btn" data-value="food_tour">🍜 맛집</button>
-            <button type="button" class="style-btn" data-value="healing">🌿 힐링</button>
-            <button type="button" class="style-btn" data-value="night_view">🌙 야경</button>
-            <button type="button" class="style-btn" data-value="activity">🎢 액티비티</button>
-        </div>
+            <label>상세 주소</label>
+            <input type="text" name="detail_address" value="{{ user[9] }}">
 
-        <input type="hidden" name="travel_style" id="travel_style" value="{{ user[10] }}">
+            <!-- 여행 스타일 -->
+            <label>여행 스타일 (최대 4개)</label>
+            <div id="style-container">
+                <button type="button" class="style-btn" data-value="spring_flower">🌸 봄꽃</button>
+                <button type="button" class="style-btn" data-value="summer_sea">☀️ 여름바다</button>
+                <button type="button" class="style-btn" data-value="autumn_leaf">🍁 가을단풍</button>
+                <button type="button" class="style-btn" data-value="winter_snow">❄️ 겨울눈</button>
+                <button type="button" class="style-btn" data-value="water_play">🏊 물놀이</button>
+                <button type="button" class="style-btn" data-value="trekking">🏃 운동/트레킹</button>
+                <button type="button" class="style-btn" data-value="food_tour">🍜 맛집</button>
+                <button type="button" class="style-btn" data-value="healing">🌿 힐링</button>
+                <button type="button" class="style-btn" data-value="night_view">🌙 야경</button>
+                <button type="button" class="style-btn" data-value="activity">🎢 액티비티</button>
+            </div>
 
-        <button class="profile-btn" type="submit">수정하기</button>
-    </form>
+            <input type="hidden" name="travel_style" id="travel_style" value="{{ user[10] }}">
 
-</div>
+            <button class="profile-btn" type="submit">수정하기</button>
+        </form>
 
-<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
 
 </body>
+
 </html>
