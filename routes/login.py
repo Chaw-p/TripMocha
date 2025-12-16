@@ -30,6 +30,8 @@ from dotenv import load_dotenv
 from flask_mail import Message
 from extensions import mail
 
+from datetime import datetime, timedelta
+
 
 load_dotenv()
 
@@ -229,40 +231,104 @@ def process_login():
         db_conn = get_db()
         cursor = db_conn.cursor()
 
-        # 해당 아이디의 비밀번호 해시 가져오기
+        # 아이디 조회 (로그인 제한 컬럼 포함)
         cursor.execute(
             """
-            SELECT password, name
+            SELECT password, name, login_fail_count, login_locked_until
             FROM users
             WHERE user_id = %s
-        """,
+            """,
             (user_id,),
         )
         row = cursor.fetchone()
 
+        # 아이디 없음
         if not row:
             return """
                 <script>
-                    alert("존재하지 않는 아이디입니다.");
+                    alert("아이디 또는 비밀번호가 올바르지 않습니다.");
                     history.back();
                 </script>
             """
 
         stored_hashed_pw = row[0]
         user_name = row[1]
+        login_fail_count = row[2] or 0
+        login_locked_until = row[3]
 
-        if bcrypt.checkpw(password.encode("utf-8"), stored_hashed_pw.encode("utf-8")):
-            session["user_id"] = user_id
-            session["user_name"] = user_name
-            return redirect(url_for("login_bp.index_page"))
+        now = datetime.now()
 
-        else:
+        # 아이디 잠금 여부 확인
+        if login_locked_until and login_locked_until > now:
             return """
                 <script>
-                    alert("비밀번호가 일치하지 않습니다.");
+                    alert("로그인 시도 횟수 초과!\\n10분 후 다시 시도해주세요 😴");
                     history.back();
                 </script>
             """
+
+        # 비밀번호 확인
+        if bcrypt.checkpw(password.encode("utf-8"), stored_hashed_pw.encode("utf-8")):
+            # 로그인 성공 → 실패 기록 초기화
+            cursor.execute(
+                """
+                UPDATE users
+                SET login_fail_count = 0,
+                    login_locked_until = NULL
+                WHERE user_id = %s
+                """,
+                (user_id,),
+            )
+            db_conn.commit()
+
+            session["user_id"] = user_id
+            session["user_name"] = user_name
+
+            return redirect(url_for("login_bp.index_page"))
+
+        # 비밀번호 틀림 → 실패 횟수 증가
+        login_fail_count += 1
+
+        # 5회 실패 → 10분 잠금
+        if login_fail_count >= 5:
+            lock_until = now + timedelta(minutes=10)
+            cursor.execute(
+                """
+                UPDATE users
+                SET login_fail_count = 0,
+                    login_locked_until = %s
+                WHERE user_id = %s
+                """,
+                (lock_until, user_id),
+            )
+            db_conn.commit()
+
+            return """
+                <script>
+                    alert("로그인 실패 5회 초과!\\n10분 후 다시 시도해주세요 ⛔");
+                    history.back();
+                </script>
+            """
+
+        # 아직 기회 남음
+        cursor.execute(
+            """
+            UPDATE users
+            SET login_fail_count = %s
+            WHERE user_id = %s
+            """,
+            (login_fail_count, user_id),
+        )
+        db_conn.commit()
+
+        remaining = 5 - login_fail_count
+
+        return f"""
+            <script>
+                alert("아이디 또는 비밀번호가 올바르지 않습니다.\\n남은 시도 횟수: {remaining}회");
+                history.back();
+            </script>
+        """
 
     except Exception as e:
         print("로그인 오류:", e)
@@ -272,7 +338,6 @@ def process_login():
                 history.back();
             </script>
         """
-
 
 # 8. 회원가입 폼 처리 라우트: /signup (POST 요청)
 @login_bp.route("/signup", methods=["POST"])
@@ -468,6 +533,7 @@ def find_id_process():
 
 @login_bp.route("/reset_password", methods=["POST"])
 def reset_password():
+    session.clear()
     user_id = request.form.get("user_id")
     new_password = request.form.get("new_password")
 
