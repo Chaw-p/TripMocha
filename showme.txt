@@ -49,3 +49,12 @@ pip install numpy==2.1.3
 or 
 최신버전 
 pip install --upgrade numpy
+
+
+html - 코드정리
+ Shift + Alt + F 
+
+python
+Black Formatter 설치 및 적용
+터미널 x
+(코드정리  Shift + Alt + F)

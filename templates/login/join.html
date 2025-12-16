@@ -11,176 +11,181 @@
 </head>
 
 <body>
-<div class="login-container">
-    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="TripMocha 로고" class="tripmocha-logo">
+    <div class="login-container">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="TripMocha 로고" class="tripmocha-logo">
 
-    <main class="login-box w-full bg-white p-8 md:p-10 rounded-xl shadow-2xl">
-        <h2 class="text-2xl font-bold mb-8 text-gray-800">회원가입</h2>
+        <main class="login-box w-full bg-white p-8 md:p-10 rounded-xl shadow-2xl">
+            <h2 class="text-2xl font-bold mb-8 text-gray-800">회원가입</h2>
 
-        <form action="/signup" method="post" class="signup-form space-y-4">
-            <p class="required-info">
-                <span class="required">*</span> 필수 입력 항목입니다
-            </p>
-            <!-- 아이디 -->
-            <label class="input-label">
-                아이디 <span class="required">*</span>
-            </label>
-            <div class="input-group id-check-group flex space-x-2">
-                <input type="text" name="user_id" id="user_id" placeholder="아이디" required>
-                <button type="button" id="check_duplicate_btn" class="id-check-btn">중복 확인</button>
-            </div>
-            <p id="id_check_message" class="text-sm text-gray-500">
-                아이디를 입력하고 중복 확인을 눌러주세요.
-            </p>
-
-            <!-- 비밀번호 -->
-            <label class="input-label">
-                비밀번호 <span class="required">*</span>
-            </label>
-            <div class="input-group">
-                <input type="password" name="password" id="password" placeholder="비밀번호" required>
-            </div>
-            <p id="password_strength" class="text-sm mt-[-5px] mb-2"></p>
-
-            <label class="input-label">
-                비밀번호 확인 <span class="required">*</span>
-            </label>
-            <div class="input-group">
-                <input type="password" name="password_confirm" id="password_confirm" placeholder="비밀번호 확인" required>
-            </div>
-
-
-            <p id="password_match_message" class="text-sm mt-[-10px] mb-4 text-red-500 hidden"></p>
-
-            <!-- 이름 -->
-            <label class="input-label">
-                이름 <span class="required">*</span>
-            </label>
-            <div class="input-group">
-                <input type="text" name="name" placeholder="이름" required>
-            </div>
-
-
-            <!-- 생년월일 -->
-            <label class="input-label">
-                생년월일 <span class="required">*</span>
-            </label>
-            <div class="input-group">
-                <input type="text" name="birthday" id="birthday" maxlength="8"
-                    placeholder="생년월일 (YYYYMMDD)" required>
-            </div>
-
-
-            <!-- 이메일 -->
-            <label class="input-label">
-                이메일 <span class="required">*</span>
-            </label>
-            <div class="input-group">
-                <input type="email" name="email" placeholder="이메일" required>
-            </div>
-
-
-            <!-- 주소 -->
-            <div class="address-row">
-                <input type="text" id="postcode" name="postcode" placeholder="우편번호" readonly>
-                
-                <button type="button" id="search_address_btn">주소 검색</button>
-            </div>
-
-
-            <div class="input-group mb-2">
-                <input type="text" id="address" name="address" placeholder="기본 주소" readonly
-                       class="w-full px-4 py-2 border rounded bg-gray-100">
-            </div>
-
-            <div class="input-group">
-                <input type="text" id="detail_address" name="detail_address" placeholder="상세 주소"
-                       class="w-full px-4 py-2 border rounded">
-            </div>
-
-            <!-- 성별 -->
-            <label class="input-label">
-                성별 <span class="required">*</span>
-            </label>
-
-            <div id="gender-buttons" class="select-container">
-                <button type="button" class="select-btn" data-value="M">남자</button>
-                <button type="button" class="select-btn" data-value="F">여자</button>
-            </div>
-            <input type="hidden" id="selected-gender" name="gender" required>
-
-            <!-- 국적 -->
-            <label class="input-label">
-                국적 <span class="required">*</span>
-            </label>
-
-            <div id="nation-buttons" class="select-container">
-                <button type="button" class="select-btn" data-value="K">내국인</button>
-                <button type="button" class="select-btn" data-value="F">외국인</button>
-            </div>
-            <input type="hidden" id="selected-nation" name="nation" required>
-
-            <!-- 여행 스타일 -->
-            <label class="style-label">선호 여행 스타일 (최대 4개)</label>
-
-            <div id="style-container">
-                <button type="button" class="style-btn" data-value="spring_flower">🌸 봄꽃</button>
-                <button type="button" class="style-btn" data-value="summer_sea">☀️ 여름바다</button>
-                <button type="button" class="style-btn" data-value="autumn_leaf">🍁 가을단풍</button>
-                <button type="button" class="style-btn" data-value="winter_snow">❄️ 겨울눈</button>
-                <button type="button" class="style-btn" data-value="water_play">🏊 물놀이</button>
-                <button type="button" class="style-btn" data-value="trekking">🏃 운동/트레킹</button>
-                <button type="button" class="style-btn" data-value="food_tour">🍜 맛집</button>
-                <button type="button" class="style-btn" data-value="healing">🌿 힐링</button>
-                <button type="button" class="style-btn" data-value="night_view">🌙 야경</button>
-                <button type="button" class="style-btn" data-value="activity">🎢 체험/액티비티</button>
-            </div>
-                        <!-- 약관 동의 영역 -->
-            <div class="terms-box">
-                <!-- 전체 동의 -->
-                <label class="terms-all">
-                    <input type="checkbox" id="term_all">
-                    전체 동의
+            <form action="/signup" method="post" class="signup-form space-y-4">
+                <p class="required-info">
+                    <span class="required">*</span> 필수 입력 항목입니다
+                </p>
+                <!-- 아이디 -->
+                <label class="input-label">
+                    아이디 <span class="required">*</span>
                 </label>
-                <hr>
-                <!-- (필수) 서비스 이용약관 -->
-                <label class="terms-item">
-                    <input type="checkbox" class="term-check required-term">
-                    [필수] 서비스 이용약관 동의
+                <div class="input-group id-check-group flex space-x-2">
+                    <input type="text" name="user_id" id="user_id" placeholder="아이디" required>
+                    <button type="button" id="check_duplicate_btn" class="id-check-btn">중복 확인</button>
+                </div>
+                <p id="id_check_message" class="text-sm text-gray-500">
+                    아이디를 입력하고 중복 확인을 눌러주세요.
+                </p>
+
+                <!-- 비밀번호 -->
+                <label class="input-label">
+                    비밀번호 <span class="required">*</span>
+                </label>
+                <div class="input-group">
+                    <input type="password" name="password" id="password" placeholder="비밀번호" required>
+                </div>
+                <p id="password_strength" class="text-sm mt-[-5px] mb-2"></p>
+
+                <label class="input-label">
+                    비밀번호 확인 <span class="required">*</span>
+                </label>
+                <div class="input-group">
+                    <input type="password" name="password_confirm" id="password_confirm" placeholder="비밀번호 확인" required>
+                </div>
+
+
+                <p id="password_match_message" class="text-sm mt-[-10px] mb-4 text-red-500 hidden"></p>
+
+                <!-- 이름 -->
+                <label class="input-label">
+                    이름 <span class="required">*</span>
+                </label>
+                <div class="input-group">
+                    <input type="text" name="name" placeholder="이름" required>
+                </div>
+
+
+                <!-- 생년월일 -->
+                <label class="input-label">
+                    생년월일 <span class="required">*</span>
+                </label>
+                <div class="input-group">
+                    <input type="text" name="birthday" id="birthday" maxlength="8" placeholder="생년월일 (YYYYMMDD)"
+                        required>
+                </div>
+
+
+                <!-- 이메일 -->
+                <label class="input-label">
+                    이메일 <span class="required">*</span>
+                </label>
+                <div class="input-group">
+                    <input type="email" name="email" placeholder="이메일" required>
+                </div>
+
+
+                <!-- 주소 -->
+                <div class="address-row">
+                    <input type="text" id="postcode" name="postcode" placeholder="우편번호" readonly>
+
+                    <button type="button" id="search_address_btn">주소 검색</button>
+                </div>
+
+
+                <div class="input-group mb-2">
+                    <input type="text" id="address" name="address" placeholder="기본 주소" readonly
+                        class="w-full px-4 py-2 border rounded bg-gray-100">
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="detail_address" name="detail_address" placeholder="상세 주소"
+                        class="w-full px-4 py-2 border rounded">
+                </div>
+
+                <!-- 성별 -->
+                <label class="input-label">
+                    성별 <span class="required">*</span>
                 </label>
 
-                <!-- (필수) 개인정보 수집·이용 -->
-                <label class="terms-item">
-                    <input type="checkbox" class="term-check required-term">
-                    [필수] 개인정보 수집 및 이용 동의
+                <div id="gender-buttons" class="select-container">
+                    <button type="button" class="select-btn" data-value="M">남자</button>
+                    <button type="button" class="select-btn" data-value="F">여자</button>
+                </div>
+                <input type="hidden" id="selected-gender" name="gender" required>
+
+                <!-- 국적 -->
+                <label class="input-label">
+                    국적 <span class="required">*</span>
                 </label>
 
-                <!-- (선택) 마케팅 수신 동의 -->
-                <label class="terms-item">
-                    <input type="checkbox" class="term-check optional-term">
-                    [선택] 마케팅 정보 수신 동의
-                </label>
-            </div>
+                <div id="nation-buttons" class="select-container">
+                    <button type="button" class="select-btn" data-value="K">내국인</button>
+                    <button type="button" class="select-btn" data-value="F">외국인</button>
+                </div>
+                <input type="hidden" id="selected-nation" name="nation" required>
 
-            <input type="hidden" name="travel_style" id="travel_style">
+                <!-- 여행 스타일 -->
+                <label class="style-label">선호 여행 스타일 (최대 4개)</label>
 
-            <!-- 가입하기 버튼 -->
-            <button type="submit" id="submit_btn"
+                <div id="style-container">
+                    <button type="button" class="style-btn" data-value="spring_flower">🌸 봄꽃</button>
+                    <button type="button" class="style-btn" data-value="summer_sea">☀️ 여름바다</button>
+                    <button type="button" class="style-btn" data-value="autumn_leaf">🍁 가을단풍</button>
+                    <button type="button" class="style-btn" data-value="winter_snow">❄️ 겨울눈</button>
+                    <button type="button" class="style-btn" data-value="water_play">🏊 물놀이</button>
+                    <button type="button" class="style-btn" data-value="trekking">🏃 운동/트레킹</button>
+                    <button type="button" class="style-btn" data-value="food_tour">🍜 맛집</button>
+                    <button type="button" class="style-btn" data-value="healing">🌿 힐링</button>
+                    <button type="button" class="style-btn" data-value="night_view">🌙 야경</button>
+                    <button type="button" class="style-btn" data-value="activity">🎢 체험/액티비티</button>
+                </div>
+                <!-- 약관 동의 영역 -->
+                <div class="terms-box">
+                    <!-- 전체 동의 -->
+                    <label class="terms-all">
+                        <input type="checkbox" id="term_all">
+                        전체 동의
+                    </label>
+
+                    <hr>
+
+                    <!-- (필수) 서비스 이용약관 -->
+                    <label class="terms-item">
+                        <input type="checkbox" class="term-check required-term">
+                        [필수] 서비스 이용약관 동의
+                    </label>
+
+                    <!-- (필수) 개인정보 수집·이용 -->
+                    <label class="terms-item">
+                        <input type="checkbox" class="term-check required-term">
+                        [필수] 개인정보 수집 및 이용 동의
+                    </label>
+
+                    <!-- (선택) 마케팅 수신 동의 -->
+                    <label class="terms-item">
+                        <input type="checkbox" class="term-check optional-term">
+                        [선택] 마케팅 정보 수신 동의
+                    </label>
+                </div>
+
+
+
+                <input type="hidden" name="travel_style" id="travel_style">
+
+                <!-- 가입하기 버튼 -->
+                <button id="submit_btn" id="submit_btn"
                     class="login-btn w-full h-12 bg-indigo-400 text-white font-semibold text-lg rounded-lg shadow-md">
-                가입하기
-            </button>
+                    가입하기
+                </button>
 
-        </form>
+            </form>
 
-        <div class="find-links">
-            <a href="{{ url_for('login_bp.login_page') }}">로그인</a>
-        </div>
-    </main>
-</div>
-<div id="toast" class="toast hidden"></div>
-<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-<script src="{{ url_for('static', filename='js/signup.js') }}"></script>
+            <div class="find-links">
+                <a href="{{ url_for('login_bp.login_page') }}">로그인</a>
+            </div>
+        </main>
+    </div>
+    <div id="toast" class="toast hidden"></div>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="{{ url_for('static', filename='js/signup.js') }}"></script>
 
 </body>
+
 </html>
