@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import DECIMAL
 
 db = SQLAlchemy() 
 
@@ -37,9 +38,24 @@ class TripMapping(db.Model):
     __tablename__ = 'trip_mapping'
     mapping_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     trip_no = db.Column(db.Integer, db.ForeignKey('trip_main.trip_no'))
-    detail_id = db.Column(db.String(100), db.ForeignKey('trip_de.trip_no'))
+    detail_id = db.Column(db.Integer, db.ForeignKey('trip_detail.detail_id'))
     day_sequence = db.Column(db.Integer)
     visit_order = db.Column(db.Integer)
+    content_id = db.Column(db.String(100))
    
     def __repr__(self):
         return f"<TripMapping {self.mapping_id}>"
+    
+class TripDetail(db.Model):
+    __tablename__ = 'trip_detail'
+    detail_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    trip_no = db.Column(db.Integer, db.ForeignKey('trip_main.trip_no'))
+    detail_name = db.Column(db.String(100))
+    address = db.Column(db.String(255))
+    latitude = db.Column(DECIMAL(13,10))
+    longitude = db.Column(DECIMAL(13,10))
+    category = db.Column(db.String(100))
+    trip_detail = db.Column(db.String(100))
+
+def __repr__(self):
+    return f"<TripMapping {self.mapping_id}>"
