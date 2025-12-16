@@ -219,32 +219,46 @@ function setupTerms() {
     });
 }
 
+// 가입 버튼 활성/비활성 상태 업데이트
+function updateSubmitButtonState() {
+    const isValid = isRequiredTermsChecked();
+    const $submitBtn = $('.signup-btn'); // 버튼 클래스 맞게 조정
+
+    if (isValid) {
+        $submitBtn.prop('disabled', false);
+        $submitBtn.removeClass('disabled');
+    } else {
+        $submitBtn.prop('disabled', true);
+        $submitBtn.addClass('disabled');
+    }
+}
+
 
 
 /* ================================
     가입 버튼 활성/비활성
 ================================ */
-function updateSubmitButtonState() {
-    const requiredFilled = $(".signup-form [required]").toArray()
-        .every(e => $(e).val().trim() !== "");
+// function updateSubmitButtonState() {
+//     const requiredFilled = $(".signup-form [required]").toArray()
+//         .every(e => $(e).val().trim() !== "");
 
-    const pwMatch = $('#password').val() === $('#password_confirm').val();
-    const termsOk = isRequiredTermsChecked(); // ← 약관 확인 추가됨
+//     const pwMatch = $('#password').val() === $('#password_confirm').val();
+//     const termsOk = isRequiredTermsChecked(); // ← 약관 확인 추가됨
 
-    const canSubmit = requiredFilled && isIdAvailable && pwMatch && termsOk;
+//     const canSubmit = requiredFilled && isIdAvailable && pwMatch && termsOk;
 
-    const $btn = $('#submit_btn');
+//     const $btn = $('#submit_btn');
 
-    if (canSubmit) {
-        $btn.prop("disabled", false)
-            .removeClass("bg-indigo-400")
-            .addClass("bg-indigo-600");
-    } else {
-        $btn.prop("disabled", true)
-            .removeClass("bg-indigo-600")
-            .addClass("bg-indigo-400");
-    }
-}
+//     if (canSubmit) {
+//         $btn.prop("disabled", false)
+//             .removeClass("bg-indigo-400")
+//             .addClass("bg-indigo-600");
+//     } else {
+//         $btn.prop("disabled", true)
+//             .removeClass("bg-indigo-600")
+//             .addClass("bg-indigo-400");
+//     }
+// }
 
 
 /* ================================
@@ -298,19 +312,19 @@ function setupFormSubmit() {
 
         if (!isIdChecked || !isIdAvailable) {
             e.preventDefault();
-            alertModal("아이디 중복 확인을 먼저 진행해주세요!");
+            showToast("아이디 중복 확인을 먼저 진행해주세요!");
             return;
         }
 
         if ($("#password").val() !== $("#password_confirm").val()) {
             e.preventDefault();
-            alertModal("비밀번호가 일치하지 않습니다.");
+            showToast("비밀번호가 일치하지 않습니다.");
             return;
         }
 
         if (!isRequiredTermsChecked()) {
             e.preventDefault();
-            alertModal("필수 약관에 모두 동의해야 회원가입이 가능합니다!");
+            showToast("필수 약관에 모두 동의해야 회원가입이 가능합니다!");
             return;
         }
 
@@ -387,4 +401,13 @@ function showToast(message) {
         }, 300);
     }, 2000);
 }
+
+
+$(document).ready(() => {
+    setupIdCheck();
+    setupPasswordCheck();
+    setupTerms();
+    setupFormSubmit();
+});
+
 

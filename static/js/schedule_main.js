@@ -83,10 +83,6 @@ $(function(){
     try {
         sessionStorage.setItem('currentSearchData', JSON.stringify(searchData));
         console.log(" ADM Code가 세션에 저장됨:", selectedAdmCode);
-        
-        // **중요:** 이 항목에 .selected 클래스를 추가하여 'search-button'에서 읽을 수 있도록 합니다.
-        // 하지만 세션에 직접 저장했으므로, 이 클릭 이벤트는 DOM 클래스 대신 세션 저장이 주 목표가 됩니다.
-        
     } catch (e) {
         console.error("ADM Code 세션 저장 오류:", e);
     }
@@ -104,16 +100,13 @@ $(function(){
     let currentYear = today.getFullYear();
     let startDate = null;
     let endDate = null;
-    const $dateDropdownn = $("#calendarDropdown"); // 드롭다운 변수 선언
+    const $dateDropdownn = $("#calendarDropdown"); 
 
 function formatDate(year, month, day) {
-    // ... (기존 formatDate 함수 유지) ...
     return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
-// 검색창 UI 업데이트를 위한 새로운 함수
 function applySelectedDatesToSearchUI() {
-
     
     let datesDisplay = '';     // '2025/11/28 - 2025/11/30'
     let durationDisplay = '';  // '2박 3일'
@@ -248,6 +241,28 @@ function applySelectedDatesToSearchUI() {
         // 선택일이 시작일보다 늦으면 -> 종료일 설정
         endDate = dateStr;
     }
+    const currentDataJson = sessionStorage.getItem('currentSearchData') || '{}';
+    let searchData;
+
+    try {
+            searchData = JSON.parse(currentDataJson);
+    } catch (e) {
+        console.error("세션 스토리지 저장 오류:", e);
+        searchData = {};
+    }
+
+    searchData.date = {
+        startDate: startDate,
+        endDate: endDate
+    };
+
+    try {
+        // currentSearchData 키에 업데이트된 데이터를 저장
+        sessionStorage.setItem('currentSearchData', JSON.stringify(searchData));
+        console.log("currentSearchData에 날짜정보 업데이트됨:", startDate, endDate);
+    } catch (e) {
+        console.error("세션 스토리지 저장 오류:", e);
+    }
     
     updateCalendars(); 
     activateAddButton();
@@ -263,17 +278,13 @@ function applySelectedDatesToSearchUI() {
     });
     
     // 적용 버튼
-    $(".apply-btn").on("click", function(){
+    $(".apply-btn").off("click").on("click", function(){
         
         applySelectedDatesToSearchUI();
         hideAllDropdowns();
     });
 
-    $(".apply-btn").on("click", function(){
-    updateDateDisplay(); 
-    hideAllDropdowns();
-    });
-
+   
 // ============================
 // 추가 버튼 및 세션 저장 처리
 // ============================
@@ -365,12 +376,9 @@ if (savedData) {
 // ============================
 // 3. 여행 인원 드롭다운 처리 
 // ============================
-let selectedPersonnelType = '1인'; 
-let personnelCount = 1; 
 
 const $paxDropdown = $("#tourDropdown"); 
 const $countNumber = $paxDropdown.find("#friendCount"); 
-const $countControls = $paxDropdown.find(".count-controls");
 
 function updatePersonnelSearchUI() {
     let nameDisplay = '';
@@ -406,11 +414,50 @@ function updatePersonnelSearchUI() {
 
 // 탭 클릭 이벤트
 $paxDropdown.on("click", ".tour-tab", function() {
-    const typeText = $(this).text();
-    $paxDropdown.find(".tour-tab").removeClass("active");
-    $(this).addClass("active");
+    const $this = $(this);
+    const typeText = $this.text();
+    const dataType = $this.data("type"); // data-type 속성 값 가져오기
     selectedPersonnelType = typeText;
+
+    // 1. 활성 클래스 업데이트
+    $paxDropdown.find(".tour-tab").removeClass("active");
+    $this.addClass("active");
+
+     try {
+            sessionStorage.setItem('selectedPersonnelType', JSON.stringify({
+            text: typeText,
+            dataType: dataType
+        }));
+            console.log("타입정보세션저장:", selectedPersonnelType);
+        } catch (e) {
+            console.error("세션 스토리지 저장 오류:", e);
+        }
+
+
+    // 4. 버튼 활성화 (기존 로직 유지)
     activateAddButton();
+});
+
+// 페이지 로드 시 세션에 저장된 값으로 초기 상태 설정 (추가)
+$(document).ready(function() {
+    const storedTab = sessionStorage.getItem("selectedTourTab");
+    if (storedTab) {
+        const tabData = JSON.parse(storedTab);
+        const textToFind = tabData.text;
+
+        // 세션에 저장된 텍스트와 일치하는 탭을 찾아 active 클래스 적용
+        $paxDropdown.find(".tour-tab").each(function() {
+            if ($(this).text() === textToFind) {
+                $(this).removeClass("active"); // 기본 active 제거
+                $(this).addClass("active");
+            }
+        });
+        
+        // 전역 변수 업데이트 (필요하다면)
+        selectedPersonnelType = textToFind;
+        activateAddButton();
+    }
+
 });
 
 // 인원수 (+/-) 버튼 클릭 이벤트
@@ -426,6 +473,14 @@ $paxDropdown.on("click", ".count-btn", function() {
     personnelCount = currentCount; 
     $countNumber.text(personnelCount); 
     activateAddButton();
+
+    try {
+            sessionStorage.setItem('personnelCount', JSON.stringify(personnelCount));
+            console.log("인원정보세션저장:", personnelCount);
+        } catch (e) {
+            console.error("세션 스토리지 저장 오류:", e);
+        }
+        
 });
 
 // 지우기 버튼
@@ -458,8 +513,6 @@ const $onePersonTab = $paxDropdown.find('.tour-tab').filter(function() {
 $onePersonTab.addClass('active');
 $countNumber.text(1);
 
-
-// updatePersonnelSearchUI();
 });
 
 
@@ -507,7 +560,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 2. 검색창 입력 이벤트 (필터링 로직)
     searchInput.addEventListener('input', function() {
-        // ... (기존 필터링 로직 유지) ...
         const searchText = searchInput.value.toLowerCase().trim();
         let foundResults = false;
 
@@ -641,6 +693,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+
+
+
+
+
 // 여행만들기 start
 
 $(document).ready(function() {
@@ -686,6 +743,10 @@ $('.button-make-travel').on('click', function(e) {
         return;
     }
 
+    const userId = 'GUEST_USER';
+    //세션저장된걸로 꺼내오게 수정 필요
+    const searchData = sessionStorage.getItem('currentSearchData');
+    // const searchData = JSON.parse(searchDataJson || '{}');
     // 2. ADM 코드 유효성 검사 (필수 입력값)
     const admCode = requestData.adm_code; 
     if (!admCode) {
@@ -715,19 +776,12 @@ $('.button-make-travel').on('click', function(e) {
     .then(data => {
         const startDate = requestData.date ? requestData.date.startDate : null;
         const endDate = requestData.date ? requestData.date.endDate : null;
+        
+
         // 4. 응답 데이터 처리 및 HTML 렌더링
         if (data.success && data.recommended_trips) {
-            
             const recommendedTrips = data.recommended_trips;
             
-            if (recommendedTrips.length === 0) {
-                 $resultArea.html(`
-                    <p style="text-align: center; color: #333; font-weight: bold;">
-                        선택하신 조건(${cityPrefix})에 맞는 여행지를 찾지 못했습니다.
-                    </p>
-                `);
-                return;
-            }
 
             // 5. HTML 리스트 생성 시작
             let listHtml = `
@@ -736,39 +790,47 @@ $('.button-make-travel').on('click', function(e) {
                     <button class="reload-btn">추천 다시 받기</button>
                 </div>
             `;
-            
+
+            const searchDataJson = sessionStorage.getItem('currentSearchData');
+            const searchData = JSON.parse(searchDataJson || '{}');
+
             recommendedTrips.forEach(trip => {
                 const title = `${cityPrefix}` + "여행";
                 const displayCity = `${trip.SIDO_NM || ''} ${cityPrefix || ''}`; 
-                const rating = (trip.SCORE ).toFixed(1);  // 별점
                 const tags = trip.TAGS ? trip.TAGS.split(',') : ['추천', '여행']; //태그
+
                 const scheduleItems = trip.RELATED_PLACES;
                 const currentTripId = trip.CONTENT_ID;
-
                 console.log("서버 데이터 CONTENT_ID:", currentTripId);
+                
+                const currentTripPlaceIds = scheduleItems.map(place => place.id);
 
                 const scheduleHtml = scheduleItems.map(place => {
                 return `<div class="schedule-place-item" data-place-id="${place.id}">${place.name}</div>`; 
                 }).join(' → ');
-
+                
                 const tripMetaData = {
-                    tripId : currentTripId,
+                    trip_no : currentTripId,
+                    user_id : userId,
                     title  : title,
                     city   : displayCity,
-                    duration : trip.DURATION,
-                    rating : rating,
-                    tags    : tags,
-                    startDate: startDate, 
-                    endDate: endDate
+                    duration : trip.DURATION || requestData.duration_days || '1',
+                    tags    : searchData.theme_tags || [],
+                    start_date: startDate, 
+                    end_date: endDate,
+                    people : personnelCount,
+                    trip_type : selectedPersonnelType,
+                    selectedPlaceIds : currentTripPlaceIds
                 };
+                
+                const tripJson = JSON.stringify(tripMetaData);
+                const tripMetaJson = tripJson.replace(/"/g, '&quot;' );
 
                 listHtml += `
-                    <div class="trip-item" data-trip-id="${currentTripId}">
+                    <div class="trip-item" data-trip-id="${currentTripId}" data-trip-meta="${tripMetaJson}">
                         <div class="trip-header-line"> 
                             <h4>${title}</h4>
-                            <p class="${JSON.stringify(tripMetaData)}">
-                            // ${displayCity} | ${trip.DURATION}일</p> 
-                            // <p class="trip-rating">⭐ ${rating}</p>
+                            ${displayCity} | ${trip.DURATION}일</p>
                         </div>
                         
                         <div class="trip-schedule-container">${scheduleHtml}  </div>
@@ -783,65 +845,99 @@ $('.button-make-travel').on('click', function(e) {
                 `;
             });
 
-            listHtml += '<div class="detail-container" data-trip-id="${currentTripId}"><a href="/schedule/view/" class="detail-btn">선택</a></div>'; 
+            listHtml += '<div class="detail-container" data-trip-id="${currentTripId}"><a href="#" class="detail-btn">선택</a></div>'; 
             $resultArea.html(listHtml);
 
             
-            $resultArea.on('click', '.schedule-place-item', function(){
+            $resultArea.on('click', '.trip-item', function(){
                 //선택한 요소 외에 비활성화
-                $resultArea.find('.schedule-place-item.selected').removeClass('selected');
                 $resultArea.find('.trip-item.selected').removeClass('selected');
                 //선택요소 강조
                 $(this).addClass('selected');
-                $(this).closest('.trip-item').addClass('selected');
                 alert("여행리스트가 선택되었습니다.")
             })
 
             $resultArea.on('click', '.detail-btn', function(e){
                 e.preventDefault();
-                const $selectedPlace = $resultArea.find('.schedule-place-item.selected');
-                   if($selectedPlace.length === 0){
+                const $tripItem = $resultArea.find('.trip-item.selected');
+                if($tripItem.length === 0){
                     alert("여행리스트를 선택해주세요.")
                     return;
-                }
-                
-                const $tripItem = $selectedPlace.closest('.trip-item');
-                const tripId = $tripItem.data('trip-id');
-                const selectedPlaceId = $selectedPlace.data('place-id');
+                }  
+
                 const tripMetaDataJson = $tripItem.attr('data-trip-meta');
                 let tripMetaData = null;
-                
+                console.log("tripMetaDataJson : " + tripMetaDataJson);
+
                 if (tripMetaDataJson) {
                     try {
-                        tripMetaData = JSON.parse(tripMetaDataJson);
-                        sessionStorage.setItem('selectedTripMeta', JSON.stringify(tripMetaData));
+                        //json 문자열로 객체 반환
+                        const decodedJson = tripMetaDataJson.replace(/&quot;/g, '"');
+                        tripMetaData = JSON.parse(decodedJson);
+                        console.log("tripMetaData : " + tripMetaData);
+
+                        if (tripMetaData && tripMetaData.selectedPlaceIds) {
+                            console.log("tripMetaDataJson 내의 selectedPlaceIds 값:", tripMetaData.selectedPlaceIds);
+                        } else {
+                            console.log("tripMetaDataJson 안에 selectedPlaceIds 속성이 없습니다.");
+                        }
+                        //세션저장
                         console.log("세션에 저장된 상세 메타데이터:", tripMetaData);
                     } catch (err) {
                         console.error("tripMetaData 파싱 오류:", err);
+                        return;
                     }
-                }
-                console.log("가져온 Trip ID:", tripId); 
-                console.log("가져온 Place ID:", selectedPlaceId);
+                    // ############################################
+                    // 3. 서버에 전송할 데이터 준비 (여행 메타데이터 + 초기 검색 조건)
+                    const requestData = JSON.parse(sessionStorage.getItem('currentSearchData') || '{}');
 
-                // 3. 유효성 검사 및 이동
-                // ⭐️ tripId가 null, undefined, 0, 또는 빈 문자열이거나 'undefined' 문자열인 경우도 체크
-                if (!tripId || String(tripId).toLowerCase() === 'undefined') { 
-                    alert("트립 ID를 찾을 수 없습니다. (HTML 구조 확인 필요)");
-                    console.error("Trip ID 누락!");
-                    return;
-                }
-                
-                // 장소 ID는 해시 값(문자열)이므로, 공백이거나 없으면 안됨
-                if (!selectedPlaceId || String(selectedPlaceId).trim() === '') {
-                    alert("선택된 장소 ID가 없습니다.");
-                    console.error("Place ID 누락!");
-                    return;
+                    const dataToSend = {
+                        tripMeta: tripMetaData,
+                        searchCriteria: requestData, // 날짜, 인원, 테마 등 초기 검색 조건
+                    };
+
+                    console.log("Final tripMetaData:", tripMetaData); 
+                    console.log("Final searchCriteria:", requestData); 
+
+                    // 4. 🚨 AJAX 요청을 보내 DB에 여행 계획 초안을 저장
+                    console.log("DB 저장을 위해 서버에 전송할 데이터:", dataToSend);
+
+                    console.log("@@@@@@@@@@@@@@@",dataToSend);
+                    
+                    fetch('/schedule/save-draft', { 
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(dataToSend)
+                  
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.status === 'success' && data.trip_no) {
+                            const savedTripId = data.trip_no;
+                            const targetUrl = `/schedule/view/${savedTripId}`;
+                            console.log("DB 저장 후 페이지 이동:", targetUrl);
+                            window.location.href = targetUrl;
+                        } else {
+                            alert("여행 계획 저장에 실패했습니다: " + (data.message || '서버 오류'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('DB 저장 중 오류 발생:', error);
+                        alert("여행 계획을 서버에 저장할 수 없습니다. 잠시 후 다시 시도해 주세요.");
+                    });
+                }else {
+                    alert("선택된 여행 항목에 메타데이터가 없습니다.");
+                    return; 
                 }
 
-                const targetUrl = `/schedule/view/${tripId}/${selectedPlaceId}`;
-                console.log("페이지 이동:", targetUrl);
-                window.location.href = targetUrl;
-            })
+            });
             
         } else {
             $resultArea.html(`<p style="text-align: center; color: red;">추천 실패: ${data.error || data.message || '알 수 없는 오류'}</p>`);

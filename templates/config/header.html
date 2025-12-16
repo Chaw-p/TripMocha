@@ -35,13 +35,14 @@
       </ul>
     </div>
 
-    <!-- ⭐ 프로필 영역 (드롭다운 포함) -->
+    <!--  프로필 영역 (드롭다운 포함) -->
     <div id="header_profile">
       {% if session.get('user_id') %}
 
         <div class="profile-wrapper">
           <span class="user_name" id="profileToggle">
-            {{ session['user_id'] }} 님 ▼
+            {{ session['user_name'] }} 님 ▼
+
           </span>
 
           <!-- 드롭다운 메뉴 -->

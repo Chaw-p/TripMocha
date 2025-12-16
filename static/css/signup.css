@@ -37,7 +37,7 @@
 }
 
 .select-btn.selected {
-    background: #00a84a;
+    background: #06402B;
     color: #fff;
     border-color: #008a3c;
     transform: scale(1.04);
@@ -181,7 +181,7 @@
 
 /* 주소 검색 버튼 */
 #search_address_btn {
-    background: #006600;
+    background: #06402B;
     color: #fff;
     border: none;
     border-radius: 10px;
@@ -237,4 +237,60 @@
 
 .pw-strong {
     color: #2a9d8f;
+}
+
+
+
+
+.required {
+    color: #e74c3c;
+    margin-left: 4px;
+    font-weight: bold;
+}
+
+.required-info {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 12px;
+}
+
+.input-label {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    display: block;
+}
+
+
+.terms-item.highlight {
+    background-color: #fff3cd;
+    border-radius: 6px;
+    padding: 6px;
+    transition: 0.3s;
+}
+
+
+.toast {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1b3b32;
+    color: #fff;
+    padding: 14px 22px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 9999;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.toast.hidden {
+    display: none;
 }

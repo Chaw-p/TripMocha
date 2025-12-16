@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,39 +11,23 @@
 
 <body>
     <div class="login-container">
-        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="TripMocha 로고" class="tripmocha-logo"> 
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="TripMocha 로고" class="tripmocha-logo">
 
         <main class="login-box">
             <form action="/find_id_process" method="post">
 
                 <div class="input-group">
-                    <input type="text" 
-                        name="name" 
-                        placeholder="이름을 입력하세요" 
-                        required>
+                    <input type="text" name="name" placeholder="이름을 입력하세요" required>
                 </div>
-
                 <div class="input-group">
-                    <input type="text" 
-                        id="birthday" 
-                        name="birthday" 
-                        placeholder="생년월일 8자리 (YYYYMMDD)"
-                        maxlength="8" 
+                    <input type="text" id="birthday" name="birthday" placeholder="생년월일 8자리 (YYYYMMDD)" maxlength="8"
                         required>
                 </div>
-
                 <div class="input-group">
-                    <input type="email" 
-                        id="email" 
-                        name="email" 
-                        placeholder="가입 시 사용한 이메일을 입력하세요"
-                        required>
+                    <input type="email" id="email" name="email" placeholder="가입 시 사용한 이메일을 입력하세요" required>
                 </div>
-
                 <button type="submit" class="login-btn">아이디 찾기</button>
             </form>
-
-
             <div class="find-links">
                 <a href="{{ url_for('login_bp.find_password') }}">비밀번호 찾기</a>
                 <a href="{{ url_for('login_bp.find_id_page') }}">아이디 찾기</a>
@@ -51,7 +36,8 @@
             </div>
         </main>
     </div>
-        <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-        <script src="{{ url_for('static', filename='js/find_id.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="{{ url_for('static', filename='js/find_id.js') }}"></script>
 </body>
+
 </html>

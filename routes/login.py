@@ -1,18 +1,44 @@
 import os
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session, current_app
+from flask import (
+    Blueprint,
+    render_template,
+    request,
+    jsonify,
+    redirect,
+    url_for,
+    session,
+    current_app,
+)
 from flask_cors import CORS
 from google import genai
 from google.genai.errors import APIError
 import time
-import smtplib
-from email.mime.text import MIMEText
-from email.header import Header
-from email.utils import formataddr
+
+# import smtplib
+# from email.mime.text import MIMEText
+# from email.header import Header
+# from email.utils import formataddr
 import random
 from flask import g
 import bcrypt
 import traceback
 import pymysql
+from dotenv import load_dotenv
+
+# from email.message import EmailMessage
+# from email.policy import SMTPUTF8
+from flask_mail import Message
+from extensions import mail
+
+
+load_dotenv()
+
+
+def mask_user_id(user_id: str) -> str:
+    if len(user_id) <= 2:
+        return user_id[0] + "*"
+    return user_id[0] + "*" * (len(user_id) - 2) + user_id[-1]
+
 
 # -------------------------------------------------
 # MySQL 직접 연결용 함수 (get_db)
@@ -25,64 +51,74 @@ def get_db():
             password="ezen",
             database="tripmocha",
             charset="utf8mb4",
-            cursorclass=pymysql.cursors.Cursor
+            cursorclass=pymysql.cursors.Cursor,
         )
     return g.db
 
 
 # Blueprint 정의
-login_bp = Blueprint('login_bp', __name__)
-api_bp = Blueprint('api_bp', __name__)
+login_bp = Blueprint("login_bp", __name__)
+api_bp = Blueprint("api_bp", __name__)
 
 auth_codes = {}
 
-def send_email_utf8(to_email, name, auth_code):
-    smtp_server = "smtp.gmail.com"
-    smtp_port = 587
 
-    # Gmail 계정 정보
-    smtp_user = "ayj0519@gmail.com"
-    smtp_password = "lhccakvpnvcfpsve"
+# def send_email_utf8(to_email, name, auth_code):
+#     print(" SMTPUTF8 + BYTES 진짜 최종 버전")
 
-    # 이메일 본문 (UTF-8)
-    body = f"""
-안녕하세요 {name}님,
+#     smtp_user = os.getenv("SMTP_USER")
+#     smtp_password = os.getenv("SMTP_PASSWORD")
 
-TripMocha 비밀번호 재설정 인증번호는
+#     body = f"""안녕하세요 {name}님,
 
-인증번호: {auth_code}
+# TripMocha 비밀번호 재설정 인증번호는
 
-입니다.
-3분 안에 입력해주세요.
-"""
-    
-    print("=== EMAIL BODY START ===")
-    for i, ch in enumerate(body):
-        print(i, repr(ch))
-    print("=== EMAIL BODY END ===")
+# 인증번호: {auth_code}
 
-    # UTF-8 본문
-    msg = MIMEText(body, "plain", "utf-8")
+# 입니다.
+# 3분 안에 입력해주세요.
+# """
 
-    # 제목 UTF-8
-    msg["Subject"] = "TripMocha Verification Code"
+#     msg = EmailMessage(policy=SMTPUTF8)
+#     msg.set_content(body, charset="utf-8")
 
-    # From UTF-8 인코딩
-    msg["From"] = smtp_user
+#     msg["Subject"] = "TripMocha Verification Code"
+#     msg["From"] = smtp_user
+#     msg["To"] = to_email
 
-    msg["To"] = to_email
+#     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+#         server.login(smtp_user, smtp_password)
+#         server.sendmail(
+#             smtp_user,
+#             [to_email],
+#             msg.as_bytes(policy=SMTPUTF8)
+#         )
 
-    server = smtplib.SMTP(smtp_server, smtp_port)
-    server.starttls()
-    server.login(smtp_user, smtp_password)
-    server.sendmail(smtp_user, [to_email], msg.as_string())
-    server.quit()
 
-@api_bp.route('/api/send_auth_code', methods=['POST'])
+# def send_simple_email(to_email, body):
+#     smtp_server = "smtp.gmail.com"
+#     smtp_port = 587
+
+#     smtp_user = "ayj0519@gmail.com"
+#     smtp_password = "앱비밀번호"
+
+#     msg = MIMEText(body, "plain", "utf-8")
+#     msg["Subject"] = "TripMocha 아이디 찾기 안내"
+#     msg["From"] = smtp_user
+#     msg["To"] = to_email
+
+#     server = smtplib.SMTP(smtp_server, smtp_port)
+#     server.starttls()
+#     server.login(smtp_user, smtp_password)
+#     server.sendmail(smtp_user, [to_email], msg.as_string())
+#     server.quit()
+
+
+@api_bp.route("/api/send_auth_code", methods=["POST"])
 def send_auth_code():
-    email = request.form.get('email')
-    user_id = request.form.get('user_id')
-    name = request.form.get('name')
+    email = request.form.get("email")
+    user_id = request.form.get("user_id")
+    name = request.form.get("name")
 
     print("받은 데이터:", email, user_id, name)
 
@@ -93,25 +129,40 @@ def send_auth_code():
     auth_codes[email] = auth_code
 
     try:
-        send_email_utf8(email, name, auth_code)
+        msg = Message(
+            subject="TripMocha 비밀번호 재설정 인증번호",
+            recipients=[email],
+            body=f"""안녕하세요 {name}님,
+
+TripMocha 비밀번호 재설정 인증번호는
+
+인증번호: {auth_code}
+
+입니다.
+3분 안에 입력해주세요.
+""",
+        )
+
+        mail.send(msg)
         print("이메일 전송 성공:", email, auth_code)
         return jsonify({"success": True})
 
     except Exception as e:
-        print("이메일 전송 오류:", e)
+        print(" 이메일 전송 오류:", e)
         return jsonify({"success": False, "message": "메일 발송 실패"}), 500
 
-    
-    
-@api_bp.route('/api/verify_auth_code', methods=['POST'])
+
+@api_bp.route("/api/verify_auth_code", methods=["POST"])
 def verify_auth_code():
-    email = request.form.get('email')
-    user_input_code = request.form.get('auth_code')
+    email = request.form.get("email")
+    user_input_code = request.form.get("auth_code")
 
     real_code = auth_codes.get(email)
 
     if not real_code:
-        return jsonify({"success": False, "message": "인증번호가 없습니다. 다시 요청해주세요."})
+        return jsonify(
+            {"success": False, "message": "인증번호가 없습니다. 다시 요청해주세요."}
+        )
 
     if user_input_code == real_code:
         return jsonify({"success": True, "message": "인증 성공!"})
@@ -119,7 +170,6 @@ def verify_auth_code():
         return jsonify({"success": False, "message": "인증번호가 일치하지 않습니다."})
 
 
-    
 # ----------------------------------------------------
 # C. Gemini API 키 설정 및 보안 강화
 # ----------------------------------------------------
@@ -131,38 +181,46 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyCSm8j9_SnGJVdoHvyc1BKpe_1hAh
 # A. 사용자 인증 및 페이지 렌더링 라우팅
 # ----------------------------------------------------
 
+
 # 1. 메인 페이지 (Root URL) 라우팅: /
-@login_bp.route('/')
+@login_bp.route("/")
 def home():
-    return render_template('login/login.html')
+    return render_template("login/login.html")
 
-@login_bp.route('/login')
+
+@login_bp.route("/login")
 def login_page():
-    return render_template('login/login.html')
+    return render_template("login/login.html")
 
-@login_bp.route('/join')
+
+@login_bp.route("/join")
 def join_page():
-    return render_template('login/join.html')
+    return render_template("login/join.html")
 
-@login_bp.route('/find_id')
+
+@login_bp.route("/find_id")
 def find_id_page():
-    return render_template('login/find_id.html')
+    return render_template("login/find_id.html")
 
-@login_bp.route('/find_password')
+
+@login_bp.route("/find_password")
 def find_password():
-    return render_template('login/find_password.html')
+    return render_template("login/find_password.html")
+
 
 # === index.html 메인 페이지 (LOGIN 후 이동) ===
-@login_bp.route('/index')
+@login_bp.route("/index")
 def index_page():
-    return render_template('index.html')
+    return render_template("index.html")
+
 
 # ----------------------------------------------------
 # B. 폼 데이터 처리 라우팅 (POST)
 # ----------------------------------------------------
 
+
 # 7. 로그인 폼 처리 라우트: /login (POST 요청)
-@login_bp.route('/login', methods=['POST'])
+@login_bp.route("/login", methods=["POST"])
 def process_login():
     user_id = request.form.get("user_id")
     password = request.form.get("password")
@@ -172,11 +230,14 @@ def process_login():
         cursor = db_conn.cursor()
 
         # 해당 아이디의 비밀번호 해시 가져오기
-        cursor.execute("""
-            SELECT password
+        cursor.execute(
+            """
+            SELECT password, name
             FROM users
             WHERE user_id = %s
-        """, (user_id,))
+        """,
+            (user_id,),
+        )
         row = cursor.fetchone()
 
         if not row:
@@ -188,13 +249,13 @@ def process_login():
             """
 
         stored_hashed_pw = row[0]
+        user_name = row[1]
 
-        #  입력 비번 vs 해시 비교
-        if bcrypt.checkpw(password.encode('utf-8'),
-                          stored_hashed_pw.encode('utf-8')):
-            session['user_id'] = user_id
-            print(" 로그인 성공:", user_id)
-            return redirect(url_for('login_bp.index_page'))
+        if bcrypt.checkpw(password.encode("utf-8"), stored_hashed_pw.encode("utf-8")):
+            session["user_id"] = user_id
+            session["user_name"] = user_name
+            return redirect(url_for("login_bp.index_page"))
+
         else:
             return """
                 <script>
@@ -213,10 +274,8 @@ def process_login():
         """
 
 
-
-
 # 8. 회원가입 폼 처리 라우트: /signup (POST 요청)
-@login_bp.route('/signup', methods=['POST'])
+@login_bp.route("/signup", methods=["POST"])
 def process_signup():
     user_id = request.form.get("user_id")
     password = request.form.get("password")
@@ -232,33 +291,49 @@ def process_signup():
     travel_style = request.form.get("travel_style")
 
     try:
-        # 🔐 비밀번호 암호화
-        hashed_pw = bcrypt.hashpw(password.encode('utf-8'),
-                                  bcrypt.gensalt()).decode('utf-8')
+        # 비밀번호 암호화
+        hashed_pw = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode(
+            "utf-8"
+        )
 
         db_conn = get_db()
         cursor = db_conn.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO users
             (user_id, password, name, birthday, email, phone, gender, nation,
              postcode, address, detail_address, travel_style)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """, (
-            user_id, hashed_pw, name, birthday, email, phone,
-            gender, nation, postcode, address, detail_address, travel_style
-        ))
+        """,
+            (
+                user_id,
+                hashed_pw,
+                name,
+                birthday,
+                email,
+                phone,
+                gender,
+                nation,
+                postcode,
+                address,
+                detail_address,
+                travel_style,
+            ),
+        )
 
         db_conn.commit()
         print(" 회원가입 & 비밀번호 암호화 저장 완료")
 
         # 회원가입 후 자동 로그인
-        session['user_id'] = user_id
+        session["user_id"] = user_id
+        session["user_name"] = name
+
         return redirect(url_for("login_bp.index_page"))
 
     except Exception as e:
         print("===== 회원가입 오류 발생! =====")
-        traceback.print_exc()   # 🔥 전체 에러 로그 출력
+        traceback.print_exc()  # 전체 에러 로그 출력
         print("===== 오류 끝 =====")
 
         return """
@@ -269,43 +344,38 @@ def process_signup():
         """
 
 
-
-
-@login_bp.route('/logout')
+@login_bp.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
 
 
-
-
-@login_bp.route('/profile')
+@login_bp.route("/profile")
 def profile_page():
-    if 'user_id' not in session:
-        return redirect(url_for('login_bp.login_page'))
+    if "user_id" not in session:
+        return redirect(url_for("login_bp.login_page"))
 
     try:
         db = get_db()
         cursor = db.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT user_id, name, birthday, email, phone, gender, nation, 
                    postcode, address, detail_address, travel_style
             FROM users
             WHERE user_id = %s
-        """, (session['user_id'],))
+        """,
+            (session["user_id"],),
+        )
 
         user = cursor.fetchone()
 
-        return render_template('login/profile.html', user=user)
+        return render_template("login/profile.html", user=user)
 
     except Exception as e:
         print("프로필 조회 오류:", e)
         return "<script>alert('서버 오류 발생'); history.back();</script>"
-
-
-
-
 
 
 # ----------------------------------------------------
@@ -313,14 +383,16 @@ def profile_page():
 # ----------------------------------------------------
 # NOTE: 이 함수를 routes/models.py나 별도의 services/auth.py로 분리하는 것이 좋습니다.
 
+
 def check_id_exists_in_db(user_id):
     """
     Placeholder 함수: 실제 데이터베이스에서 해당 user_id가 존재하는지 확인하는 함수
     """
     # 예시: 'admin', 'testuser' 아이디는 이미 존재한다고 가정
-    return user_id in ['admin', 'testuser']
+    return user_id in ["admin", "testuser"]
 
-@api_bp.route('/api/check_userid', methods=['POST'])
+
+@api_bp.route("/api/check_userid", methods=["POST"])
 def check_userid():
     user_id = request.form.get("user_id")
 
@@ -337,49 +409,52 @@ def check_userid():
         if row:
             return jsonify({"exists": True})  # 이미 존재
         else:
-            return jsonify({"exists": False}) # 사용 가능
+            return jsonify({"exists": False})  # 사용 가능
 
     except Exception as e:
         print("아이디 중복확인 오류:", e)
         return jsonify({"exists": True})  # 오류 시 안전하게 '중복' 처리
 
 
-
-@login_bp.route('/find_id_process', methods=['POST'])
+@login_bp.route("/find_id_process", methods=["POST"])
 def find_id_process():
     name = request.form.get("name")
     birthday = request.form.get("birthday")
     email = request.form.get("email")
 
-    print("아이디 찾기 요청:", name, birthday, email)
-
     try:
         db = get_db()
         cursor = db.cursor()
 
-        cursor.execute("""
-            SELECT user_id 
+        cursor.execute(
+            """
+            SELECT user_id
             FROM users
             WHERE name = %s AND birthday = %s AND email = %s
-        """, (name, birthday, email))
+        """,
+            (name, birthday, email),
+        )
 
-        result = cursor.fetchone()
+        results = cursor.fetchall()
 
-        if result:
-            user_id = result[0]
-            return f"""
-                <script>
-                    alert("고객님의 아이디는 '{user_id}' 입니다!");
-                    window.location.href = "/login";
-                </script>
-            """
-        else:
+        if not results:
             return """
                 <script>
                     alert("일치하는 정보를 찾을 수 없습니다.");
                     history.back();
                 </script>
             """
+
+        #  아이디 마스킹 후 화면 표시
+        masked_ids = [mask_user_id(row[0]) for row in results]
+        id_text = "\\n".join(masked_ids)
+
+        return f"""
+            <script>
+                alert("고객님의 아이디는 다음과 같습니다:\\n\\n{id_text}");
+                window.location.href = "/login";
+            </script>
+        """
 
     except Exception as e:
         print("아이디 찾기 오류:", e)
@@ -391,25 +466,28 @@ def find_id_process():
         """
 
 
-
-@login_bp.route('/reset_password', methods=['POST'])
+@login_bp.route("/reset_password", methods=["POST"])
 def reset_password():
     user_id = request.form.get("user_id")
     new_password = request.form.get("new_password")
 
     try:
         # 🔐 비밀번호 해싱 (회원가입과 동일하게)
-        hashed_pw = bcrypt.hashpw(new_password.encode('utf-8'),
-                                  bcrypt.gensalt()).decode('utf-8')
+        hashed_pw = bcrypt.hashpw(
+            new_password.encode("utf-8"), bcrypt.gensalt()
+        ).decode("utf-8")
 
         db = get_db()
         cursor = db.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             UPDATE users
             SET password = %s
             WHERE user_id = %s
-        """, (hashed_pw, user_id))
+        """,
+            (hashed_pw, user_id),
+        )
 
         db.commit()
 
@@ -418,9 +496,9 @@ def reset_password():
     except Exception as e:
         print("비밀번호 변경 오류:", e)
         return jsonify({"success": False, "message": "비밀번호 변경 실패"}), 500
-    
 
-@login_bp.route('/profile/update', methods=['POST'])
+
+@login_bp.route("/profile/update", methods=["POST"])
 def update_profile():
     user_id = session.get("user_id")
 
@@ -458,100 +536,39 @@ def update_profile():
         # 비밀번호 해싱 후 업데이트
         hashed_pw = bcrypt.hashpw(new_pw.encode(), bcrypt.gensalt()).decode("utf-8")
 
-        cursor.execute("""
+        cursor.execute(
+            """
             UPDATE users
             SET password=%s
             WHERE user_id=%s
-        """, (hashed_pw, user_id))
+        """,
+            (hashed_pw, user_id),
+        )
 
     # ⭐ 일반 정보 업데이트
-    cursor.execute("""
+    cursor.execute(
+        """
         UPDATE users
         SET name=%s, birthday=%s, email=%s, phone=%s,
             gender=%s, nation=%s, postcode=%s, address=%s,
             detail_address=%s, travel_style=%s
         WHERE user_id=%s
-    """, (
-        name, birthday, email, phone, gender, nation,
-        postcode, address, detail_address, travel_style, user_id
-    ))
+    """,
+        (
+            name,
+            birthday,
+            email,
+            phone,
+            gender,
+            nation,
+            postcode,
+            address,
+            detail_address,
+            travel_style,
+            user_id,
+        ),
+    )
 
     db.commit()
-
+    session["user_name"] = name
     return redirect(url_for("index"))
-
-
-
-
-# ----------------------------------------------------
-# C. Gemini API 호출 라우팅 (여행 계획 생성)
-# ----------------------------------------------------
-
-# XML_PROMPT_TEMPLATE = """
-# 당신은 오직 XML 형식의 데이터만을 출력해야 합니다. 추가적인 설명이나 서론/결론 문구를 절대 포함하지 마세요.
-# {destination_str} 여행을 {duration_str} 동안 {date_str}부터 2명(남,여 각 1명) 이 여행하고 싶은데 여행 코스를 작성해줘
-# 작성된 결과는 다음 XML 문서의 {{}}안에 작성해줘. 여행코스 태그는 여행 일자에 따라서 반복해서 작성해줘
-# 숙소 태그에 내용이 없으면 "내용없음"으로 출력해줘
-
-# <여행가이드>
-#     <여행코스>
-#         <일자>{{여행일자}}</일자>
-#         <장소>{{장소}}</장소>
-#         <숙소>{{숙소}}</숙소>
-#         <비용>{{비용}}</비용>
-#         <지도위치>{{위도}},{{경도}}</지도위치>
-#         <상세설명>
-#             <오전>{{상세설명}}</오전>
-#             <점심>{{상세설명}}</점심>
-#             <오후>{{상세설명}}</오후>
-#         </상세설명>
-#     </여행코스>
-# </여행가이드>
-# """
-
-# @login_bp.route('/api/travel_plan', methods=['POST'])
-# def get_travel_plan():
-#     """프론트엔드 요청을 받아 Gemini API를 호출하고 XML 결과를 반환합니다."""
-    
-#     try:
-#         data = request.json
-#         date_query = data.get('startDate', '2025년 12월 1일')
-#         duration_query = data.get('duration', '1박 2일')
-#         destination_query = data.get('destination', '파주')
-        
-#         if not destination_query or not date_query or not duration_query:
-#             return jsonify({'xml_data': "<여행가이드><error>INVALID_INPUT: 지역, 날짜 또는 기간 정보가 누락되었습니다.</error></여행가이드>"}), 400
-    
-#     except Exception:
-#         return jsonify({'xml_data': "<여행가이드><error>INVALID_REQUEST: 요청 JSON 형식이 잘못되었습니다.</error></여행가이드>"}), 400
-    
-#     xml_result = generate_gemini_travel_plan(date_query, destination_query, duration_query)
-    
-#     return jsonify({'xml_data': xml_result})
-
-
-# def generate_gemini_travel_plan(date_str: str, destination_str: str, duration_str: str) -> str:
-#     """Gemini API를 호출하여 XML 형식의 여행 계획을 생성합니다."""
-    
-#     prompt = XML_PROMPT_TEMPLATE.format(
-#         date_str=date_str, 
-#         destination_str=destination_str,
-#         duration_str=duration_str
-#     )
-    
-#     try:
-#         # NOTE: 이 함수를 별도의 services/gemini_service.py로 분리하는 것이 좋습니다.
-#         client = genai.Client(api_key=GEMINI_API_KEY) 
-#         model = 'gemini-2.5-flash'
-        
-#         response = client.models.generate_content(
-#             model=model,
-#             contents=prompt,
-#         )
-        
-#         return response.text
-
-#     except APIError as e:
-#         return f"<여행가이드><error>API_ERROR: {e}</error></여행가이드>"
-#     except Exception as e:
-#         return f"<여행가이드><error>UNKNOWN_ERROR: {e}</error></여행가이드>"

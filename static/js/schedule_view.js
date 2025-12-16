@@ -152,38 +152,70 @@ document.addEventListener('DOMContentLoaded', function() {
 //PDF 
 
 
-  //schedule_main 세션
-  $(document).ready(function(){
-    const metaString = sessionStorage.getItem('selectedTripMeta');
+ $(document).ready(function(){
+    const tripDataElement = $('#trip-data')[0];
+    let encodedMetaString = tripDataElement?.dataset?.tripMeta || '';
+    let tripMeta = {};
 
-    if(metaString) {
+    if (encodedMetaString) {
         try {
-            const tripMeta = JSON.parse(metaString);
+            // 1단계: Flask의 quote_plus가 생성한 '+' 문자를 공백으로 치환합니다.
+            const stringWithSpaces = encodedMetaString.replace(/\+/g, ' '); 
+            
+            // 🚨🚨🚨 수정: 치환된 문자열(stringWithSpaces)을 디코딩합니다.
+            const decodedMetaString = decodeURIComponent(stringWithSpaces); 
+            
+            // 2단계: trim을 수행
+            const trimmedMetaString = decodedMetaString.trim();
 
-            console.log("트립정보", tripMeta);
+            if (trimmedMetaString && trimmedMetaString !== '{}') {
+                // 3차: JSON 파싱 시도
+                tripMeta = JSON.parse(trimmedMetaString); 
+            }
+            
+            // 🚨🚨🚨 성공적으로 파싱된 데이터를 콘솔에 출력하여 확인
+            if(Object.keys(tripMeta).length !== 0) {
+                 console.log("✅✅✅ 트립정보 (로딩 성공):", tripMeta);
+                 
+                 // 화면에 데이터 뿌리기 (디버깅용)
+                 $('#trip-title').text(tripMeta.title);
+                 $('#trip-city').text(`- 여행지역 | ${tripMeta.city}`);
+                 // ... (나머지 데이터 출력 로직) ...
+            } else {
+                 throw new Error("파싱은 성공했으나 객체가 비어있음");
+            }
+            
+        } catch (e) {
+            console.error("🚨🚨🚨 치명적 오류: JSON 또는 URL 디코딩 실패. ", e);
+            console.log("읽어온 원본 URL 인코딩 문자열:", encodedMetaString);
+            // 디코딩 단계까지는 성공했는지 확인하기 위해 출력
+            if (typeof decodedMetaString !== 'undefined') {
+                 console.log("디코딩된 문자열 (한글이 깨지지 않았는지 확인):", decodedMetaString);
+            }
+            
+            tripMeta = {};
+        }
+    }
+    if(Object.keys(tripMeta).length !== 0){
+        console.log("트립정보", tripMeta);
 
-            $('#trip-title').text(tripMeta.title);
-            $('#trip-city').text(`- 여행지역 | ${tripMeta.city}`);
-            $('#trip-duration').text(`${tripMeta.duration}일`);
-            $('#trip-rating').text(tripMeta.rating);
-            $('#trip-startDate').text(tripMeta.startDate);
-            $('#trip-endDate').text(tripMeta.endDate);
-                        
-            } catch (e) {
-                        console.error("세션 데이터 파싱 오류:", e);
-                    }
-                    sessionStorage.removeItem('selectedTripMeta');
+        $('#trip-title').text(tripMeta.title);
+        $('#trip-city').text(`- 여행지역 | ${tripMeta.city}`);
+        $('#trip-duration').text(`${tripMeta.duration}일`);
+        $('#trip-startDate').text(tripMeta.startDate);
+        $('#trip-endDate').text(tripMeta.endDate);
+        $('#trip-people').text(`인원: ${tripMeta.people || 0}명`);
+        $('#trip-tags').text(`테마: ${tripMeta.tags.join(', ') || '없음'}`);           
+    
         } else {
-            console.log("세션 스토리지에 'selectedTripMeta' 정보가 없습니다.");
+            console.log("db에 정보가 없습니다.");
         }
         
         // URL에서 Trip ID 가져오기 (기존 로직 유지)
         const urlParts = window.location.pathname.split('/');
-        // urlParts[2] == 'view', urlParts[3] == TripID, urlParts[4] == PlaceID
         const tripIdFromUrl = urlParts[3];
     
     if (tripIdFromUrl) {
-        console.log("URL에서 가져온 Trip ID:", tripIdFromUrl);
-        // 이 ID를 사용하여 서버에서 상세 일정을 불러오는 AJAX/Fetch 로직이 추가되어야 합니다.
+        console.log("현재 View 페이지의 Trip ID::", tripIdFromUrl);
     }
   });

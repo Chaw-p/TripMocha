@@ -59,6 +59,52 @@ function Scroll(isIndexPage){
 }
 
 
+
+var scrollThreshold = 50;
+
+$(document).ready(function () {
+
+    // 현재 경로 확인
+    const currentPath = window.location.pathname;
+    const isIndexPage = currentPath === "/" || currentPath.includes("/index");
+
+    console.log("currentPath:", currentPath);
+
+    // Swiper (있을 때만)
+    if ($(".mySwiper").length) {
+        new Swiper(".mySwiper", {
+            slidesPerView: 4,
+            spaceBetween: 15,
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            },
+        });
+    }
+
+    initScroll(isIndexPage);
+});
+
+function initScroll(isIndexPage) {
+
+    // threshold는 한 번만 계산
+    scrollThreshold = isIndexPage ? 50 : -50;
+
+    $(window).on("scroll", function () {
+        const scrollPosition = $(window).scrollTop();
+
+        const isHeaderScrolled = scrollPosition > scrollThreshold;
+        const isSearchScrolled = scrollPosition > (scrollThreshold * 2 + 20);
+
+        $("#header").toggleClass("header-scrolled", isHeaderScrolled);
+        $("#nav_search_wrap").toggleClass("search-scrolled", isSearchScrolled);
+    });
+
+    // 최초 로드시 반영
+    $(window).trigger("scroll");
+}
+
+
   
 
 
