@@ -4,15 +4,24 @@ from flask_cors import CORS
 from google import genai
 from google.genai.errors import APIError
 import time
-import smtplib
-from email.mime.text import MIMEText
-from email.header import Header
-from email.utils import formataddr
+# import smtplib
+# from email.mime.text import MIMEText
+# from email.header import Header
+# from email.utils import formataddr
 import random
 from flask import g
 import bcrypt
 import traceback
 import pymysql
+from dotenv import load_dotenv
+# from email.message import EmailMessage
+# from email.policy import SMTPUTF8
+from flask_mail import Message
+from extensions import mail
+
+
+
+load_dotenv()
 
 
 def mask_user_id(user_id: str) -> str:
@@ -45,66 +54,59 @@ api_bp = Blueprint('api_bp', __name__)
 
 auth_codes = {}
 
-def send_email_utf8(to_email, name, auth_code):
-    smtp_server = "smtp.gmail.com"
-    smtp_port = 587
-
-    # Gmail 계정 정보
-    smtp_user = "ayj0519@gmail.com"
-    smtp_password = "lhccakvpnvcfpsve"
-
-    # 이메일 본문 (UTF-8)
-    body = f"""
-안녕하세요 {name}님,
-
-TripMocha 비밀번호 재설정 인증번호는
-
-인증번호: {auth_code}
-
-입니다.
-3분 안에 입력해주세요.
-"""
-    
-    print("=== EMAIL BODY START ===")
-    for i, ch in enumerate(body):
-        print(i, repr(ch))
-    print("=== EMAIL BODY END ===")
-
-    # UTF-8 본문
-    msg = MIMEText(body, "plain", "utf-8")
-
-    # 제목 UTF-8
-    msg["Subject"] = "TripMocha Verification Code"
-
-    # From UTF-8 인코딩
-    msg["From"] = smtp_user
-
-    msg["To"] = to_email
-
-    server = smtplib.SMTP(smtp_server, smtp_port)
-    server.starttls()
-    server.login(smtp_user, smtp_password)
-    server.sendmail(smtp_user, [to_email], msg.as_string())
-    server.quit()
 
 
-def send_simple_email(to_email, body):
-    smtp_server = "smtp.gmail.com"
-    smtp_port = 587
+# def send_email_utf8(to_email, name, auth_code):
+#     print("🔥 SMTPUTF8 + BYTES 진짜 최종 버전")
 
-    smtp_user = "ayj0519@gmail.com"
-    smtp_password = "앱비밀번호"   # ⚠️ 실제론 env로 빼는 게 정석
+#     smtp_user = os.getenv("SMTP_USER")
+#     smtp_password = os.getenv("SMTP_PASSWORD")
 
-    msg = MIMEText(body, "plain", "utf-8")
-    msg["Subject"] = "TripMocha 아이디 찾기 안내"
-    msg["From"] = smtp_user
-    msg["To"] = to_email
+#     body = f"""안녕하세요 {name}님,
 
-    server = smtplib.SMTP(smtp_server, smtp_port)
-    server.starttls()
-    server.login(smtp_user, smtp_password)
-    server.sendmail(smtp_user, [to_email], msg.as_string())
-    server.quit()    
+# TripMocha 비밀번호 재설정 인증번호는
+
+# 인증번호: {auth_code}
+
+# 입니다.
+# 3분 안에 입력해주세요.
+# """
+
+#     msg = EmailMessage(policy=SMTPUTF8)
+#     msg.set_content(body, charset="utf-8")
+
+#     msg["Subject"] = "TripMocha Verification Code"
+#     msg["From"] = smtp_user
+#     msg["To"] = to_email
+
+#     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+#         server.login(smtp_user, smtp_password)
+#         server.sendmail(
+#             smtp_user,
+#             [to_email],
+#             msg.as_bytes(policy=SMTPUTF8)
+#         )
+
+
+
+
+# def send_simple_email(to_email, body):
+#     smtp_server = "smtp.gmail.com"
+#     smtp_port = 587
+
+#     smtp_user = "ayj0519@gmail.com"
+#     smtp_password = "앱비밀번호"   
+
+#     msg = MIMEText(body, "plain", "utf-8")
+#     msg["Subject"] = "TripMocha 아이디 찾기 안내"
+#     msg["From"] = smtp_user
+#     msg["To"] = to_email
+
+#     server = smtplib.SMTP(smtp_server, smtp_port)
+#     server.starttls()
+#     server.login(smtp_user, smtp_password)
+#     server.sendmail(smtp_user, [to_email], msg.as_string())
+#     server.quit()    
 
 @api_bp.route('/api/send_auth_code', methods=['POST'])
 def send_auth_code():
@@ -121,13 +123,28 @@ def send_auth_code():
     auth_codes[email] = auth_code
 
     try:
-        send_email_utf8(email, name, auth_code)
+        msg = Message(
+            subject="TripMocha 비밀번호 재설정 인증번호",
+            recipients=[email],
+            body=f"""안녕하세요 {name}님,
+
+TripMocha 비밀번호 재설정 인증번호는
+
+인증번호: {auth_code}
+
+입니다.
+3분 안에 입력해주세요.
+"""
+        )
+
+        mail.send(msg)
         print("이메일 전송 성공:", email, auth_code)
         return jsonify({"success": True})
 
     except Exception as e:
-        print("이메일 전송 오류:", e)
+        print("🔥 이메일 전송 오류:", e)
         return jsonify({"success": False, "message": "메일 발송 실패"}), 500
+
 
     
     
@@ -261,7 +278,7 @@ def process_signup():
     travel_style = request.form.get("travel_style")
 
     try:
-        # 🔐 비밀번호 암호화
+        # 비밀번호 암호화
         hashed_pw = bcrypt.hashpw(password.encode('utf-8'),
                                   bcrypt.gensalt()).decode('utf-8')
 
@@ -287,7 +304,7 @@ def process_signup():
 
     except Exception as e:
         print("===== 회원가입 오류 발생! =====")
-        traceback.print_exc()   # 🔥 전체 에러 로그 출력
+        traceback.print_exc()   # 전체 에러 로그 출력
         print("===== 오류 끝 =====")
 
         return """

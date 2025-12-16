@@ -4,9 +4,25 @@ from routes.schedule import schedule_bp
 from routes.login import login_bp, api_bp
 from routes.models import db
 import pymysql
+from extensions import mail
+
 
 app = Flask(__name__)
 app.secret_key = "mocha"
+
+# -------------------------------------------------
+# MAIL (GMAIL SMTP)
+# -------------------------------------------------
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'ayj0519@gmail.com'
+app.config['MAIL_PASSWORD'] = 'lhccakvpnvcfpsve'  # 앱 비밀번호
+app.config['MAIL_DEFAULT_SENDER'] = ('TripMocha', 'ayj0519@gmail.com')
+
+mail.init_app(app)   # 🔥🔥🔥🔥🔥 이 줄 없으면 전부 무효
+
 
 
 
