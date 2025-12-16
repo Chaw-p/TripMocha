@@ -19,74 +19,45 @@
                                 만들기</a></button></td>
                 </tr>
             </table>
-
             {% if trips %}
             {% for trip in trips %}
             <div class="trip-item">
-                <a href="{{ url_for('schedule.view', trip_id=trip.id) }}" class="trip-link-wrapper">
+                <a href="{{ url_for('schedule.view', draftId=trip.trip_no) }}" class="trip-link-wrapper">
                     <table>
                         <tr>
-                            <td rowspan="2" style="width: 105px;"><img src="{{ trip.image_url }}"
-                                    alt="{{ trip.title }} 이미지" class="trip-image"></td>
+                            <td rowspan="2" style="width: 105px;"><img src="#"
+                                    alt="#" class="trip-image"></td>
                             <td style="width: calc(100% - 150px);">
                                 <div class="trip-title">{{ trip.title }}</div>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <div class="trip-info">{{ trip.start_date }} → {{ trip.end_date }} 📍 {{ trip.location
-                                    }}</div>
+                                <div class="trip-info">{{ trip.start_date}} → {{ trip.end_date }} 📍 {{trip.city}}</div>
                                 <div class="trip-tags">
-                                    {% for tag in trip.tags.split(',') %}
-                                    <span>#{{ tag | trim }}</span>
+                                    {% for tag in trip.tags %}
+                                    <span>#{{ tag }}</span>
                                     {% endfor %}
                                 </div>
                             </td>
-                            <td></td>
                         </tr>
                     </table>
                 </a>
-                <div>
-                    <a href="#">수정</a> | 삭제
-                </div>
             </div>
             {% endfor %}
 
-            {% else %}
-            <div class="trip-item">
-                <a class="trip-link-wrapper">
-                    <table>
-                        <tr>
-                            <td rowspan="2" style="width: 105px;"></td>
-                            <td style="width: calc(100% - 150px);">
-                                <div class="trip-title">군산시여행</div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="trip-info">2025-12-5 → 2025-12-6 📍 군산시</div>
-                                <div class="trip-tags">
-                                    <span>#맛집</span>
-                                    <span>#체험</span>
-                                    <span>#축제</span>
-                                </div>
-                            </td>
-                            <td></td>
-                        </tr>
-                    </table>
-                </a>
-            </div>    
+            {% else %} 
                 <div class="trip-item">
                     <table id="no-travle">
                         <tr>
-                            <td>
+                            <td>📍
                                 <img src="{{ url_for('static', filename='img/nono.png') }}">
                             </td>
                         </tr>
                     </table>
                 </div>
 
-                {% endif %}
+            {% endif %}
 
                 <!-- 작업영역 -->
             </div>
