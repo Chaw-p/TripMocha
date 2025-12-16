@@ -1,5 +1,5 @@
 from flask import jsonify, request, Blueprint, render_template,redirect, session
-from .models import db, CityCounty,TripMain, TripMapping 
+from .models import db, CityCounty,TripMain, TripMapping, TripDetail 
 from dotenv import load_dotenv
 import os
 import pickle
@@ -310,6 +310,7 @@ def recommend_schedule():
 
         trip['RELATED_PLACES'] = final_related_places[:5]
     
+    print("##################",recommended_trips_list)
     return jsonify({
         "success": True,
         "recommended_trips": recommended_trips_list
@@ -323,32 +324,87 @@ def save_draft():
         
         if not data:
             return jsonify({'status': 'error', 'message': '요청 본문(Body)이 비어있거나 JSON 형식이 아닙니다.'}), 400
+     
+        logged_in_user_id = session.get('user_id')
+        if not logged_in_user_id:
+            return jsonify({'status': 'error', 'message': '세션에서 사용자 ID를 찾을 수 없습니다 (로그인 오류 가능성).'}), 401
 
-        trip_meta = data.get('tripMeta')
-        search_criteria = data.get('searchCriteria')
-        trip_schedule_plan = data.get('schedule_plan', [])
+        trip_meta = data.get('tripMeta', {})
+        selected_ids = trip_meta.get('selectedPlaceIds', [])
 
-        try:
-            trip_no = save_data_to_database(trip_meta, search_criteria, trip_schedule_plan)
-        except Exception as db_err:
-            print("데이터베이스 저장 오류:", str(db_err))
-            return jsonify({
-                'status': 'error', 
-                'message': '데이터베이스 저장 중 오류가 발생했습니다.'
-            }), 500
-    
-        # DB 저장 및 ID 획득 가정
+        # 1. TripMain 객체 생성 및 저장 준비
+        new_trip_main = TripMain(
+            # user_id는 인증/세션에서 가져오는 로직으로 대체해야 합니다.
+            user_id=logged_in_user_id,
+            title=trip_meta.get('title'),
+            city=trip_meta.get('city'),
+            tags=','.join(trip_meta.get('tags', [])),
+            start_date=trip_meta.get('startDate'),
+            end_date=trip_meta.get('endDate'),
+            people=trip_meta.get('people'),
+            trip_type=trip_meta.get('tripType'),
+            selectedPlaceId=json.dumps(selected_ids), 
+        )
+        print("$$$")
+        db.session.add(new_trip_main)
+        print("$$$")
+        # trip_no를 얻기 위해 flush를 실행합니다.
+        db.session.flush() 
+        saved_trip_no = new_trip_main.trip_no 
+
+        print(saved_trip_no)
+
+        # tipqdetil insert
+        saved_trip_no = new_trip_main.trip_no 
+
+        # # 2. 프론트엔드에서 받은 장소 ID 리스트
+        # selected_place_ids = trip_meta.get('selectedPlaceIds', []) 
+
+        # if selected_place_ids and saved_trip_no:
+        #     for place_id in selected_place_ids:
+                
+        #         place_info = db.session.query(TripDetail).filter_by(detail_id=place_id).first() 
+
+        #         if place_info:
+        #             new_trip_detail = TripDetail(
+        #                 trip_no=saved_trip_no,          
+        #                 detail_name=place_info.name,    
+        #                 address=place_info.addr,       
+        #                 latitude=place_info.lat,       
+        #                 longitude=place_info.lon,       
+        #                 category=place_info.category, 
+        #             )
+        #             db.session.add(new_trip_detail)
+            
+        # 2. TripMapping에 초기 데이터 저장
+        for index, place_id in enumerate(selected_ids):
+            new_mapping = TripMapping(
+                trip_no=saved_trip_no, 
+                content_id=place_id,
+                detail_id=None,
+                day_sequence=1,       # 임시 1일차
+                visit_order=index + 1 # 순서 지정
+            )
+            db.session.add(new_mapping)
         
-        # JSON 응답으로 ID 반환
+        # 3. 모든 작업을 커밋하고 성공 응답
+        db.session.commit()
+        
         return jsonify({
-            'status': 'success',
-            'trip_no' : trip_no,
+            'status': 'success', 
+            'trip_no': saved_trip_no, 
             'message': '여행 계획 초안이 성공적으로 저장되었습니다.'
         })
 
     except Exception as e:
-        print("서버 처리 중 오류 발생:", str(e))
-        return jsonify({'status': 'error', 'message': f'서버 처리 오류: {str(e)}'}), 500
+        # 오류 발생 시 모든 트랜잭션을 롤백
+        db.session.rollback()
+        
+        # 서버 콘솔에 상세 오류 출력 (디버깅용)
+        import traceback
+        print(f"서버 처리 중 오류 발생:\n{traceback.format_exc()}")
+        
+        return jsonify({'status': 'error', 'message': '데이터베이스 저장 실패 또는 서버 처리 오류'}), 500
     
 
 @schedule_bp.route("/view/<draftId>", methods=["GET"])
@@ -362,27 +418,34 @@ def view(draftId):
     else:
         query = url_query
 
-    # 세션에 값이 있을경우는 파라메터 값 없을 경우는 빈값을 다시 넣는다.
     session["query"] = query
     trip_record = TripMain.query.filter_by(trip_no=draftId).first()
 
-    if trip_record is None:
-        print("db에 id 없음")
-        
-        trip_meta_data = {}
+    raw_place_id = trip_record.selectedPlaceId
+
+    if raw_place_id and isinstance(raw_place_id, str):
+        try:
+            selected_place_ids_list = json.loads(raw_place_id)
+        except json.JSONDecodeError:
+            print("경고: selectedPlaceId가 유효한 JSON 문자열이 아닙니다.")
+            selected_place_ids_list = []
+    elif isinstance(raw_place_id, list):
+        selected_place_ids_list = raw_place_id
     else:
-        trip_meta_data = {
-            'trip_no': trip_record.trip_no, 
-            'user_id': trip_record.user_id, 
-            'title': trip_record.title, 
-            'city': trip_record.city,
-            'tags': trip_record.tags.split(',') if trip_record.tags else [],
-            'start_date': trip_record.start_date.strftime('%Y-%m-%d') if trip_record.start_date else '',
-            'end_date': trip_record.end_date.strftime('%Y-%m-%d') if trip_record.end_date else '',    
-            'people': trip_record.people,
-            'trip_type': trip_record.trip_type, 
-            'selectedPlaceId': trip_record.selectedPlaceId if trip_record.selectedPlaceId is not None else []
-        }
+        selected_place_ids_list = []
+    
+    trip_meta_data = {
+        'trip_no': trip_record.trip_no, 
+        'user_id': trip_record.user_id, 
+        'title': trip_record.title, 
+        'city': trip_record.city,
+        'tags': trip_record.tags.split(',') if trip_record.tags else [],
+        'start_date': trip_record.start_date.strftime('%Y-%m-%d') if trip_record.start_date else '',
+        'end_date': trip_record.end_date.strftime('%Y-%m-%d') if trip_record.end_date else '',    
+        'people': trip_record.people,
+        'trip_type': trip_record.trip_type, 
+        'selectedPlaceId': selected_place_ids_list
+    }
     trip_mappings = TripMapping.query.filter_by(trip_no=draftId).order_by(
     TripMapping.day_sequence, 
     TripMapping.visit_order
@@ -405,17 +468,107 @@ def view(draftId):
                 'address': address_data 
             })
 
+    grouped_schedule = {}
+    for item in trip_schedule_data:
+        day = item['day']
+        if day not in grouped_schedule:
+            grouped_schedule[day] = []
+        grouped_schedule[day].append(item)
+
     meta_json_str = json.dumps(trip_meta_data, ensure_ascii=False)
     schedule_json_str = json.dumps(trip_schedule_data, ensure_ascii=False) 
     safe_meta_data = quote_plus(meta_json_str)
     safe_schedule_data = quote_plus(schedule_json_str)
-    print(f"Flask에서 전달되는 Meta Data: {trip_meta_data}")
-     
+
     return render_template("schedule/schedule_view.html",safe_meta_data=safe_meta_data, 
     safe_schedule_data=safe_schedule_data,
-    trip_meta=trip_meta_data,search_query=query, trip_schedule=trip_schedule_data, user_id=trip_meta_data.get('user_id', 'Guest'), draft_id=draftId , choakey=key)
+    trip_meta=trip_meta_data, grouped_schedule=grouped_schedule,
+    query=query,user_id=trip_meta_data.get('user_id', 'Guest'), draft_id=draftId , choakey=key)
+
+# 여행 상세보기
+@schedule_bp.route('/finalize', methods=['POST'])
+def finalize_schedule():
+    data = request.get_json()
+
+    if isinstance(data, list) and len(data) > 0 and isinstance(data[0], list):
+        # ⚠️ 프론트엔드에서 [[ {place} ]] 형태로 보낸 경우
+        final_schedule = data[0]
+        # trip_no는 JSON 본문에 포함되어 있지 않으므로, URL 쿼리 파라미터나 다른 곳에서 가져와야 합니다.
+        # 여기서는 trip_no가 요청 URL에 쿼리 파라미터로 포함되었다고 가정합니다.
+        # 예: /finalize?trip_no=78
+        trip_no = request.args.get('trip_no', type=int)
+        
+    elif isinstance(data, list) and len(data) > 0 and isinstance(data[0], dict):
+        # ⚠️ 프론트엔드에서 [ {place}, {place} ] 형태로 보낸 경우
+        final_schedule = data
+        trip_no = request.args.get('trip_no', type=int)
+        
+    else:
+        # 데이터가 예상치 못한 형태이거나 비어 있는 경우
+        trip_no = None
+        final_schedule = []
+
+    print("#############요청 본문(data) 타입:", type(data))
+    print("#############추출된 Trip No:", trip_no)
+    print("#############추출된 final_schedule (장소 리스트):", final_schedule)
+
+    # trip_no는 URL에서 가져와야 하므로, 해당 로직을 추가해야 합니다.
+    if not trip_no or not final_schedule:
+        return jsonify({"status": "error", "message": "필요한 데이터가 누락되었습니다. (Trip No 확인 필요)"}), 400
+
+    try:
+        # ... (이하 TripDetail 삽입 및 TripMapping 업데이트 로직) ...
+        
+        for index, place_data in enumerate(final_schedule):
+            
+            # 필드 이름 매핑 (프론트엔드 필드 이름을 서버 필드 이름에 맞게 조정)
+            content_id = place_data.get('CONTENT_ID') # 'CONTENT_ID' 사용
+            
+            # --- A. TripDetail 삽입 (정수형 detail_id 획득) ---
+            new_trip_detail = TripDetail(
+                trip_no=trip_no, # 👈 추출된 trip_no 사용
+                detail_name=place_data.get('VISIT_AREA_NM'), # 'VISIT_AREA_NM' 사용
+                address=place_data.get('LOTNO_ADDR'),        # 'LOTNO_ADDR' 사용
+                latitude=place_data.get('Y_COORD'),          # 'Y_COORD' 사용
+                longitude=place_data.get('X_COORD'),         # 'X_COORD' 사용
+                category=place_data.get('VISIT_AREA_TYPE_CD'), # 'VISIT_AREA_TYPE_CD' 사용
+                trip_detail=f"여행 상세 정보" 
+            )
+            db.session.add(new_trip_detail)
+            
+            db.session.flush() 
+            new_detail_id = new_trip_detail.detail_id 
+            print(f"로그 1: TripDetail 임시 삽입 성공. 획득한 ID: {new_detail_id}")
+
+            mapping_record = db.session.query(TripMapping).filter_by(
+                trip_no=trip_no, 
+                content_id=content_id 
+            ).first()
+
+            if mapping_record:
+                print(f"로그 2: TripMapping 레코드 찾음. Mapping ID: {mapping_record.mapping_id}")
+                mapping_record.detail_id = new_detail_id
+                mapping_record.day_sequence = 1 # 현재 데이터에 day 정보가 없으므로 1일차로 가정
+                mapping_record.visit_order = index + 1
+                # mapping_record.day_sequence = place_data.get('day')
+                # mapping_record.visit_order = place_data.get('order')
+            else:
+                # 🚨 로그 3: TripMapping 레코드 못 찾음 (가장 의심되는 부분)
+                print(f"로그 3: ⚠️ TripMapping 레코드 (trip_no={trip_no}, content_id={content_id}) 찾기 실패.")
+                # ⚠️ 이 경우, 이 레코드에 대해서는 detail_id가 업데이트되지 않습니다.
+                #    다음 루프로 넘어갑니다.
+
+        # 3. 최종 커밋
+        db.session.commit()
+        return jsonify({"status": "success", "message": "여행 일정이 최종 확정되었습니다."})
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"서버 처리 중 오류 발생: {e}") 
+        return jsonify({"status": "error", "message": f"서버 오류: {str(e)}"}), 500
 
 
+# 여행일정 목록
 @schedule_bp.route("/list", methods=["GET"])
 def list():
     query = ""

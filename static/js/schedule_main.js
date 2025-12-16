@@ -293,7 +293,10 @@ $(".search-button").on("click", function() {
   
     const $selectedDestination = $("#destinationDropdown .destination-item.selected");
     const admCode = $selectedDestination.length ? $selectedDestination.data('code') : null;
-    
+    const startDate = $("#startDateInputId").val() || null; 
+    const endDate = $("#endDateInputId").val() || null;   
+    const personnelCount = parseInt($("#personnelCountInputId").val(), 10) || 0; 
+    const selectedPersonnelType = $("#personnelTypeInputId").val() || ''; 
     
     const durationText = $("#dateItem .selected-duration").text();
     let durationDays = 0;
@@ -696,8 +699,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-
-
 // 여행만들기 start
 
 $(document).ready(function() {
@@ -746,6 +747,7 @@ $('.button-make-travel').on('click', function(e) {
     const userId = 'GUEST_USER';
     //세션저장된걸로 꺼내오게 수정 필요
     const searchData = sessionStorage.getItem('currentSearchData');
+    const personnelType = sessionStorage.getItem('selectedPersonnelType');
     // const searchData = JSON.parse(searchDataJson || '{}');
     // 2. ADM 코드 유효성 검사 (필수 입력값)
     const admCode = requestData.adm_code; 
@@ -776,8 +778,13 @@ $('.button-make-travel').on('click', function(e) {
     .then(data => {
         const startDate = requestData.date ? requestData.date.startDate : null;
         const endDate = requestData.date ? requestData.date.endDate : null;
-        
-
+        const selectedPersonnelType = personnelType.dataType;
+        // const selectedPersonnelType = (searchData.personnel && searchData.personnel.type) || 
+        //                           searchData.tripType || 
+        //                           searchData.type || // 혹시 최상위 키에 type이 있을 경우
+        //                           '';
+        console.log("DEBUG: 최종 추출된 selectedPersonnelType:", selectedPersonnelType);
+          console.log("DEBUG: sessionStorage의 searchData 원본:", searchData);
         // 4. 응답 데이터 처리 및 HTML 렌더링
         if (data.success && data.recommended_trips) {
             const recommendedTrips = data.recommended_trips;
@@ -891,6 +898,18 @@ $('.button-make-travel').on('click', function(e) {
                     // 3. 서버에 전송할 데이터 준비 (여행 메타데이터 + 초기 검색 조건)
                     const requestData = JSON.parse(sessionStorage.getItem('currentSearchData') || '{}');
 
+                    if (!tripMetaData.startDate) {
+                        tripMetaData.startDate = requestData.date ? requestData.date.startDate : '';
+                    }
+                    if (!tripMetaData.endDate) {
+                        tripMetaData.endDate = requestData.date ? requestData.date.endDate : '';
+                    }
+                    if (!tripMetaData.people) {
+                        tripMetaData.people = requestData.personnel ? requestData.personnel.count : 0;
+                    }
+                    if (!tripMetaData.tripType) {
+                        tripMetaData.tripType = requestData.personnel ? requestData.personnel.type : '';
+                    }
                     const dataToSend = {
                         tripMeta: tripMetaData,
                         searchCriteria: requestData, // 날짜, 인원, 테마 등 초기 검색 조건
@@ -903,7 +922,8 @@ $('.button-make-travel').on('click', function(e) {
                     console.log("DB 저장을 위해 서버에 전송할 데이터:", dataToSend);
 
                     console.log("@@@@@@@@@@@@@@@",dataToSend);
-                    
+                    console.log("Request Data from SessionStorage:", requestData);
+                    console.log("tripMetaData After Merging:", tripMetaData);
                     fetch('/schedule/save-draft', { 
                         method: 'POST',
                         headers: {
