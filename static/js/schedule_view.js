@@ -149,8 +149,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-//PDF 
-
 
  $(document).ready(function(){
     const tripDataElement = $('#trip-data')[0];
@@ -223,6 +221,63 @@ document.addEventListener('DOMContentLoaded', function() {
     if (tripIdFromUrl) {
         console.log("현재 View 페이지의 Trip ID::", tripIdFromUrl);
     }
-  });
+
+    });
+
+    $(document).ready(function(){
+    // ... (기존 tripMeta 로딩 및 파싱 로직은 그대로 유지) ...
+    
+    // URL에서 Trip ID 가져오기 (기존 로직 유지)
+    const urlParts = window.location.pathname.split('/');
+    const tripIdFromUrl = urlParts[3];
+
+    if (tripIdFromUrl) {
+        console.log("현재 View 페이지의 Trip ID::", tripIdFromUrl);
+        
+        // ----------------------------------------------------
+        // 🚨 새로 추가하거나 수정해야 할 부분 🚨
+        // 페이지 로드 완료 시, 즉시 최종 확정 요청을 보냅니다.
+        // ----------------------------------------------------
+        
+        // 1. 최종 확정 데이터 가져오기 (⭐ 가장 중요한 함수)
+        const finalScheduleData = getFinalScheduleData();
+        const tripNo = tripIdFromUrl;
+
+        if (finalScheduleData.length > 0) {
+            sendFinalizeRequest(tripNo, finalScheduleData);
+        } else {
+            console.error("오류: 최종 확정할 장소 데이터가 준비되지 않았습니다. (getFinalScheduleData 확인 필요)");
+            // 사용자에게 오류 메시지를 보여줄 수 있습니다.
+        }
+    }
+});
+
+   function getFinalScheduleData() {
+    const $dataElement = $('#final-schedule-data'); 
+    let finalData = [];
+
+    if ($dataElement.length) {
+        // data-schedule 속성에 JSON 문자열이 담겨있다고 가정
+        const jsonString = $dataElement.data('schedule'); 
+        
+        if (jsonString) {
+            try {
+                // Flask에서 전달받은 JSON 문자열을 파싱
+                finalData = JSON.parse(jsonString);
+                console.log("SUCCESS: 최종 확정 데이터", finalData.length, "개 로드 완료.");
+            } catch (e) {
+                console.error("CRITICAL ERROR: 최종 스케줄 JSON 파싱 실패", e);
+            }
+        }
+    } else {
+        // 이 메시지가 뜨면 HTML 구조를 확인해야 합니다.
+        console.warn("WARNING: #final-schedule-data 요소를 HTML에서 찾을 수 없습니다.");
+    }
+    
+    // 이 배열은 CONTENT_ID, VISIT_AREA_NM, Y_COORD, X_COORD 등의 필드를 
+    // 모두 포함하는 객체의 배열이어야 합니다.
+    return finalData; 
+}
+
 
 
