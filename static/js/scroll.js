@@ -82,7 +82,7 @@ const page = {
               // console.log("After append - LI count:", $travel_list.children('li').length);
               // console.log("$travel_list element:", $travel_list[0]);
             } else {
-              $travel_list.append('<li>검색 결과가 없습니다.</li>');
+              // $travel_list.append('<li>검색 결과가 없습니다.</li>');
                 
               // 💡 최종 페이지 처리: 옵저버 해제
               const sentinel = document.getElementById('sentinel');
@@ -117,7 +117,7 @@ const page = {
     }
 };
 
-//https://velog.io/@eunoia/%EB%AC%B4%ED%95%9C-%EC%8A%A4%ED%81%AC%EB%A1%A4Infinite-scroll-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0
+// https://velog.io/@eunoia/%EB%AC%B4%ED%95%9C-%EC%8A%A4%ED%81%AC%EB%A1%A4Infinite-scroll-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0
 const io = new IntersectionObserver((entries, observer) => {
 	entries.forEach(entry => {
 		//entry가 interscting 중이 아니라면 함수를 실행하지 않습니다.

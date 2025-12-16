@@ -19,7 +19,7 @@
   <div id="wrap">
     {% include 'config/header.html' %}
     <div id="waitMsg">
-    <img src="../static/img/icons8-loading-96.gif">
+      <img src="../static/img/icons8-loading-96.gif">
     </div>
     <div id="container">
       
@@ -71,20 +71,16 @@
                     </div>
                   </li>
                   {% endfor %}
-                <li>
-                  <a href="/info/1">
-                    <img src="../static/img/flower.jpg" alt="나리농원">
-                  </a>
-                  <div class="list_cont">
-                    <h3 class="title">광명선원</h3>
-                    <p class="loc">충북 음성군</p>
-                    <p>조용히 나를 돌아보는 사찰</p>
-                    <p class="hash">
-                      <a href="{{ url_for('info.info',query='관광지') }}">#관광지</a>
-                      <a href="{{ url_for('info.info',query='광명선원') }}">#광명선원</a>
-                    </p>
-                  </div>
-                </li>
+                  {% if not items %}
+                    <div class="no-result">
+                      <p>
+                        <span class="material-symbols-outlined">search</span>
+                      </p>
+                      <p>
+                        검색 결과가 없습니다.
+                      </p>
+                    </div>
+                  {%endif%}
               </ul>
               <p id="sentinel"></p>
             </div>

@@ -1,0 +1,27 @@
+.schedule_travel_list {
+  width: 500px;
+  height: 500px;
+  /* background-color: brown; */
+  padding: 0;
+  border-radius: 5px;
+  border: 1px solid var(--mocha-border);
+  overflow: hidden;
+  overflow-y: scroll;
+  cursor: pointer;
+}
+.schedule_travel_list li:hover {
+  background-color: aliceblue;
+}
+.schedule_travel_list li.selected {
+  background-color: var(--mocha-border);
+}
+
+.no-result {
+  height: 100%;
+  background-color: none !important;
+}
+
+.no-result:hover {
+  background-color: none !important;
+  cursor: auto;
+}

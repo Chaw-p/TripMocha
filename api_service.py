@@ -338,6 +338,8 @@ class APIService :
         "type": self.TYPE_MAPPING(i.get("lclsSystm1")),
         "area" : self.AREA_CODE_MAPPING(i.get("areacode")),
         "areacode" : i.get("areacode"),
+        "mapX" : i.get("mapx"),
+        "mapY" : i.get("mapy"),
         "cat3" : i.get("cat3"),
         "cat3_name" : self.CATEGORY_CODE_MAPPING(i.get("cat3"))
       }
@@ -396,6 +398,8 @@ class APIService :
           "type": self.TYPE_MAPPING(i.get("lclsSystm1")),
           "area" : self.AREA_CODE_MAPPING(i.get("areacode")),
           "areacode" : i.get("areacode"),
+          "mapX" : i.get("mapx"),
+          "mapY" : i.get("mapy"),
           "cat3" : i.get("cat3"),
           "cat3_name" : self.CATEGORY_CODE_MAPPING(i.get("cat3"))
         }
