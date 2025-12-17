@@ -3,7 +3,7 @@ import requests
 import json
 from dotenv import load_dotenv
 import os
-
+from .models import db, TripMain , TripMapping 
 # pip install python-dotenv
 
 load_dotenv()
