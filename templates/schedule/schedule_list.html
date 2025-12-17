@@ -19,6 +19,7 @@
                                 만들기</a></button></td>
                 </tr>
             </table>
+
             {% if trips %}
             {% for trip in trips %}
             <div class="trip-item">
@@ -29,6 +30,7 @@
                                     alt="#" class="trip-image"></td>
                             <td style="width: calc(100% - 150px);">
                                 <div class="trip-title">{{ trip.title }}</div>
+                                <div>{{trip.trip_no}}</div>
                             </td>
                         </tr>
                         <tr>

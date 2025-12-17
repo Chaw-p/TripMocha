@@ -22,6 +22,8 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script type=text/javascript src="{{url_for('static', filename='js/main.js') }}"></script>
     <script type=text/javascript src="{{url_for('static', filename='js/schedule_main.js') }}"></script>
+    <script>
+    const currentUserId = "{{ session.get('user_id', '') }}";</script>
 
     <!-- etc -->
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" /> -->

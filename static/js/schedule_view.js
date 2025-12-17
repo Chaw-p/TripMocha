@@ -217,11 +217,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     $(document).ready(function(){
     
+    // URL에서 Trip ID 가져오기 (기존 로직 유지)
     const urlParts = window.location.pathname.split('/');
     const tripIdFromUrl = urlParts[3];
 
     if (tripIdFromUrl) {
         console.log("현재 View 페이지의 Trip ID::", tripIdFromUrl);
+        
+        // ----------------------------------------------------
+        // 🚨 새로 추가하거나 수정해야 할 부분 🚨
+        // 페이지 로드 완료 시, 즉시 최종 확정 요청을 보냅니다.
+        // ----------------------------------------------------
         
         // 1. 최종 확정 데이터 가져오기 (⭐ 가장 중요한 함수)
         const finalScheduleData = getFinalScheduleData();

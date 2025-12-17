@@ -1,3 +1,37 @@
+// 여행태그 한글변환
+const TAG_TRANSLATIONS = {
+    'ai': 'AI추천',
+    'mountain': '산',
+    'sea': '바다',
+    'indoor': '실내',
+    'activity': '액티비티',
+    'experience': '체험',
+    'themepark': '테마파크',
+    'market': '전통시장',
+    'food': '맛집',
+    'festival': '축제',
+    'healing': '힐링',
+    'photo': '사진',
+    '여행': '여행',
+    '추천': '추천'
+};
+function translateTags(tagsArray) {
+    if (!tagsArray || !Array.isArray(tagsArray)) return [];
+    return tagsArray.map(tag => {
+        const key = tag.toLowerCase().trim();
+        return TAG_TRANSLATIONS[key] || tag;
+    });
+}
+
+// 배열을 받아서 한글 배열로 뱉어주는 함수
+function translateTags(tagsArray) {
+    if (!tagsArray || !Array.isArray(tagsArray)) return [];
+    return tagsArray.map(tag => {
+        const key = tag.toLowerCase().trim();
+        return TAG_TRANSLATIONS[key] || tag; // 맵에 없으면 원래 단어 그대로 유지
+    });
+}
+
 function activateAddButton() {
     // '추가' 버튼을 활성화 상태로 되돌립니다.
     const $addButton = $(".search-button");
@@ -759,7 +793,7 @@ $('.button-make-travel').on('click', function(e) {
                        ? requestData.destination.city 
                        : '추천';
     
-    // 3. 실제 AJAX 요청 (fetch API 사용 , 비동기)
+    // 3. AJAX 요청 (fetch API 사용 , 비동기)
     fetch('/schedule/recommend', {
         method: 'POST',
         headers: {
@@ -781,15 +815,16 @@ $('.button-make-travel').on('click', function(e) {
     
         console.log("DEBUG: 최종 추출된 selectedPersonnelType:", selectedPersonnelType);
           console.log("DEBUG: sessionStorage의 searchData 원본:", searchData);
+        const user_id = sessionStorage.getItem('user_id') || '고객';
         // 4. 응답 데이터 처리 및 HTML 렌더링
         if (data.success && data.recommended_trips) {
             const recommendedTrips = data.recommended_trips;
-            
+            const user_id = (typeof currentUserId !== 'undefined' && currentUserId) ? currentUserId : '고객';
 
             // 5. HTML 리스트 생성 시작
             let listHtml = `
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                    <h3 style="color: #333; margin: 0;">${cityPrefix} 추천 여행 리스트</h3>
+                    <h3 style="color: #333; margin: 0;">${user_id} 님을 위한 추천 여행 리스트</h3>
                     <button class="reload-btn">추천 다시 받기</button>
                 </div>
             `;
@@ -809,16 +844,19 @@ $('.button-make-travel').on('click', function(e) {
                 const selectedThemeTags = searchData.theme_tags || [];
 
                 // 🚨 2. 메타데이터 추출 (이제 trip 대신 firstPlace에서 추출)
-                const title = `${cityPrefix}` + "여행"; 
-                const displayCity = `${firstPlace.SIDO_NM || ''}${cityPrefix || ''}`.replace('?', ''); 
-                let tags;
-                if (selectedThemeTags.length > 0) {
-                    tags = selectedThemeTags;
-                } else if (firstPlace.TAGS) {
-                    // firstPlace.TAGS는 콤마로 구분된 문자열이므로 배열로 split 합니다.
-                    tags = firstPlace.TAGS.split(',');
+                const title = `${cityPrefix}` + "여행" ;
+                
+                // const displayCity = `${firstPlace.SIDO_NM || ''} ${cityPrefix || ''}`; 
+                const displayCity = `   ${cityPrefix || ''}`; 
+                
+                const currentTags = (typeof tags !== 'undefined' ? tags : (typeof tripMeta !== 'undefined' ? tripMeta.tags : [])) || [];
+
+                // 3. 한글 번역 적용 (함수가 정의되어 있는지 확인 필수!)
+                let koreanTags = [];
+                if (typeof translateTags === 'function') {
+                    koreanTags = translateTags(currentTags);
                 } else {
-                    tags = ['추천', '여행'];
+                    koreanTags = currentTags; // 함수가 없으면 원본이라도 유지
                 }
                 
                 // ----------------------------------------------------
@@ -883,20 +921,25 @@ $('.button-make-travel').on('click', function(e) {
                 
                 const tripJson = JSON.stringify(tripMetaData);
                 const tripMetaJson = tripJson.replace(/"/g, '&quot;' );
+                const days = itinerary.length;
+                const nights = days - 1;
+                const durationText = nights > 0 ? `${nights}박 ${days}일` : `${days}일`;
 
                 // 5. HTML 템플릿에 데이터 삽입 (기존 템플릿 사용)
                 listHtml += `
                     <div class="trip-item" data-trip-id="${currentTripId}" data-trip-meta="${tripMetaJson}">
                         <div class="trip-header-line"> 
                             <h4>${title}</h4>
-                            ${displayCity} | ${itinerary.length}일</p>
+                           | ${displayCity} | ${durationText}
                         </div>
                         
                         <div class="trip-schedule-container">${scheduleHtml}</div>
                         
                         <div class="trip-tags">
                             <div class="tag-group"> 
-                                ${tags.map(tag => `<span>#${tag}</span>`).join('')}
+                                ${koreanTags.length > 0 
+                              ? koreanTags.map(tag => `<span>#${tag}</span>`).join('') 
+                        : '<span>#추천</span><span>#여행</span>'}
                             </div>
                         </div>
                     </div>

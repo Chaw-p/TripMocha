@@ -546,7 +546,8 @@ def save_draft():
         selected_itinerary = None
 
         for itinerary in recommended_list:
-
+        
+            # 안전하게 접근
             if itinerary and itinerary[0] and itinerary[0].get('schedule') and itinerary[0]['schedule'][0]:
                 first_place = itinerary[0]['schedule'][0]
                 if first_place.get('CONTENT_ID') == selected_trip_id or first_place.get('id') == selected_trip_id:
