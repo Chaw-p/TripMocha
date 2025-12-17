@@ -236,6 +236,29 @@ def verify_auth_code():
             "message": "서버 오류가 발생했습니다."
         }), 500
 
+@api_bp.route("/api/check_current_password", methods=["POST"])
+def check_current_password():
+    user_id = session.get("user_id")
+    current_pw = request.form.get("current_password")
+
+    if not user_id or not current_pw:
+        return jsonify({"success": False})
+
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("SELECT password FROM users WHERE user_id=%s", (user_id,))
+    row = cursor.fetchone()
+
+    if not row:
+        return jsonify({"success": False})
+
+    stored_pw = row[0]
+
+    if bcrypt.checkpw(current_pw.encode(), stored_pw.encode()):
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False})
 
 
 # ----------------------------------------------------
@@ -661,6 +684,13 @@ def reset_password():
 def update_profile():
     user_id = session.get("user_id")
 
+    if not user_id:
+        return "<script>alert('로그인이 필요합니다'); location.href='/login';</script>"
+
+    current_pw = request.form.get("current_password")
+    if not current_pw:
+        return "<script>alert('현재 비밀번호를 입력해주세요'); history.back();</script>"
+
     name = request.form.get("name")
     birthday = request.form.get("birthday")
     email = request.form.get("email")
@@ -672,27 +702,29 @@ def update_profile():
     detail_address = request.form.get("detail_address")
     travel_style = request.form.get("travel_style")
 
-    current_pw = request.form.get("current_password")
     new_pw = request.form.get("new_password")
     new_pw_confirm = request.form.get("new_password_confirm")
 
     db = get_db()
     cursor = db.cursor()
 
-    # ⭐ 비밀번호 변경 로직 포함
+    # ⭐ 어떤 수정이든 무조건 현재 비밀번호 먼저 검증
+    cursor.execute("SELECT password FROM users WHERE user_id=%s", (user_id,))
+    row = cursor.fetchone()
+
+    if not row:
+        return "<script>alert('사용자 정보를 찾을 수 없습니다'); history.back();</script>"
+
+    stored_pw = row[0]
+
+    if not bcrypt.checkpw(current_pw.encode(), stored_pw.encode()):
+        return "<script>alert('현재 비밀번호가 일치하지 않습니다'); history.back();</script>"
+
+    # ⭐ 비밀번호 변경 (선택)
     if new_pw:
-        # 새 비밀번호 작성 + 확인 일치 여부
         if new_pw != new_pw_confirm:
             return "<script>alert('새 비밀번호가 일치하지 않습니다'); history.back();</script>"
 
-        # 현재 비밀번호 일치 여부 검사
-        cursor.execute("SELECT password FROM users WHERE user_id=%s", (user_id,))
-        stored_pw = cursor.fetchone()[0]
-
-        if not bcrypt.checkpw(current_pw.encode(), stored_pw.encode()):
-            return "<script>alert('현재 비밀번호가 일치하지 않습니다'); history.back();</script>"
-
-        # 비밀번호 해싱 후 업데이트
         hashed_pw = bcrypt.hashpw(new_pw.encode(), bcrypt.gensalt()).decode("utf-8")
 
         cursor.execute(
@@ -700,7 +732,7 @@ def update_profile():
             UPDATE users
             SET password=%s
             WHERE user_id=%s
-        """,
+            """,
             (hashed_pw, user_id),
         )
 
@@ -712,7 +744,7 @@ def update_profile():
             gender=%s, nation=%s, postcode=%s, address=%s,
             detail_address=%s, travel_style=%s
         WHERE user_id=%s
-    """,
+        """,
         (
             name,
             birthday,
@@ -730,4 +762,8 @@ def update_profile():
 
     db.commit()
     session["user_name"] = name
+
     return redirect(url_for("index"))
+
+
+

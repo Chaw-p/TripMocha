@@ -5,26 +5,28 @@
     <meta charset="UTF-8" />
     <title>내 정보 수정</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+  {% include 'config/config.html' %}
 
 </head>
 
 <body>
-    <!-- profile 전용 헤더 -->
+      <div id="wrap">
+    {% include 'config/header.html' %}
     <header class="profile-header">
         <div class="profile-header-inner">
 
             <!-- 로고 -->
-            <div class="profile-logo">
+            <!-- <div class="profile-logo">
                 <a href="/">
                     <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Trip Mocha">
                 </a>
-            </div>
+            </div> -->
 
             <!-- 메뉴 -->
-            <nav class="profile-nav">
+            <!-- <nav class="profile-nav">
                 <a href="{{ url_for('info.festival') }}">축제 보기</a>
                 <a href="{{ url_for('schedule.list') }}">나의 여행계획</a>
-            </nav>
+            </nav> -->
 
             <!-- 유저 -->
             <div class="profile-user">
@@ -38,7 +40,7 @@
     <div class="profile-container">
 
         <h2 class="profile-title">내 정보 수정</h2>
-        <button type="button" class="back-btn" onclick="history.back()">← 뒤로가기</button>
+        <!-- <button type="button" class="back-btn" onclick="history.back()">← 뒤로가기</button> -->
 
         <form action="/profile/update" method="post" class="profile-form">
 
@@ -46,63 +48,66 @@
             <input type="text" value="{{ user[0] }}" disabled>
 
             <label>현재 비밀번호</label>
-            <input type="password" name="current_password" placeholder="기존 비밀번호 입력">
+            <input type="password" name="current_password" id="current_pw" placeholder="기존 비밀번호 입력">
 
             <label>새 비밀번호</label>
-            <input type="password" name="new_password" placeholder="새 비밀번호 입력">
+            <input type="password" name="new_password" class="lock-target" disabled placeholder="새 비밀번호 입력">
 
             <label>새 비밀번호 확인</label>
-            <input type="password" name="new_password_confirm" placeholder="새 비밀번호 확인">
+            <input type="password" name="new_password_confirm" class="lock-target" disabled placeholder="새 비밀번호 확인">
 
             <label>이름</label>
-            <input type="text" name="name" value="{{ user[1] }}" required>
+            <input type="text" name="name" class="lock-target" readonly value="{{ user[1] }}">
 
             <label>생년월일</label>
-            <input type="text" name="birthday" value="{{ user[2] }}" maxlength="8" required>
+            <input type="text" name="birthday" class="lock-target" readonly value="{{ user[2] }}" maxlength="8" required>
 
             <label>이메일</label>
-            <input type="email" name="email" value="{{ user[3] }}" required>
+            <input type="email" name="email" class="lock-target" readonly value="{{ user[3] }}" required>
+
 
             <!-- <label>휴대폰 번호</label>
         <input type="text" name="phone" value="{{ user[4] }}"> -->
 
             <label>성별</label>
-            <select name="gender">
+            <select name="gender" class="lock-target" disabled>
                 <option value="M" {% if user[5]=='M' %}selected{% endif %}>남자</option>
                 <option value="F" {% if user[5]=='F' %}selected{% endif %}>여자</option>
             </select>
 
             <label>국적</label>
-            <select name="nation">
+            <select name="nation" class="lock-target" disabled>
                 <option value="K" {% if user[6]=='K' %}selected{% endif %}>내국인</option>
                 <option value="F" {% if user[6]=='F' %}selected{% endif %}>외국인</option>
             </select>
 
-            <label>우편번호</label>
-            <input type="text" name="postcode" value="{{ user[7] }}">
+            <label>우편번호</label> 
+            <input type="text" name="postcode" class="lock-target" readonly value="{{ user[7] }}">
 
             <label>주소</label>
-            <input type="text" name="address" value="{{ user[8] }}">
+            <input type="text" name="address" class="lock-target" readonly value="{{ user[8] }}">
 
             <label>상세 주소</label>
-            <input type="text" name="detail_address" value="{{ user[9] }}">
+            <input type="text" name="detail_address" class="lock-target" readonly value="{{ user[9] }}">
+
 
             <!-- 여행 스타일 -->
             <label>여행 스타일 (최대 4개)</label>
             <div id="style-container">
-                <button type="button" class="style-btn" data-value="spring_flower">🌸 봄꽃</button>
-                <button type="button" class="style-btn" data-value="summer_sea">☀️ 여름바다</button>
-                <button type="button" class="style-btn" data-value="autumn_leaf">🍁 가을단풍</button>
-                <button type="button" class="style-btn" data-value="winter_snow">❄️ 겨울눈</button>
-                <button type="button" class="style-btn" data-value="water_play">🏊 물놀이</button>
-                <button type="button" class="style-btn" data-value="trekking">🏃 운동/트레킹</button>
-                <button type="button" class="style-btn" data-value="food_tour">🍜 맛집</button>
-                <button type="button" class="style-btn" data-value="healing">🌿 힐링</button>
-                <button type="button" class="style-btn" data-value="night_view">🌙 야경</button>
-                <button type="button" class="style-btn" data-value="activity">🎢 액티비티</button>
+                <button type="button"  class="style-btn lock-target" data-value="spring_flower" disabled>🌸 봄꽃</button>
+                <button type="button"  class="style-btn lock-target" data-value="summer_sea" disabled>☀️ 여름바다</button>
+                <button type="button"  class="style-btn lock-target" data-value="autumn_leaf" disabled>🍁 가을단풍</button>
+                <button type="button"  class="style-btn lock-target" data-value="winter_snow" disabled>❄️ 겨울눈</button>
+                <button type="button"  class="style-btn lock-target" data-value="water_play" disabled>🏊 물놀이</button>
+                <button type="button"  class="style-btn lock-target" data-value="trekking" disabled>🏃 운동/트레킹</button>
+                <button type="button"  class="style-btn lock-target" data-value="food_tour" disabled>🍜 맛집</button>
+                <button type="button"  class="style-btn lock-target" data-value="healing" disabled>🌿 힐링</button>
+                <button type="button"  class="style-btn lock-target" data-value="night_view" disabled>🌙 야경</button>
+                <button type="button"  class="style-btn lock-target" data-value="activity" disabled>🎢 액티비티</button>
             </div>
 
             <input type="hidden" name="travel_style" id="travel_style" value="{{ user[10] }}">
+
 
             <button class="profile-btn" type="submit">수정하기</button>
         </form>
@@ -157,7 +162,7 @@
 
 
     <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
-
+    <div id="toast"></div>
 </body>
 
 </html>
