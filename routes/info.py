@@ -95,7 +95,7 @@ def tourapi_info():
 def location():
   return render_template("info/add_location.html")
 
-# @info_bp.route("/location/<trip_no>", method = "PUT")
+# @info_bp.route("/location/<trip_no>", methods = "PUT")
 # def update_trip_detail(trip_no): 
 #   data = request.get_json()
   
@@ -140,21 +140,30 @@ def location():
 #     latitude = latitude,
 #     longitude = longitude
 #   )
-
-#   try:
-#     db.session.add(new_detail)
-#     db.session.commit()
-#     return jsonify({
-#       "message": "새로운 여행 장소가 성공적으로 생성되었습니다.",
-#       "trip_id": new_detail.trip_no,
+#   print("new_detail", new_detail)
+#   return jsonify({"new_detail": {
+#     "new_detail": {                          
+#       "id": new_detail.id,
+#       "detail_name": new_detail.detail_name,
 #       "address": new_detail.address,
 #       "latitude": new_detail.latitude,
 #       "longitude": new_detail.longitude
-#       }), 201
+#     }
+#   }})
+  # try:
+  #   db.session.add(new_detail)
+  #   db.session.commit()
+  #   return jsonify({
+  #     "message": "새로운 여행 장소가 성공적으로 생성되었습니다.",
+  #     "trip_id": new_detail.trip_no,
+  #     "address": new_detail.address,
+  #     "latitude": new_detail.latitude,
+  #     "longitude": new_detail.longitude
+  #     }), 201
 
-#   except Exception as e:
-#     db.session.rollback()
-#     # 내부 서버 오류 응답
-#     return jsonify({"message": "여행 장소 생성 중 오류가 발생했습니다.", "error": str(e)}), 500
+  # except Exception as e:
+  #   db.session.rollback()
+  #   # 내부 서버 오류 응답
+  #   return jsonify({"message": "여행 장소 생성 중 오류가 발생했습니다.", "error": str(e)}), 500
 
 

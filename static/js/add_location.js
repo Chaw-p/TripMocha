@@ -1,14 +1,14 @@
 var $travel_list; 
 var loading;
 
-
+// travel 내의 비동기함수
 const page = {
   _page: 1, // 현재 페이지 번호
   _scrollchk: false, // 로딩 중 플래그 (코드에는 전역 변수 _scrollchk로 사용됨)
   list: {
     search: async function() {
       const locQuery = document.getElementById("locQuery").value;
-      const locType = document.getElementById("locType").value;
+      const locType = $('#locType .option_item.selected').data('value');
       const paramsToSend = { 
         page: page._page,
         query: locQuery,
@@ -74,7 +74,7 @@ const page = {
   }
 };
 
-
+// travel 내의 search 함수
 function DoSearch2(event) {
   const no_result_Html = `
     <div class="no-result">
@@ -148,7 +148,6 @@ function SelectedLiData() {
   return selectedData;
 }
 
-
 $(document).ready(function() {
   $travel_list = $('#schedule_travel_list');
   loading = $('#waitMsg');
@@ -158,3 +157,29 @@ $(document).on("click", "#schedule_travel_list > li", function(){
   $("#schedule_travel_list > li").removeClass("selected")
   $(this).addClass("selected")
 })
+// 드롭다운 리스트를 골랐을때 li값으로 변경
+$(document).on("click", ".options_dropdown  li", function(){
+  $(this).siblings().removeClass('selected');
+  $(this).addClass('selected');
+  $(this).closest('.options_dropdown').find('.selected_option').html(
+    $(this).text().trim() + ' <span class="material-symbols-outlined">arrow_drop_down</span>'
+  );
+  $(this).closest('.options_dropdown').removeClass('active');
+});
+// .selected_option을 클릭했을 때, active라는 클래스 추가
+$(document).on("click", ".selected_option", function(){
+  $(this).closest('.options_dropdown').toggleClass('active');
+});
+
+// // place_id 값 추가 함수
+// async function InsertPlaceId() {
+//   const selectedData = SelectedLiData();
+
+//   // 데이터가 없으면 중단 //이후 수정
+//   if (!selectedData) {
+//       alert("먼저 여행지를 선택해주세요!");
+//       return;
+//   }
+//   const url = `/info/location/${tripNo}`;
+
+// }

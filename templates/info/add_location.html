@@ -16,24 +16,28 @@
     <div id="waitMsg">
       <img src="../static/img/icons8-loading-96.gif">
     </div>
-    <div id="modal-search-area">
-      <form id="modalform" name="search" method="get" onsubmit="return DoSearch2(event);">
-        <select name="locType" id="locType">
-          <option value="AC">숙박</option>
-          <option value="EX">체험</option>
-          <option value="FD">음식</option>
-          <option value="HS">역사</option>
-          <option value="NA">자연</option>
-          <option value="SH">쇼핑</option>
-          <option value="VE">문화</option>
-        </select>
-        <div id="modal-search-input-box">
-          <input type="search" id="locQuery" name="locQuery" placeholder="여행지를 입력해 주세요.">
-          <button class="search_btn">
-            <i class="bi bi-search"></i>
-          </button>
+    <div id="modal_search_wrap">
+      <div class="search_wrap">
+        <div id="search_area">
+          <form id="modalform" class="sform" name="search" method="get" onsubmit="return DoSearch2(event);">
+            <select name="locType" id="locType">
+              <option value="AC">숙박</option>
+              <option value="EX">체험</option>
+              <option value="FD">음식</option>
+              <option value="HS">역사</option>
+              <option value="NA">자연</option>
+              <option value="SH">쇼핑</option>
+              <option value="VE">문화</option>
+            </select>
+            <div class="search-input-box">
+              <input type="search" id="locQuery" class="query" name="locQuery" placeholder="여행지를 입력해 주세요.">
+              <button class="search_btn">
+                <i class="bi bi-search"></i>
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
     <ul class="travel_list schedule_travel_list" id="schedule_travel_list">
       <div class="no-result">

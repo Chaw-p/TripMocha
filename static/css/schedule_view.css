@@ -392,6 +392,7 @@ p {
   padding: 30px 30px;
   min-height: 300px;
   border: 1px solid #777;
+  border-radius: 6px;
   background-color: #fff; 
   position: absolute; 
   top: 50%;
@@ -432,17 +433,6 @@ p {
   padding-right: 60px; 
   
 }
-#query {
-  width: 300px;
-  border: 0;
-  font-size: 1.125rem;
-  padding: 0;
-  outline: none;
-  height: 100%;
-  color: var(--gray-700);
-  font-family: inherit;
-}
-
 .modal-search-btn {
   color: var(--mocha-primary);
   position: absolute;
