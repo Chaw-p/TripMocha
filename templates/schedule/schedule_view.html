@@ -64,9 +64,13 @@
 
                 </div>
             </div>
+            <div 
+                id="final-schedule-data" 
+                data-schedule="{{ final_schedule_list_for_js | default([]) | tojson }}">
+            </div>
 
          {% for day, items in grouped_schedule.items() %}
-        <div class="travel-schedule-layout">
+        <div class="travel-schedule-layout" id="">
             <div class="schedule-list-area">
                 <div class="modify_cntainer">
                     <div class="schedule-day-title" >Day {{ day }} - {{ day }}</div>
