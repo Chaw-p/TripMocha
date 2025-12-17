@@ -203,11 +203,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.warn("selectedPlaceId는 배열이 아니거나 존재하지 않습니다.");
                 }    
     
-    } else {
-        console.log("db에 정보가 없습니다.");
     }
         
-        // URL에서 Trip ID 가져오기 (기존 로직 유지)
         const urlParts = window.location.pathname.split('/');
         const tripIdFromUrl = urlParts[3];
 
@@ -219,19 +216,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     $(document).ready(function(){
-    // ... (기존 tripMeta 로딩 및 파싱 로직은 그대로 유지) ...
     
-    // URL에서 Trip ID 가져오기 (기존 로직 유지)
     const urlParts = window.location.pathname.split('/');
     const tripIdFromUrl = urlParts[3];
 
     if (tripIdFromUrl) {
         console.log("현재 View 페이지의 Trip ID::", tripIdFromUrl);
-        
-        // ----------------------------------------------------
-        // 🚨 새로 추가하거나 수정해야 할 부분 🚨
-        // 페이지 로드 완료 시, 즉시 최종 확정 요청을 보냅니다.
-        // ----------------------------------------------------
         
         // 1. 최종 확정 데이터 가져오기 (⭐ 가장 중요한 함수)
         const finalScheduleData = getFinalScheduleData();
@@ -239,8 +229,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (finalScheduleData.length > 0) {
             sendFinalizeRequest(tripNo, finalScheduleData);
-        } else {
-            console.error("오류: 최종 확정할 장소 데이터가 준비되지 않았습니다. (getFinalScheduleData 확인 필요)");
         }
     }
 });
@@ -250,24 +238,29 @@ document.addEventListener('DOMContentLoaded', function() {
     let finalData = [];
 
     if ($dataElement.length) {
-        const jsonString = $dataElement.data('schedule'); 
+        let jsonData = $dataElement.data('schedule'); 
         
-        if (jsonString) {
-            try {
-                // Flask에서 전달받은 JSON 문자열을 파싱
-                finalData = JSON.parse(jsonString);
-                console.log("SUCCESS: 최종 확정 데이터", finalData.length, "개 로드 완료.");
-            } catch (e) {
-                console.error("CRITICAL ERROR: 최종 스케줄 JSON 파싱 실패", e);
-            }
+        // 데이터가 없는 경우를 미리 걸러냅니다.
+        if (!jsonData) {
+            console.log("INFO: 스케줄 데이터가 비어 있습니다.");
+            return finalData;
         }
-    } else {
-        // 이 메시지가 뜨면 HTML 구조를 확인해야 합니다.
-        console.warn("WARNING: #final-schedule-data 요소를 HTML에서 찾을 수 없습니다.");
+
+        // 만약 이미 객체라면 파싱할 필요가 없습니다.
+        if (typeof jsonData === 'object') {
+            return jsonData;
+        }
+
+        try {
+            // 문자열인 경우에만 파싱 시도
+            finalData = JSON.parse(jsonData);
+            console.log("SUCCESS: 최종 데이터 로드 완료.");
+        } catch (e) {
+            // 파싱 에러 발생 시 데이터 내용 확인용 로그
+            console.warn("CHECK: JSON 형식이 올바르지 않습니다. 데이터 내용:", jsonData);
+        }
     }
     
-    // 이 배열은 CONTENT_ID, VISIT_AREA_NM, Y_COORD, X_COORD 등의 필드를 
-    // 모두 포함하는 객체의 배열이어야 합니다.
     return finalData; 
 }
 

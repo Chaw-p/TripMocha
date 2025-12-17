@@ -128,8 +128,7 @@ function applySelectedDatesToSearchUI() {
         
         // **시작일 ~ 종료일 형식으로 표시**
         datesDisplay = `${startStr} ~ ${endStr}`;
-        // **기간 표시 (예: 2박 3일)**
-        // durationDisplay = `${nights}박 ${days}일`; 
+        durationDisplay = `${nights}박 ${days}일`; 
         
         // '날짜 추가' 텍스트를 제거
         $("#dateItem .sub-label").text(""); 
@@ -798,53 +797,108 @@ $('.button-make-travel').on('click', function(e) {
             const searchDataJson = sessionStorage.getItem('currentSearchData');
             const searchData = JSON.parse(searchDataJson || '{}');
 
-            recommendedTrips.forEach(trip => {
-                const title = `${cityPrefix}` + "여행";
-                const displayCity = `${trip.SIDO_NM || ''} ${cityPrefix || ''}`; 
-                const tags = trip.TAGS ? trip.TAGS.split(',') : ['추천', '여행']; //태그
-
-                const scheduleItems = trip.RELATED_PLACES;
-                const currentTripId = trip.CONTENT_ID;
-                console.log("서버 데이터 CONTENT_ID:", currentTripId);
+            // 🚨 1. 3개의 일정 (Itinerary)을 순회합니다.
+            recommendedTrips.forEach((itinerary, itineraryIndex) => { 
                 
-                const currentTripPlaceIds = scheduleItems.map(place => place.id);
+                const firstDaySchedule = itinerary[0];
+                if (!itinerary || itinerary.length === 0 || !firstDaySchedule || !firstDaySchedule.schedule || firstDaySchedule.schedule.length === 0) {
+                console.warn(`일정 ${itineraryIndex + 1}의 데이터가 불완전하여 렌더링을 건너뜁니다.`);
+                return; 
+                }
+                const firstPlace = firstDaySchedule.schedule[0]; 
+                const selectedThemeTags = searchData.theme_tags || [];
 
-                const scheduleHtml = scheduleItems.map(place => {
-                return `<div class="schedule-place-item" data-place-id="${place.id}">${place.name}</div>`; 
-                }).join(' → ');
+                // 🚨 2. 메타데이터 추출 (이제 trip 대신 firstPlace에서 추출)
+                const title = `${cityPrefix}` + "여행"; 
+                const displayCity = `${firstPlace.SIDO_NM || ''}${cityPrefix || ''}`.replace('?', ''); 
+                let tags;
+                if (selectedThemeTags.length > 0) {
+                    tags = selectedThemeTags;
+                } else if (firstPlace.TAGS) {
+                    // firstPlace.TAGS는 콤마로 구분된 문자열이므로 배열로 split 합니다.
+                    tags = firstPlace.TAGS.split(',');
+                } else {
+                    tags = ['추천', '여행'];
+                }
                 
+                // ----------------------------------------------------
+                // 🚨 3. 일정의 모든 장소를 모아서 하나의 scheduleHtml 문자열로 만듭니다.
+                // ----------------------------------------------------
+                
+                // 모든 일차의 모든 장소 이름을 담을 리스트
+                let allScheduleItems = []; 
+                let allPlaceIds = [];
+
+                // 2. 이 일정(itinerary) 내의 모든 Day를 순회합니다.
+                itinerary.forEach(daySchedule => {
+                    const dayLabel = `${daySchedule.day}일차`;
+                    
+                    // ----------------------------------------------------
+                    // 🚨 수정 부분: 해당 일차의 장소들만 임시로 담을 배열 생성
+                    let currentDayPlaces = []; 
+
+                    daySchedule.schedule.forEach(place => {
+                        const pId = place.id || place.CONTENT_ID;
+                        const pName = place.name || place.VISIT_AREA_NM;
+                        
+                        // 장소 아이템 생성 (기존 div 구조 유지)
+                        currentDayPlaces.push(`<div class="schedule-place-item" data-place-id="${pId}">${pName}</div>`);
+                        allPlaceIds.push(pId);
+                    });
+
+                    // 제목 추가
+                    allScheduleItems.push(`<div class="day-indicator">${dayLabel}</div>`); 
+                    
+                    // 장소들만 화살표로 잇기 (currentDayPlaces.join(' → '))
+                    // 이 결과물이 하나의 큰 덩어리로 allScheduleItems에 들어갑니다.
+                    allScheduleItems.push(`<div class="day-places-group">${currentDayPlaces.join(' → ')}</div>`);
+                    
+                    // 구분선 추가
+                    allScheduleItems.push(`<div class="day-separator"></div>`);
+                    // ----------------------------------------------------
+                });
+
+                // 🚨 중요: 마지막 join은 화살표가 아니라 빈 문자열('')로 해야 합니다.
+                // 이미 위에서 장소들끼리 화살표를 다 넣어줬기 때문입니다.
+                const scheduleHtml = allScheduleItems.join(''); 
+                const currentTripId = firstPlace.id || firstPlace.CONTENT_ID;
+                // ----------------------------------------------------
+
+
+                // 4. 메타데이터 구성 (firstPlace에서 가져온 데이터 사용)
                 const tripMetaData = {
                     trip_no : currentTripId,
                     user_id : userId,
-                    title  : title,
-                    city   : displayCity,
-                    duration : trip.DURATION || requestData.duration_days || '1',
-                    tags    : searchData.theme_tags || [],
+                    title : title,
+                    city : displayCity,
+                    // DURATION은 Day 배열의 길이로 계산
+                    duration : itinerary.length || '1', 
+                    tags : searchData.theme_tags || [],
                     start_date: startDate, 
                     end_date: endDate,
                     people : personnelCount,
                     trip_type : selectedPersonnelType,
-                    selectedPlaceIds : currentTripPlaceIds
+                    selectedPlaceIds : allPlaceIds
                 };
                 
                 const tripJson = JSON.stringify(tripMetaData);
                 const tripMetaJson = tripJson.replace(/"/g, '&quot;' );
 
+                // 5. HTML 템플릿에 데이터 삽입 (기존 템플릿 사용)
                 listHtml += `
                     <div class="trip-item" data-trip-id="${currentTripId}" data-trip-meta="${tripMetaJson}">
                         <div class="trip-header-line"> 
                             <h4>${title}</h4>
-                            ${displayCity} | ${trip.DURATION}일</p>
+                            ${displayCity} | ${itinerary.length}일</p>
                         </div>
                         
-                        <div class="trip-schedule-container">${scheduleHtml}  </div>
+                        <div class="trip-schedule-container">${scheduleHtml}</div>
                         
                         <div class="trip-tags">
                             <div class="tag-group"> 
                                 ${tags.map(tag => `<span>#${tag}</span>`).join('')}
                             </div>
                         </div>
-
                     </div>
                 `;
             });

@@ -28,7 +28,7 @@ class TripMain(db.Model):
     end_date = db.Column(db.Date)
     people = db.Column(db.Integer)
     trip_type = db.Column(db.String(100))
-    selectedPlaceId = db.Column(db.String(100))
+    selectedPlaceId = db.Column(db.String(300))
     created_at = db.Column(db.DateTime, default=db.func.now())
     
     def __repr__(self):

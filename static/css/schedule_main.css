@@ -857,7 +857,7 @@ th, td { padding: 8px 0; width: 14.28%; cursor: pointer; border-radius: 5px; }
 }
 
 .trip-schedule-container {
-    display: flex; 
+    display: block; 
     white-space: nowrap; 
     overflow-x: auto; 
     gap: 15px; 
@@ -1046,4 +1046,26 @@ th, td { padding: 8px 0; width: 14.28%; cursor: pointer; border-radius: 5px; }
     text-align: center;
     padding: 10px;
     z-index: 10;
+}
+
+.day-indicator {
+    font-weight: bold;
+    margin-top: 10px;
+    display: block; /* 일차 제목은 한 줄 차지 */
+}
+
+.day-places-group {
+    display: block;
+    padding: 5px 0;
+    line-height: 1.8;
+}
+
+.schedule-place-item {
+    display: inline; /* 장소명이 화살표와 나란히 나오도록 inline 설정 */
+    color: #333;
+}
+
+.day-separator {
+    border-bottom: 1px solid #eee;
+    margin: 10px 0;
 }
