@@ -89,3 +89,149 @@
 }
 
 
+/* =========================
+   profile 전용 헤더
+   ========================= */
+.profile-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.profile-header-inner {
+    max-width: 1200px;
+    height: 72px;
+    margin: 0 auto;
+    padding: 0 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* 로고 */
+.profile-logo img {
+    height: 60px; /* 기존 헤더랑 비슷한 크기 */
+    width: auto;
+    display: block;
+}
+
+/* 메뉴 */
+.profile-nav {
+    display: flex;
+    gap: 28px;
+}
+
+.profile-nav a {
+    text-decoration: none;
+    font-size: 25px;
+    font-weight: 600;
+    color: #1b3b32;
+}
+
+.profile-nav a:hover {
+    text-decoration: underline;
+}
+
+/* 유저 영역 */
+.profile-user {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1b3b32;
+}
+
+
+/* =========================
+   profile 전용 footer (4단)
+   ========================= */
+.profile-footer {
+    background: #ffffff;
+    padding: 60px 0;
+    border-top: 1px solid #e6e6e6;
+    font-size: 14px;
+    color: #222;
+}
+
+.profile-footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+
+    display: grid;
+    grid-template-columns: 2fr 1fr 1.5fr 1fr;
+    gap: 40px;
+}
+
+/* 공통 */
+.profile-footer h3 {
+    font-size: 18px;
+    margin-bottom: 14px;
+}
+
+.profile-footer h4 {
+    font-size: 16px;
+    margin-bottom: 14px;
+}
+
+.profile-footer p {
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+/* 1열 */
+.profile-footer .copyright {
+    margin-top: 14px;
+    font-size: 13px;
+    color: #555;
+}
+
+/* 링크 */
+.profile-footer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.profile-footer li {
+    margin-bottom: 8px;
+}
+
+.profile-footer a {
+    text-decoration: none;
+    color: #888;
+}
+
+.profile-footer a:hover {
+    text-decoration: underline;
+    color: #222;
+}
+
+/* =========================
+   모바일
+   ========================= */
+@media (max-width: 900px) {
+    .profile-footer-inner {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+}
+
+
+#toast {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 9999;
+}
+
+#toast.show {
+    opacity: 1;
+}
