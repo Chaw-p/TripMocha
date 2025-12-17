@@ -95,66 +95,66 @@ def tourapi_info():
 def location():
   return render_template("info/add_location.html")
 
-@info_bp.route("/location/<trip_no>", method = "POST")
-def update_trip_detail(trip_no): 
-  data = request.get_json()
+# @info_bp.route("/location/<trip_no>", method = "PUT")
+# def update_trip_detail(trip_no): 
+#   data = request.get_json()
   
-  # None 체크
-  # trip 여부 체크
-  trip = TripDetail.query.filter_by(id=trip_no).first()
-  if not trip_no:
-    return jsonify({"message": f"ID가 {trip_no}인 여행을 찾을 수 없습니다."}), 404
+#   # None 체크
+#   # trip 여부 체크
+#   trip = TripDetail.query.filter_by(id=trip_no).first()
+#   if not trip_no:
+#     return jsonify({"message": f"ID가 {trip_no}인 여행을 찾을 수 없습니다."}), 404
   
-  # new_trip_detail로 보낸것을 가져온다.
-  required_fields = ["detail_name", "address", "latitude", "longitude"]
-  missing_fields = []
+#   # new_trip_detail로 보낸것을 가져온다.
+#   required_fields = ["detail_name", "address", "latitude", "longitude"]
+#   missing_fields = []
   
-  for field in required_fields:
-    # data.get(field)는 필드가 없으면 None을 반환합니다.
-    # 또한, 공백 문자열("")도 비어있다고 간주합니다.
-    field_value = data.get(field)
+#   for field in required_fields:
+#     # data.get(field)는 필드가 없으면 None을 반환합니다.
+#     # 또한, 공백 문자열("")도 비어있다고 간주합니다.
+#     field_value = data.get(field)
     
-    # 값이 None이거나 빈 문자열이거나 (문자열인 경우) 혹은 값이 아예 없을 경우를 체크
-    if field_value is None or (isinstance(field_value, str) and not field_value.strip()):
-      missing_fields.append(field)
+#     # 값이 None이거나 빈 문자열이거나 (문자열인 경우) 혹은 값이 아예 없을 경우를 체크
+#     if field_value is None or (isinstance(field_value, str) and not field_value.strip()):
+#       missing_fields.append(field)
 
-    if missing_fields:
-        return (
-            jsonify({
-                "message": "필수 데이터가 누락되었거나 비어 있습니다.",
-                "missing_fields": missing_fields
-            }), 
-            400 # Bad Request
-        ), None
+#     if missing_fields:
+#         return (
+#             jsonify({
+#                 "message": "필수 데이터가 누락되었거나 비어 있습니다.",
+#                 "missing_fields": missing_fields
+#             }), 
+#             400 # Bad Request
+#         ), None
     
-  # 값을 가져온다.
-  detail_name = data.get("detail_name")
-  address = data.get("address")
-  latitude = data.get("latitude")
-  longitude = data.get("longitude")
+#   # 값을 가져온다.
+#   detail_name = data.get("detail_name")
+#   address = data.get("address")
+#   latitude = data.get("latitude")
+#   longitude = data.get("longitude")
   
-  # insert 실행
-  new_detail = TripDetail(
-    detail_name = detail_name,
-    address = address,
-    latitude = latitude,
-    longitude = longitude
-  )
+#   # insert 실행
+#   new_detail = TripDetail(
+#     detail_name = detail_name,
+#     address = address,
+#     latitude = latitude,
+#     longitude = longitude
+#   )
 
-  try:
-    db.session.add(new_detail)
-    db.session.commit()
-    return jsonify({
-      "message": "새로운 여행 장소가 성공적으로 생성되었습니다.",
-      "trip_id": new_detail.trip_no,
-      "address": new_detail.address,
-      "latitude": new_detail.latitude,
-      "longitude": new_detail.longitude
-      }), 201
+#   try:
+#     db.session.add(new_detail)
+#     db.session.commit()
+#     return jsonify({
+#       "message": "새로운 여행 장소가 성공적으로 생성되었습니다.",
+#       "trip_id": new_detail.trip_no,
+#       "address": new_detail.address,
+#       "latitude": new_detail.latitude,
+#       "longitude": new_detail.longitude
+#       }), 201
 
-  except Exception as e:
-    db.session.rollback()
-    # 내부 서버 오류 응답
-    return jsonify({"message": "여행 장소 생성 중 오류가 발생했습니다.", "error": str(e)}), 500
+#   except Exception as e:
+#     db.session.rollback()
+#     # 내부 서버 오류 응답
+#     return jsonify({"message": "여행 장소 생성 중 오류가 발생했습니다.", "error": str(e)}), 500
 
 
