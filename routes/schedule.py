@@ -374,6 +374,8 @@ def save_draft():
         replated_place = [data for data in recommended_list if data.get("CONTENT_ID") == trip_meta.get("trip_no")]
         print("replated_place:@@@@@@@@@@@@@@",replated_place)
 
+        detail_ids = []
+
         for place_data in replated_place[0].get('RELATED_PLACES', []):
 
             new_trip_detail = TripDetail(
@@ -386,13 +388,16 @@ def save_draft():
                 trip_detail=place_data.get('id', None)
             )
             db.session.add(new_trip_detail)
+            db.session.flush() 
+            new_detail_id = new_trip_detail.detail_id
+            detail_ids.append(new_detail_id)
             
         # 2. TripMapping에 초기 데이터 저장
         for index, place_id in enumerate(selected_ids):
             new_mapping = TripMapping(
                 trip_no=saved_trip_no, 
                 content_id=place_id,
-                detail_id=None,
+                detail_id=detail_ids[index],
                 day_sequence=1,       # 임시 1일차
                 visit_order=index + 1 # 순서 지정
             )
@@ -443,12 +448,8 @@ def clean_for_json(data):
 @schedule_bp.route("/view/<draftId>", methods=["GET"])
 def view(draftId):
     print(f"view({draftId}):start:--------------------------");
-    #recommended_list = session.pop('recommended_trips', None)
-    #session['recommended_trips'] = recommended_list
+  
     recommended_list = session.get('recommended_trips')
-    print("<->" * 40)
-    print(recommended_list)
-    print("[-]" * 40)
     if recommended_list:
         # 💡 수정 3: 클라이언트에게 전달할 변수에 할당 (clean_for_json 적용 필요)
         cleaned_data = clean_for_json(recommended_list)
@@ -498,8 +499,11 @@ def view(draftId):
     ).all()
 
     place_ids = [m.detail_id for m in trip_mappings]
-    place_details = TripMapping.query.filter(TripMapping.detail_id.in_(place_ids)).all()
-    place_dict = {p.detail_id: p for p in place_details} # 딕셔너리로 변환
+    place_details = TripDetail.query.filter(TripDetail.detail_id.in_(place_ids)).all()
+    place_dict = {p.detail_id: p for p in place_details} 
+
+    print("!!place_ids:", place_ids)
+    print("!!place_details count:", len(place_details))
 
     trip_schedule_data = []
     for mapping in trip_mappings:
@@ -510,17 +514,18 @@ def view(draftId):
                 'id': mapping.detail_id,
                 'day': mapping.day_sequence,      
                 'sequence': mapping.visit_order, 
-                'name': place_info.place_name, 
+                'name': place_info.detail_name, 
                 'address': address_data 
             })
+    print("****************trip_schedule_data:",trip_schedule_data)        
 
-    # grouped_schedule = {}
-    # for item in trip_schedule_data:
-    #     day = item['day']
-    #     if day not in grouped_schedule:
-    #         grouped_schedule[day] = []
-    #     grouped_schedule[day].append(item)
-    # print("grouped_schedule:",grouped_schedule)
+    grouped_schedule = {}
+    for item in trip_schedule_data:
+        day = item['day']
+        if day not in grouped_schedule:
+            grouped_schedule[day] = []
+        grouped_schedule[day].append(item)
+
     cleaned_trip_schedule_data = clean_for_json(trip_schedule_data) 
     cleaned_trip_meta_data = clean_for_json(trip_meta_data)
     
@@ -534,15 +539,14 @@ def view(draftId):
     return render_template("schedule/schedule_view.html",
         # safe_meta_data=meta_json_str,           
         # safe_schedule_data=schedule_json_str,
-        trip_meta=trip_meta_data 
-        # trip_meta=cleaned_trip_meta_data, 
-        # grouped_schedule=grouped_schedule, # 이 변수는 clean_for_json이 필요하다면 처리해야 함
-        # query=query,
-        # user_id=cleaned_trip_meta_data.get('user_id', 'Guest'), 
+        #trip_meta=trip_meta_data ,
+        trip_meta=cleaned_trip_meta_data, 
+        grouped_schedule=grouped_schedule,
+        #query=query,
+        user_id=cleaned_trip_meta_data.get('user_id', 'Guest'), 
         # draft_id=draftId, 
-        # choakey=key,
-        # # 템플릿에서 | tojson 필터를 사용하는 변수명에 맞춰 수정
-        # final_schedule_list_from_flask=cleaned_trip_schedule_data 
+        choakey=key,
+        final_schedule_list_from_flask=cleaned_trip_schedule_data 
     )
 
 # 여행 상세보기

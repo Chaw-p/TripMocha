@@ -54,7 +54,6 @@ class TripDetail(db.Model):
     address = db.Column(db.String(255))
     latitude = db.Column(DECIMAL(13,10))
     longitude = db.Column(DECIMAL(13,10))
-    category = db.Column(db.String(100))
     trip_detail = db.Column(db.String(100))
 
 def __repr__(self):
