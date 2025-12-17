@@ -778,11 +778,8 @@ $('.button-make-travel').on('click', function(e) {
     .then(data => {
         const startDate = requestData.date ? requestData.date.startDate : null;
         const endDate = requestData.date ? requestData.date.endDate : null;
-        const selectedPersonnelType = personnelType.dataType;
-        // const selectedPersonnelType = (searchData.personnel && searchData.personnel.type) || 
-        //                           searchData.tripType || 
-        //                           searchData.type || // 혹시 최상위 키에 type이 있을 경우
-        //                           '';
+        const selectedPersonnelType = personnelType?.dataType ? personnelType.dataType : "1인";
+    
         console.log("DEBUG: 최종 추출된 selectedPersonnelType:", selectedPersonnelType);
           console.log("DEBUG: sessionStorage의 searchData 원본:", searchData);
         // 4. 응답 데이터 처리 및 HTML 렌더링
