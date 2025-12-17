@@ -25,6 +25,7 @@ a {
 
   margin: 0 auto;
   min-width: var(--page-width);
+  min-height: 100vh;
   
 }
 #header {
@@ -64,9 +65,8 @@ a {
   flex-grow: 1;
 
   width: var(--page-width);
-  height: 100%;
   position: relative;
-  padding-bottom: 60px;
+  padding-bottom: 0px;
 }
 #contents {
   width: 100%;
@@ -87,7 +87,9 @@ a {
   background-color: #f7f7f7;
   padding: 40px 20px; /* 상하좌우 패딩 */
   font-family: Arial, sans-serif; /* 기본 글꼴 */
-  width: 100%;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
   box-sizing: border-box; /* 패딩과 보더가 width에 포함되도록 설정 */
 }
 /* 푸터 콘텐츠를 담는 컨테이너 */

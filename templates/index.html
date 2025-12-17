@@ -29,7 +29,7 @@
             <div class="swiper-wrapper">
               <div class="swiper-slide">
                 <img src="../static/img/nature.jpg">
-                <a href="{{ url_for('info.info',query='자연 힐링') }}" class="card_contents">
+                <a href="{{ url_for('info.info',type='NA') }}" class="card_contents">
                   <div class="card_title">
                     자연과 힐링
                   </div>
@@ -41,7 +41,7 @@
               </div>
               <div class="swiper-slide">
                 <img src="../static/img/food.jpg">
-                <a href="#" class="card_contents">
+                <a href="{{ url_for('info.info',type='FD') }}" class="card_contents">
                   <div class="card_title">
                     미식탐방
                   </div>
@@ -53,9 +53,9 @@
               </div>
               <div class="swiper-slide">
                 <img src="../static/img/history.jpg">
-                <a href="#" class="card_contents">
+                <a href="{{ url_for('info.info',type='HS') }}" class="card_contents">
                   <div class="card_title">
-                    예술과 역사
+                    전통과 역사
                   </div>
                   <div class="card_note">
                     미술관, 갤러리, 박물관 등을 중심으로 문화와 역사속으로 떠나는 여행
@@ -65,7 +65,7 @@
               </div>
               <div class="swiper-slide">
                 <img src="../static/img/entertainment.jpg">
-                <a href="#" class="card_contents">
+                <a href="{{ url_for('info.info',type='EX') }}" class="card_contents">
                   <div class="card_title">
                     오락
                   </div>
@@ -74,55 +74,6 @@
                     <span class="material-symbols-outlined arrow">arrow_right_alt</span>
                   </div>
                 </a>
-              </div>
-              <div class="swiper-slide">
-                <img src="../static/img/entertainment.jpg">
-                <a href="#" class="card_contents">
-                  <div class="card_title">
-                    오락
-                  </div>
-                  <div class="card_note">
-                    놀이공원, 아쿠아리움 등 오락 시설을 중심으로 즐거움과 함께하는 여행
-                    <span class="material-symbols-outlined arrow">arrow_right_alt</span>
-                  </div>
-                </a>
-              </div>
-              <div class="swiper-slide">
-                <img src="../static/img/entertainment.jpg">
-                <a href="#" class="card_contents">
-                  <div class="card_title">
-                    오락
-                  </div>
-                  <div class="card_note">
-                    놀이공원, 아쿠아리움 등 오락 시설을 중심으로 즐거움과 함께하는 여행
-                    <span class="material-symbols-outlined arrow">arrow_right_alt</span>
-                  </div>
-                </a>
-              </div>
-              <div class="swiper-slide">
-                <img src="../static/img/entertainment.jpg">
-                <a href="#" class="card_contents">
-                  <div class="card_title">
-                    오락
-                  </div>
-                  <div class="card_note">
-                    놀이공원, 아쿠아리움 등 오락 시설을 중심으로 즐거움과 함께하는 여행
-                    <span class="material-symbols-outlined arrow">arrow_right_alt</span>
-                  </div>
-                </a>
-              </div>
-              <div class="swiper-slide">
-                <img src="../static/img/entertainment.jpg">
-                <a href="#" class="card_contents">
-                  <div class="card_title">
-                    오락
-                  </div>
-                  <div class="card_note">
-                    놀이공원, 아쿠아리움 등 오락 시설을 중심으로 즐거움과 함께하는 여행
-                    <span class="material-symbols-outlined arrow">arrow_right_alt</span>
-                  </div>
-                </a>
-              </div>
             </div>
             <div class="swiper-pagination"></div>
           </div>
@@ -138,12 +89,7 @@
             </div>
           </div>
         </div>
-        <div class="popular_cont">
-          <div class="cont_head">
-            <h2>인기 여행지 알아보기</h2>
-            <p>많은 사람들이 방문하는 여행지로 떠나보세요.</p>
-          </div>
-        </div>
+        
       </div>
     </div>
     {% include 'config/footer.html' %}

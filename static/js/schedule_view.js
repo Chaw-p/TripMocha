@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (deleteBtns.length > 0) {
         deleteBtns.forEach(btn => {
             btn.onclick = function(e) {
-                e.preventDefault(); // 버튼 클릭 시 기본 동작(예: 페이지 이동) 방지
+                e.preventDefault(); 
                 
                 const scheduleName = this.closest('.details').querySelector('h4').textContent;
                 
@@ -116,16 +116,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // ==========================================================
     if (listDelBtn) {
         listDelBtn.onclick = function(e) {
-            e.preventDefault(); // 기본 페이지 이동을 막습니다.
+            e.preventDefault();
             
-            // 전체 일정에 대한 확인 메시지
             if (confirm("이 전체 여행 일정을 정말로 삭제하고 목록으로 돌아가시겠습니까?")) {
                 alert("전체 일정을 삭제하고 목록으로 이동합니다.");
-                
-                // 🚨 여기에 서버에 전체 일정 삭제 요청을 보내는 실제 fetch 로직이 들어갑니다.
-                // 예시: deleteEntireSchedule(scheduleId).then(() => { window.location.href = this.href; });
-                
-                // 서버 통신이 성공했다고 가정하고 페이지 이동 실행
                 window.location.href = this.href; 
             } else {
                 alert("삭제가 취소되었습니다.");
@@ -148,8 +142,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-
-//PDF 
 
 
  $(document).ready(function(){
@@ -201,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const placeIds = tripMeta.selectedPlaceId;
         if (Array.isArray(placeIds)) {
-            const $placeList = $('#place-list'); // HTML에 이 ID의 div가 있다고 가정
+            const $placeList = $('#place-list'); 
             
             placeIds.forEach(id => {
                 // 각 ID를 <p> 태그로 만들어 목록 컨테이너에 추가
@@ -223,6 +215,61 @@ document.addEventListener('DOMContentLoaded', function() {
     if (tripIdFromUrl) {
         console.log("현재 View 페이지의 Trip ID::", tripIdFromUrl);
     }
-  });
+
+    });
+
+    $(document).ready(function(){
+    // ... (기존 tripMeta 로딩 및 파싱 로직은 그대로 유지) ...
+    
+    // URL에서 Trip ID 가져오기 (기존 로직 유지)
+    const urlParts = window.location.pathname.split('/');
+    const tripIdFromUrl = urlParts[3];
+
+    if (tripIdFromUrl) {
+        console.log("현재 View 페이지의 Trip ID::", tripIdFromUrl);
+        
+        // ----------------------------------------------------
+        // 🚨 새로 추가하거나 수정해야 할 부분 🚨
+        // 페이지 로드 완료 시, 즉시 최종 확정 요청을 보냅니다.
+        // ----------------------------------------------------
+        
+        // 1. 최종 확정 데이터 가져오기 (⭐ 가장 중요한 함수)
+        const finalScheduleData = getFinalScheduleData();
+        const tripNo = tripIdFromUrl;
+
+        if (finalScheduleData.length > 0) {
+            sendFinalizeRequest(tripNo, finalScheduleData);
+        } else {
+            console.error("오류: 최종 확정할 장소 데이터가 준비되지 않았습니다. (getFinalScheduleData 확인 필요)");
+        }
+    }
+});
+
+   function getFinalScheduleData() {
+    const $dataElement = $('#final-schedule-data'); 
+    let finalData = [];
+
+    if ($dataElement.length) {
+        const jsonString = $dataElement.data('schedule'); 
+        
+        if (jsonString) {
+            try {
+                // Flask에서 전달받은 JSON 문자열을 파싱
+                finalData = JSON.parse(jsonString);
+                console.log("SUCCESS: 최종 확정 데이터", finalData.length, "개 로드 완료.");
+            } catch (e) {
+                console.error("CRITICAL ERROR: 최종 스케줄 JSON 파싱 실패", e);
+            }
+        }
+    } else {
+        // 이 메시지가 뜨면 HTML 구조를 확인해야 합니다.
+        console.warn("WARNING: #final-schedule-data 요소를 HTML에서 찾을 수 없습니다.");
+    }
+    
+    // 이 배열은 CONTENT_ID, VISIT_AREA_NM, Y_COORD, X_COORD 등의 필드를 
+    // 모두 포함하는 객체의 배열이어야 합니다.
+    return finalData; 
+}
+
 
 
