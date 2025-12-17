@@ -223,267 +223,267 @@ def recommend_schedule():
     keep='first'
     ).copy()
 
-    # ----------------------------------------------------
-    # 1. 🚨 총 필요한 메인 후보 개수 확보 (3개 일정 * Duration)
-    total_main_candidates_needed = 3 * int(duration_days)
+    # # ----------------------------------------------------
+    # # 1. 🚨 총 필요한 메인 후보 개수 확보 (3개 일정 * Duration)
+    # total_main_candidates_needed = 3 * int(duration_days)
 
-    # 2. 🚨 전체 후보군 DataFrame 생성
-    all_candidates_df = diverse_main_candidates.head(total_main_candidates_needed).copy()
+    # # 2. 🚨 전체 후보군 DataFrame 생성
+    # all_candidates_df = diverse_main_candidates.head(total_main_candidates_needed).copy()
 
-    # 3. 🚨 전체 후보 리스트로 변환 (총 3*Duration 개의 딕셔너리)
-    candidate_list = all_candidates_df.to_dict('records') 
+    # # 3. 🚨 전체 후보 리스트로 변환 (총 3*Duration 개의 딕셔너리)
+    # candidate_list = all_candidates_df.to_dict('records') 
 
-    # ----------------------------------------------------
-    # 4. 3개의 전체 일정(Itinerary) 생성 및 할당 로직 (신규)
-    # ----------------------------------------------------
+    # # ----------------------------------------------------
+    # # 4. 3개의 전체 일정(Itinerary) 생성 및 할당 로직 (신규)
+    # # ----------------------------------------------------
 
-    final_three_itineraries = []
-    used_main_ids = set() # 메인 장소 할당 시 중복을 피하기 위함
-    candidate_idx = 0 
+    # final_three_itineraries = []
+    # used_main_ids = set() # 메인 장소 할당 시 중복을 피하기 위함
+    # candidate_idx = 0 
 
-    # 3개의 전체 일정을 생성 (Itinerary 1, 2, 3)
-    for itinerary_index in range(1, 4):
+    # # 3개의 전체 일정을 생성 (Itinerary 1, 2, 3)
+    # for itinerary_index in range(1, 4):
         
-        current_itinerary = [] # Itinerary 1개에 대한 전체 스케줄 (일차별 리스트)
+    #     current_itinerary = [] # Itinerary 1개에 대한 전체 스케줄 (일차별 리스트)
         
-        # 해당 일정의 일차(Day)별 메인 장소를 할당
-        for day in range(1, int(duration_days) + 1):
+    #     # 해당 일정의 일차(Day)별 메인 장소를 할당
+    #     for day in range(1, int(duration_days) + 1):
             
-            main_candidate = None
+    #         main_candidate = None
             
-            # 다음 메인 후보지 선택 및 인덱스 이동
-            while candidate_idx < len(candidate_list):
+    #         # 다음 메인 후보지 선택 및 인덱스 이동
+    #         while candidate_idx < len(candidate_list):
                 
-                candidate = candidate_list[candidate_idx]
-                candidate_idx += 1 # 인덱스는 무조건 증가
+    #             candidate = candidate_list[candidate_idx]
+    #             candidate_idx += 1 # 인덱스는 무조건 증가
                 
-                # 메인 후보의 고유 ID 확인 (CONTENT_ID를 사용한다고 가정)
-                candidate_id = hashlib.sha1(str(candidate['VISIT_AREA_NM']).encode('utf-8')).hexdigest()[:10]
+    #             # 메인 후보의 고유 ID 확인 (CONTENT_ID를 사용한다고 가정)
+    #             candidate_id = hashlib.sha1(str(candidate['VISIT_AREA_NM']).encode('utf-8')).hexdigest()[:10]
                 
-                if candidate_id not in used_main_ids:
-                    main_candidate = candidate.copy()
-                    main_candidate['CONTENT_ID'] = candidate_id
-                    main_candidate['DAY'] = day
-                    main_candidate['ITINERARY_NO'] = itinerary_index
-                    used_main_ids.add(candidate_id)
-                    break
+    #             if candidate_id not in used_main_ids:
+    #                 main_candidate = candidate.copy()
+    #                 main_candidate['CONTENT_ID'] = candidate_id
+    #                 main_candidate['DAY'] = day
+    #                 main_candidate['ITINERARY_NO'] = itinerary_index
+    #                 used_main_ids.add(candidate_id)
+    #                 break
             
-            if main_candidate is None:
-                # 후보가 부족하면 해당 일정의 나머지 일차는 건너뜁니다.
-                break 
+    #         if main_candidate is None:
+    #             # 후보가 부족하면 해당 일정의 나머지 일차는 건너뜁니다.
+    #             break 
             
-            # 5. 기존의 서브 장소 추천 로직을 함수로 감싸거나 이 위치에 통합
+    #         # 5. 기존의 서브 장소 추천 로직을 함수로 감싸거나 이 위치에 통합
             
-            # 🚨 이 부분에 기존의 '메인 장소 추천 후 반복문' 내의 코드를 사용합니다.
+    #         # 🚨 이 부분에 기존의 '메인 장소 추천 후 반복문' 내의 코드를 사용합니다.
             
-            # 메인 장소 정보 추출
-            main_area_nm = str(main_candidate['VISIT_AREA_NM'])
-            target_adm_code = main_candidate['ADM_CODE_NUMERIC']
-            target_type_cd = main_candidate.get('VISIT_AREA_TYPE_CD') or main_candidate.get('TRAVEL_MISSION_INT')
+    #         # 메인 장소 정보 추출
+    #         main_area_nm = str(main_candidate['VISIT_AREA_NM'])
+    #         target_adm_code = main_candidate['ADM_CODE_NUMERIC']
+    #         target_type_cd = main_candidate.get('VISIT_AREA_TYPE_CD') or main_candidate.get('TRAVEL_MISSION_INT')
 
-            related_places = []
-            address = []
-            x_coord = []
-            y_coord = []
+    #         related_places = []
+    #         address = []
+    #         x_coord = []
+    #         y_coord = []
             
-            # --- (기존의 1단계 & 2단계 추천 로직 통합 시작) ---
-            # (편의상 전체 로직은 생략하고 기존 코드를 그대로 복사하여 사용한다고 가정합니다)
+    #         # --- (기존의 1단계 & 2단계 추천 로직 통합 시작) ---
+    #         # (편의상 전체 로직은 생략하고 기존 코드를 그대로 복사하여 사용한다고 가정합니다)
             
-            # 1단계 추천 3개 (동일지역, 동일테마)
-            if target_type_cd is not None:
-                strict_filter = (sorted_df['ADM_CODE_NUMERIC'] == target_adm_code) & \
-                                (sorted_df['VISIT_AREA_TYPE_CD'] == target_type_cd) & \
-                                (sorted_df['VISIT_AREA_NM'] != main_area_nm) 
+    #         # 1단계 추천 3개 (동일지역, 동일테마)
+    #         if target_type_cd is not None:
+    #             strict_filter = (sorted_df['ADM_CODE_NUMERIC'] == target_adm_code) & \
+    #                             (sorted_df['VISIT_AREA_TYPE_CD'] == target_type_cd) & \
+    #                             (sorted_df['VISIT_AREA_NM'] != main_area_nm) 
                 
-                related_places.extend(sorted_df[strict_filter]['VISIT_AREA_NM'].head(3).tolist())
-                address.extend(sorted_df[strict_filter]['LOTNO_ADDR'].head(3).tolist())
-                x_coord.extend(sorted_df[strict_filter]['X_COORD'].head(3).tolist())
-                y_coord.extend(sorted_df[strict_filter]['Y_COORD'].head(3).tolist())
+    #             related_places.extend(sorted_df[strict_filter]['VISIT_AREA_NM'].head(3).tolist())
+    #             address.extend(sorted_df[strict_filter]['LOTNO_ADDR'].head(3).tolist())
+    #             x_coord.extend(sorted_df[strict_filter]['X_COORD'].head(3).tolist())
+    #             y_coord.extend(sorted_df[strict_filter]['Y_COORD'].head(3).tolist())
             
-            # 2단계 추천 (5개 채우기) - 기존 로직을 그대로 사용
-            if len(related_places) < 5:
-                current_places_set = set(related_places)
-                needed_count = 5 - len(related_places)
+    #         # 2단계 추천 (5개 채우기) - 기존 로직을 그대로 사용
+    #         if len(related_places) < 5:
+    #             current_places_set = set(related_places)
+    #             needed_count = 5 - len(related_places)
                 
-                wide_filter = (sorted_df['ADM_CODE_NUMERIC'] == target_adm_code) & \
-                            (sorted_df['VISIT_AREA_NM'] != main_area_nm)
+    #             wide_filter = (sorted_df['ADM_CODE_NUMERIC'] == target_adm_code) & \
+    #                         (sorted_df['VISIT_AREA_NM'] != main_area_nm)
                 
-                new_places_df = sorted_df[wide_filter].copy()
-                new_places_df = new_places_df[~new_places_df['VISIT_AREA_NM'].isin(current_places_set)]
+    #             new_places_df = sorted_df[wide_filter].copy()
+    #             new_places_df = new_places_df[~new_places_df['VISIT_AREA_NM'].isin(current_places_set)]
                 
-                existing_themes = sorted_df[sorted_df['VISIT_AREA_NM'].isin(current_places_set)]['VISIT_AREA_TYPE_CD'].unique().tolist()
-                new_places_df = new_places_df[~new_places_df['VISIT_AREA_TYPE_CD'].isin(existing_themes)]
+    #             existing_themes = sorted_df[sorted_df['VISIT_AREA_NM'].isin(current_places_set)]['VISIT_AREA_TYPE_CD'].unique().tolist()
+    #             new_places_df = new_places_df[~new_places_df['VISIT_AREA_TYPE_CD'].isin(existing_themes)]
                 
-                diverse_places_df = new_places_df.drop_duplicates(subset=['VISIT_AREA_TYPE_CD'], keep='first')
+    #             diverse_places_df = new_places_df.drop_duplicates(subset=['VISIT_AREA_TYPE_CD'], keep='first')
                 
-                new_places = diverse_places_df['VISIT_AREA_NM'].head(needed_count).tolist()
-                address.extend(diverse_places_df['LOTNO_ADDR'].head(needed_count).tolist())
-                x_coord.extend(diverse_places_df['X_COORD'].head(needed_count).tolist())
-                y_coord.extend(diverse_places_df['Y_COORD'].head(needed_count).tolist())
-                related_places.extend(new_places)
+    #             new_places = diverse_places_df['VISIT_AREA_NM'].head(needed_count).tolist()
+    #             address.extend(diverse_places_df['LOTNO_ADDR'].head(needed_count).tolist())
+    #             x_coord.extend(diverse_places_df['X_COORD'].head(needed_count).tolist())
+    #             y_coord.extend(diverse_places_df['Y_COORD'].head(needed_count).tolist())
+    #             related_places.extend(new_places)
                 
-                # 데이터 부족 시 채우기 (기존 로직)
-                while len(related_places) < 5:
-                    related_places.append("추가 추천 장소 (데이터 부족)")
+    #             # 데이터 부족 시 채우기 (기존 로직)
+    #             while len(related_places) < 5:
+    #                 related_places.append("추가 추천 장소 (데이터 부족)")
             
-            # 최종 서브 장소 리스트 생성 (기존 로직)
-            final_related_places = []
-            seen_names = set()
-            for i, place_name in enumerate(related_places):
-                if place_name in seen_names: continue
+    #         # 최종 서브 장소 리스트 생성 (기존 로직)
+    #         final_related_places = []
+    #         seen_names = set()
+    #         for i, place_name in enumerate(related_places):
+    #             if place_name in seen_names: continue
                     
-                place_hash_id = hashlib.sha1(place_name.encode('utf-8')).hexdigest()[:10]
-                final_related_places.append({
-                    "id": place_hash_id,
-                    "name": place_name,
-                    "address": address[i],
-                    "latitude": y_coord[i],
-                    "longitude": x_coord[i]
-                })
-                seen_names.add(place_name)
+    #             place_hash_id = hashlib.sha1(place_name.encode('utf-8')).hexdigest()[:10]
+    #             final_related_places.append({
+    #                 "id": place_hash_id,
+    #                 "name": place_name,
+    #                 "address": address[i],
+    #                 "latitude": y_coord[i],
+    #                 "longitude": x_coord[i]
+    #             })
+    #             seen_names.add(place_name)
 
-            # --- (기존의 1단계 & 2단계 추천 로직 통합 끝) ---
+    #         # --- (기존의 1단계 & 2단계 추천 로직 통합 끝) ---
             
-            # 6. 하루 일정 완성: 메인 장소를 0번째로, 서브 장소를 1~4번째로 배치합니다.
-            day_schedule = [main_candidate] 
-            day_schedule.extend(final_related_places[:4]) # 총 5개로 맞춤
+    #         # 6. 하루 일정 완성: 메인 장소를 0번째로, 서브 장소를 1~4번째로 배치합니다.
+    #         day_schedule = [main_candidate] 
+    #         day_schedule.extend(final_related_places[:4]) # 총 5개로 맞춤
 
-            # 7. 메타데이터 추가 (DURATION, SIDO_NM, SIGUNGU_NM)
-            for place in day_schedule:
-                place['DURATION'] = int(duration_days)
-                place['SIDO_NM'] = sido_nm
-                place['SIGUNGU_NM'] = sigungu_nm
+    #         # 7. 메타데이터 추가 (DURATION, SIDO_NM, SIGUNGU_NM)
+    #         for place in day_schedule:
+    #             place['DURATION'] = int(duration_days)
+    #             place['SIDO_NM'] = sido_nm
+    #             place['SIGUNGU_NM'] = sigungu_nm
 
-            # 일차 정보 저장
-            current_itinerary.append({
-                'day': day, 
-                'schedule': day_schedule 
-            })
-        
-        # 8. 전체 일정 리스트에 추가
-        if current_itinerary:
-            final_three_itineraries.append(current_itinerary)
-
-
-    # 9. 🚨 recommended_trips_list 변수를 최종 결과로 사용 (변수명 유지)
-    recommended_trips_list = final_three_itineraries 
-    session['recommended_trips'] = recommended_trips_list
-    print("로그: recommended_trips_list를 세션에 저장했습니다.")
-
-
-    print("##################",recommended_trips_list)
-    return jsonify({
-        "success": True,
-        "recommended_trips": recommended_trips_list
-    })
-
-
-
-
-
-
-
-
-    # recommended_df = diverse_main_candidates.head(3).copy()
-    
-    # recommended_df['DURATION'] = int(duration_days)
-    # recommended_df['SIDO_NM'] = sido_nm
-    # recommended_df['SIGUNGU_NM'] = sigungu_nm
-
-    # recommended_trips_list = recommended_df.to_dict('records')
-
-    # # 메인 장소 추천 후 반복문
-    
-    # for trip in recommended_trips_list:
-    #     main_area_nm = str(trip['VISIT_AREA_NM'])
-    #     target_adm_code = trip['ADM_CODE_NUMERIC']
-    #     target_type_cd = trip.get('VISIT_AREA_TYPE_CD') or trip.get('TRAVEL_MISSION_INT')
-    #     trip['CONTENT_ID'] = hashlib.sha1(main_area_nm.encode('utf-8')).hexdigest()[:10]
-    #     print("현재 처리 중인 Trip 데이터:", trip)
-    #     related_places = []
-    #     address = []
-    #     x_coord = []
-    #     y_coord = []
-
-    #     # 1단계 추천 3개의 목록 (동일지역, 동일테마)
-    #     if target_type_cd is not None:
-    #         strict_filter = (sorted_df['ADM_CODE_NUMERIC'] == target_adm_code) & \
-    #                         (sorted_df['VISIT_AREA_TYPE_CD'] == target_type_cd) & \
-    #                         (sorted_df['VISIT_AREA_NM'] != main_area_nm) 
-            
-    #         related_places.extend(sorted_df[strict_filter]['VISIT_AREA_NM'].head(3).tolist())
-
-    #         address.extend(sorted_df[strict_filter]['LOTNO_ADDR'].head(3).tolist())
-    #         x_coord.extend(sorted_df[strict_filter]['X_COORD'].head(3).tolist())
-    #         y_coord.extend(sorted_df[strict_filter]['Y_COORD'].head(3).tolist())
-
-    #     # 2단계 추천 3개의 목록안에 5개의 일정 추천
-    #     if len(related_places) < 5:
-    #         current_places_set = set(related_places)
-    #         needed_count = 5 - len(related_places)
-            
-    #         wide_filter = (sorted_df['ADM_CODE_NUMERIC'] == target_adm_code) & \
-    #                     (sorted_df['VISIT_AREA_NM'] != main_area_nm)
-            
-    #         new_places_df = sorted_df[wide_filter].copy()
-        
-    #         # 2. 1단계에서 이미 선택된 장소의 이름 목록을 제외
-    #     new_places_df = new_places_df[~new_places_df['VISIT_AREA_NM'].isin(current_places_set)]
-
-    #     # 3. 1단계에서 이미 사용된 테마 코드 목록 확인
-    #     existing_themes = sorted_df[sorted_df['VISIT_AREA_NM'].isin(current_places_set)]['VISIT_AREA_TYPE_CD'].unique().tolist()
-
-    #     # 4. 남아있는 후보에서 이미 사용된 테마 코드를 제외
-    #     new_places_df = new_places_df[~new_places_df['VISIT_AREA_TYPE_CD'].isin(existing_themes)]
-        
-    #     # 5. 🚨 테마 중복 제거: 점수가 가장 높은 장소(keep='first')를 남기고, 동일 테마는 제거합니다.
-    #     diverse_places_df = new_places_df.drop_duplicates(subset=['VISIT_AREA_TYPE_CD'], keep='first')
-        
-    #     # 6. 필요한 개수만큼 장소 이름 가져오기
-    #     new_places = diverse_places_df['VISIT_AREA_NM'].head(needed_count).tolist()
-
-    #     address.extend(diverse_places_df['LOTNO_ADDR'].head(needed_count).tolist())
-
-    #     x_coord.extend(diverse_places_df['X_COORD'].head(needed_count).tolist())
-    #     y_coord.extend(diverse_places_df['Y_COORD'].head(needed_count).tolist())
-        
-    #     related_places.extend(new_places)
-    #     print("##@@@##", related_places)
-    #     print("##@@@##", address)
-    #     print("##@@@##", x_coord)
-    #     print("##@@@##", y_coord)
-
-    #     while len(related_places) < 5:
-    #         related_places.append("추가 추천 장소 (데이터 부족)")
-        
-    #     final_related_places = []
-    #     seen_names = set()
-
-    #     for i, place_name in enumerate(related_places):
-    #         if place_name in seen_names:
-    #             continue
-                
-    #         place_hash_id = hashlib.sha1(place_name.encode('utf-8')).hexdigest()[:10]
-            
-    #         final_related_places.append({
-    #             "id": place_hash_id,
-    #             "name": place_name,
-    #             "address": address[i],
-    #             "latitude": y_coord[i],
-    #             "longitude": x_coord[i]
+    #         # 일차 정보 저장
+    #         current_itinerary.append({
+    #             'day': day, 
+    #             'schedule': day_schedule 
     #         })
-    #         seen_names.add(place_name)
+        
+    #     # 8. 전체 일정 리스트에 추가
+    #     if current_itinerary:
+    #         final_three_itineraries.append(current_itinerary)
 
-    #     trip['RELATED_PLACES'] = final_related_places[:5]
 
-    #     session['recommended_trips'] = recommended_trips_list
-    #     print("로그: recommended_trips_list를 세션에 저장했습니다.")
-    
+    # # 9. 🚨 recommended_trips_list 변수를 최종 결과로 사용 (변수명 유지)
+    # recommended_trips_list = final_three_itineraries 
+    # session['recommended_trips'] = recommended_trips_list
+    # print("로그: recommended_trips_list를 세션에 저장했습니다.")
+
+
     # print("##################",recommended_trips_list)
     # return jsonify({
     #     "success": True,
     #     "recommended_trips": recommended_trips_list
     # })
+
+
+
+
+
+
+
+
+    recommended_df = diverse_main_candidates.head(3).copy()
+    
+    recommended_df['DURATION'] = int(duration_days)
+    recommended_df['SIDO_NM'] = sido_nm
+    recommended_df['SIGUNGU_NM'] = sigungu_nm
+
+    recommended_trips_list = recommended_df.to_dict('records')
+
+    # 메인 장소 추천 후 반복문
+    
+    for trip in recommended_trips_list:
+        main_area_nm = str(trip['VISIT_AREA_NM'])
+        target_adm_code = trip['ADM_CODE_NUMERIC']
+        target_type_cd = trip.get('VISIT_AREA_TYPE_CD') or trip.get('TRAVEL_MISSION_INT')
+        trip['CONTENT_ID'] = hashlib.sha1(main_area_nm.encode('utf-8')).hexdigest()[:10]
+        print("현재 처리 중인 Trip 데이터:", trip)
+        related_places = []
+        address = []
+        x_coord = []
+        y_coord = []
+
+        # 1단계 추천 3개의 목록 (동일지역, 동일테마)
+        if target_type_cd is not None:
+            strict_filter = (sorted_df['ADM_CODE_NUMERIC'] == target_adm_code) & \
+                            (sorted_df['VISIT_AREA_TYPE_CD'] == target_type_cd) & \
+                            (sorted_df['VISIT_AREA_NM'] != main_area_nm) 
+            
+            related_places.extend(sorted_df[strict_filter]['VISIT_AREA_NM'].head(3).tolist())
+
+            address.extend(sorted_df[strict_filter]['LOTNO_ADDR'].head(3).tolist())
+            x_coord.extend(sorted_df[strict_filter]['X_COORD'].head(3).tolist())
+            y_coord.extend(sorted_df[strict_filter]['Y_COORD'].head(3).tolist())
+
+        # 2단계 추천 3개의 목록안에 5개의 일정 추천
+        if len(related_places) < 5:
+            current_places_set = set(related_places)
+            needed_count = 5 - len(related_places)
+            
+            wide_filter = (sorted_df['ADM_CODE_NUMERIC'] == target_adm_code) & \
+                        (sorted_df['VISIT_AREA_NM'] != main_area_nm)
+            
+            new_places_df = sorted_df[wide_filter].copy()
+        
+            # 2. 1단계에서 이미 선택된 장소의 이름 목록을 제외
+        new_places_df = new_places_df[~new_places_df['VISIT_AREA_NM'].isin(current_places_set)]
+
+        # 3. 1단계에서 이미 사용된 테마 코드 목록 확인
+        existing_themes = sorted_df[sorted_df['VISIT_AREA_NM'].isin(current_places_set)]['VISIT_AREA_TYPE_CD'].unique().tolist()
+
+        # 4. 남아있는 후보에서 이미 사용된 테마 코드를 제외
+        new_places_df = new_places_df[~new_places_df['VISIT_AREA_TYPE_CD'].isin(existing_themes)]
+        
+        # 5. 🚨 테마 중복 제거: 점수가 가장 높은 장소(keep='first')를 남기고, 동일 테마는 제거합니다.
+        diverse_places_df = new_places_df.drop_duplicates(subset=['VISIT_AREA_TYPE_CD'], keep='first')
+        
+        # 6. 필요한 개수만큼 장소 이름 가져오기
+        new_places = diverse_places_df['VISIT_AREA_NM'].head(needed_count).tolist()
+
+        address.extend(diverse_places_df['LOTNO_ADDR'].head(needed_count).tolist())
+
+        x_coord.extend(diverse_places_df['X_COORD'].head(needed_count).tolist())
+        y_coord.extend(diverse_places_df['Y_COORD'].head(needed_count).tolist())
+        
+        related_places.extend(new_places)
+        print("##@@@##", related_places)
+        print("##@@@##", address)
+        print("##@@@##", x_coord)
+        print("##@@@##", y_coord)
+
+        while len(related_places) < 5:
+            related_places.append("추가 추천 장소 (데이터 부족)")
+        
+        final_related_places = []
+        seen_names = set()
+
+        for i, place_name in enumerate(related_places):
+            if place_name in seen_names:
+                continue
+                
+            place_hash_id = hashlib.sha1(place_name.encode('utf-8')).hexdigest()[:10]
+            
+            final_related_places.append({
+                "id": place_hash_id,
+                "name": place_name,
+                "address": address[i],
+                "latitude": y_coord[i],
+                "longitude": x_coord[i]
+            })
+            seen_names.add(place_name)
+
+        trip['RELATED_PLACES'] = final_related_places[:5]
+
+        session['recommended_trips'] = recommended_trips_list
+        print("로그: recommended_trips_list를 세션에 저장했습니다.")
+    
+    print("##################",recommended_trips_list)
+    return jsonify({
+        "success": True,
+        "recommended_trips": recommended_trips_list
+    })
 
 
 @schedule_bp.route("/save-draft", methods=["POST"])
