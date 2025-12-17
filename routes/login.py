@@ -62,7 +62,7 @@ def get_db():
 login_bp = Blueprint("login_bp", __name__)
 api_bp = Blueprint("api_bp", __name__)
 
-auth_codes = {}
+# auth_codes = {}
 
 
 # def send_email_utf8(to_email, name, auth_code):
@@ -128,9 +128,29 @@ def send_auth_code():
         return jsonify({"success": False, "message": "이메일이 필요합니다."}), 400
 
     auth_code = str(random.randint(100000, 999999))
-    auth_codes[email] = auth_code
 
     try:
+        # ✅ DB 저장
+        db = get_db()
+        cursor = db.cursor()
+
+        # (선택) 기존 인증번호 삭제
+        cursor.execute(
+            "DELETE FROM auth_codes WHERE email = %s",
+            (email,)
+        )
+
+        cursor.execute(
+            """
+            INSERT INTO auth_codes (email, auth_code, created_at)
+            VALUES (%s, %s, NOW())
+            """,
+            (email, auth_code)
+        )
+
+        db.commit()  
+
+        # ✅ 메일 발송
         msg = Message(
             subject="TripMocha 비밀번호 재설정 인증번호",
             recipients=[email],
@@ -146,12 +166,13 @@ TripMocha 비밀번호 재설정 인증번호는
         )
 
         mail.send(msg)
-        print("이메일 전송 성공:", email, auth_code)
+
+        print("이메일 전송 + DB 저장 성공:", email, auth_code)
         return jsonify({"success": True})
 
     except Exception as e:
-        print(" 이메일 전송 오류:", e)
-        return jsonify({"success": False, "message": "메일 발송 실패"}), 500
+        print("인증번호 처리 오류:", e)
+        return jsonify({"success": False, "message": "인증번호 처리 실패"}), 500
 
 
 @api_bp.route("/api/verify_auth_code", methods=["POST"])
@@ -159,17 +180,85 @@ def verify_auth_code():
     email = request.form.get("email")
     user_input_code = request.form.get("auth_code")
 
-    real_code = auth_codes.get(email)
+    if not email or not user_input_code:
+        return jsonify({
+            "success": False,
+            "message": "요청 데이터가 부족합니다."
+        })
 
-    if not real_code:
-        return jsonify(
-            {"success": False, "message": "인증번호가 없습니다. 다시 요청해주세요."}
+    try:
+        db = get_db()
+        cursor = db.cursor()
+
+        cursor.execute(
+            """
+            SELECT auth_code, created_at
+            FROM auth_codes
+            WHERE email = %s
+            ORDER BY created_at DESC
+            LIMIT 1
+            """,
+            (email,)
         )
 
-    if user_input_code == real_code:
-        return jsonify({"success": True, "message": "인증 성공!"})
+        row = cursor.fetchone()
+
+        if not row:
+            return jsonify({
+                "success": False,
+                "message": "인증번호가 없습니다. 다시 요청해주세요."
+            })
+
+        real_code, created_at = row
+
+        # ⏱ 3분 만료 체크
+        if datetime.now() - created_at > timedelta(minutes=3):
+            return jsonify({
+                "success": False,
+                "message": "인증번호가 만료되었습니다. 다시 요청해주세요."
+            })
+
+        if user_input_code == real_code:
+            return jsonify({
+                "success": True,
+                "message": "인증 성공!"
+            })
+        else:
+            return jsonify({
+                "success": False,
+                "message": "인증번호가 일치하지 않습니다."
+            })
+
+    except Exception as e:
+        print("인증번호 검증 오류:", e)
+        return jsonify({
+            "success": False,
+            "message": "서버 오류가 발생했습니다."
+        }), 500
+
+@api_bp.route("/api/check_current_password", methods=["POST"])
+def check_current_password():
+    user_id = session.get("user_id")
+    current_pw = request.form.get("current_password")
+
+    if not user_id or not current_pw:
+        return jsonify({"success": False})
+
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("SELECT password FROM users WHERE user_id=%s", (user_id,))
+    row = cursor.fetchone()
+
+    if not row:
+        return jsonify({"success": False})
+
+    stored_pw = row[0]
+
+    if bcrypt.checkpw(current_pw.encode(), stored_pw.encode()):
+        return jsonify({"success": True})
     else:
-        return jsonify({"success": False, "message": "인증번호가 일치하지 않습니다."})
+        return jsonify({"success": False})
 
 
 # ----------------------------------------------------
@@ -533,12 +622,10 @@ def find_id_process():
 
 @login_bp.route("/reset_password", methods=["POST"])
 def reset_password():
-    session.clear()
     user_id = request.form.get("user_id")
     new_password = request.form.get("new_password")
 
     try:
-        # 🔐 비밀번호 해싱 (회원가입과 동일하게)
         hashed_pw = bcrypt.hashpw(
             new_password.encode("utf-8"), bcrypt.gensalt()
         ).decode("utf-8")
@@ -546,27 +633,63 @@ def reset_password():
         db = get_db()
         cursor = db.cursor()
 
+        # 1️⃣ 비밀번호 변경
         cursor.execute(
             """
             UPDATE users
             SET password = %s
             WHERE user_id = %s
-        """,
+            """,
             (hashed_pw, user_id),
+        )
+
+        # 2️⃣ 🔥 비밀번호 변경 로그 기록 (핵심)
+        cursor.execute(
+            """
+            INSERT INTO password_reset_log
+            (user_id, reset_time, ip_address, success)
+            VALUES (%s, NOW(), %s, 1)
+            """,
+            (user_id, request.remote_addr),
         )
 
         db.commit()
 
+        session.clear()  # ✅ 맨 마지막에
         return jsonify({"success": True})
 
     except Exception as e:
         print("비밀번호 변경 오류:", e)
+
+        # 실패 로그도 남기고 싶다면 (선택)
+        try:
+            db = get_db()
+            cursor = db.cursor()
+            cursor.execute(
+                """
+                INSERT INTO password_reset_log
+                (user_id, reset_time, ip_address, success)
+                VALUES (%s, NOW(), %s, 0)
+                """,
+                (user_id, request.remote_addr),
+            )
+            db.commit()
+        except:
+            pass
+
         return jsonify({"success": False, "message": "비밀번호 변경 실패"}), 500
 
 
 @login_bp.route("/profile/update", methods=["POST"])
 def update_profile():
     user_id = session.get("user_id")
+
+    if not user_id:
+        return "<script>alert('로그인이 필요합니다'); location.href='/login';</script>"
+
+    current_pw = request.form.get("current_password")
+    if not current_pw:
+        return "<script>alert('현재 비밀번호를 입력해주세요'); history.back();</script>"
 
     name = request.form.get("name")
     birthday = request.form.get("birthday")
@@ -579,27 +702,29 @@ def update_profile():
     detail_address = request.form.get("detail_address")
     travel_style = request.form.get("travel_style")
 
-    current_pw = request.form.get("current_password")
     new_pw = request.form.get("new_password")
     new_pw_confirm = request.form.get("new_password_confirm")
 
     db = get_db()
     cursor = db.cursor()
 
-    # ⭐ 비밀번호 변경 로직 포함
+    # ⭐ 어떤 수정이든 무조건 현재 비밀번호 먼저 검증
+    cursor.execute("SELECT password FROM users WHERE user_id=%s", (user_id,))
+    row = cursor.fetchone()
+
+    if not row:
+        return "<script>alert('사용자 정보를 찾을 수 없습니다'); history.back();</script>"
+
+    stored_pw = row[0]
+
+    if not bcrypt.checkpw(current_pw.encode(), stored_pw.encode()):
+        return "<script>alert('현재 비밀번호가 일치하지 않습니다'); history.back();</script>"
+
+    # ⭐ 비밀번호 변경 (선택)
     if new_pw:
-        # 새 비밀번호 작성 + 확인 일치 여부
         if new_pw != new_pw_confirm:
             return "<script>alert('새 비밀번호가 일치하지 않습니다'); history.back();</script>"
 
-        # 현재 비밀번호 일치 여부 검사
-        cursor.execute("SELECT password FROM users WHERE user_id=%s", (user_id,))
-        stored_pw = cursor.fetchone()[0]
-
-        if not bcrypt.checkpw(current_pw.encode(), stored_pw.encode()):
-            return "<script>alert('현재 비밀번호가 일치하지 않습니다'); history.back();</script>"
-
-        # 비밀번호 해싱 후 업데이트
         hashed_pw = bcrypt.hashpw(new_pw.encode(), bcrypt.gensalt()).decode("utf-8")
 
         cursor.execute(
@@ -607,7 +732,7 @@ def update_profile():
             UPDATE users
             SET password=%s
             WHERE user_id=%s
-        """,
+            """,
             (hashed_pw, user_id),
         )
 
@@ -619,7 +744,7 @@ def update_profile():
             gender=%s, nation=%s, postcode=%s, address=%s,
             detail_address=%s, travel_style=%s
         WHERE user_id=%s
-    """,
+        """,
         (
             name,
             birthday,
@@ -637,4 +762,8 @@ def update_profile():
 
     db.commit()
     session["user_name"] = name
+
     return redirect(url_for("index"))
+
+
+
