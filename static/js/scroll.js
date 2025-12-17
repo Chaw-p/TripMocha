@@ -51,7 +51,7 @@ const page = {
                 var html = `
                   <li>
                     <a href="/info/${item.id}">
-                        <img src="${item.image}">
+                        <img src="${item.image ? item.image : '/static/img/no-image.png'}"
                     </a>
                     <div class="list_cont">
                         <h3 class="title">
@@ -63,10 +63,12 @@ const page = {
                               ${item.typecode1 === params.type ? 'class="selected_hash"' : ''}>
                               <span>#${item.type}</span>
                             </a>
+                            ${item.areacode ? `
                             <a href="${areaUrl}" 
                               ${item.areacode === params.area ? 'class="selected_hash"' : ''}>
                               <span>#${item.area}</span>
                             </a>
+                            ` : ''}
                             ${item.cat3 && item.cat3_name ? `
                               <a href="${catUrl}"
                                   ${item.cat3 === params.cat ? 'class="selected_hash"' : ''}>

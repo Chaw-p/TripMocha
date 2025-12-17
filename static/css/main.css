@@ -280,6 +280,7 @@ a {
   font-family: inherit;
 }
 .search_btn {
+  padding-right: 15px;
   border: none;
   background-color: transparent;
   color: var(--mocha-primary);
