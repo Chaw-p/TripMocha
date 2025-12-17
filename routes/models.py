@@ -55,6 +55,6 @@ class TripDetail(db.Model):
     latitude = db.Column(DECIMAL(13,10))
     longitude = db.Column(DECIMAL(13,10))
     trip_detail = db.Column(db.String(100))
-
+    day_no = db.Column(db.Integer)
 def __repr__(self):
     return f"<TripMapping {self.mapping_id}>"
