@@ -4,11 +4,36 @@
 <head>
     <meta charset="UTF-8" />
     <title>내 정보 수정</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
 
 </head>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
 
 <body>
+    <!-- profile 전용 헤더 -->
+    <header class="profile-header">
+        <div class="profile-header-inner">
+
+            <!-- 로고 -->
+            <div class="profile-logo">
+                <a href="/">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Trip Mocha">
+                </a>
+            </div>
+
+            <!-- 메뉴 -->
+            <nav class="profile-nav">
+                <a href="{{ url_for('info.festival') }}">축제 보기</a>
+                <a href="{{ url_for('schedule.list') }}">나의 여행계획</a>
+            </nav>
+
+            <!-- 유저 -->
+            <div class="profile-user">
+                {{ session['user_name'] }} 님
+            </div>
+
+        </div>
+    </header>
+
 
     <div class="profile-container">
 
@@ -83,6 +108,53 @@
         </form>
 
     </div>
+
+
+
+    <!-- profile 전용 footer -->
+    <footer class="profile-footer">
+        <div class="profile-footer-inner">
+
+            <!-- 1열 -->
+            <div class="footer-col">
+                <h3>Trip Mocha</h3>
+                <p>
+                    새로운 경험을 위한 당신의 완벽한 여행 파트너, 트립 모카!<br>
+                    맞춤형 여행지 추천으로 특별한 순간을 만들어 드립니다.
+                </p>
+                <p class="copyright">
+                    © 2025 Trip Mocha. All rights reserved.
+                </p>
+            </div>
+
+            <!-- 2열 -->
+            <div class="footer-col">
+                <h4>주요 링크</h4>
+                <ul>
+                    <li><a href="#">회사 소개</a></li>
+                    <li><a href="#">서비스 안내</a></li>
+                    <li><a href="#">개인정보 처리방침</a></li>
+                    <li><a href="#">이용약관</a></li>
+                    <li><a href="#">사이트맵</a></li>
+                </ul>
+            </div>
+
+            <!-- 3열 -->
+            <div class="footer-col">
+                <h4>고객 지원</h4>
+                <p>이메일: support@tripmocha.com</p>
+                <p>전화: 070-1234-5678 (평일 09:00 - 16:30)</p>
+                <p>주소: 대한민국 전주시</p>
+            </div>
+
+            <!-- 4열 -->
+            <div class="footer-col">
+                <h4>Connect With Us</h4>
+            </div>
+
+        </div>
+    </footer>
+
 
     <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
 
