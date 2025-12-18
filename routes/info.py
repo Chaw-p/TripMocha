@@ -5,6 +5,28 @@ from .models import db, TripMain , TripDetail
 
 info_bp = Blueprint("info", __name__, url_prefix="/info")
 
+
+@info_bp.route('/about')
+def about():
+    return render_template('info/about.html')
+
+@info_bp.route('/service')
+def service():
+    return render_template('info/service.html')
+
+@info_bp.route('/privacy')
+def privacy():
+    return render_template('info/privacy.html')
+
+@info_bp.route('/terms')
+def terms():
+    return render_template('info/terms.html')
+
+@info_bp.route('/sitemap')
+def sitemap():
+    return render_template('info/sitemap.html')
+
+
 @info_bp.route("/")
 def info():
   #query
