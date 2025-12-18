@@ -3,31 +3,37 @@ document.addEventListener("DOMContentLoaded", function () {
     /* ===============================
        0️⃣ 상태 변수
     =============================== */
-    let unlocked = false;
-    let lastResult = null; // 중복 toast 방지
+    let unlocked = false;        // 현재 비밀번호 인증 여부
+    let lastResult = null;       // 현재 비밀번호 toast 중복 방지
+    let lastPwMatch = null;      // 새 비밀번호 비교 toast 중복 방지
 
     const pwInput = document.getElementById("current_pw");
     const lockTargets = document.querySelectorAll(".lock-target");
+
+    const newPwInput = document.querySelector('input[name="new_password"]');
+    const newPwCheckInput = document.querySelector('input[name="new_password_confirm"]');
 
     /* ===============================
        1️⃣ 잠금 / 해제 함수
     =============================== */
     function lockAll() {
         lockTargets.forEach(el => {
-            if (el.tagName === "SELECT" || el.tagName === "BUTTON") {
+            if (el.tagName === "INPUT") {
                 el.disabled = true;
-            } else {
                 el.readOnly = true;
+            } else {
+                el.disabled = true;
             }
         });
     }
 
     function unlockAll() {
         lockTargets.forEach(el => {
-            if (el.tagName === "SELECT" || el.tagName === "BUTTON") {
+            if (el.tagName === "INPUT") {
                 el.disabled = false;
-            } else {
                 el.readOnly = false;
+            } else {
+                el.disabled = false;
             }
         });
     }
@@ -36,7 +42,38 @@ document.addEventListener("DOMContentLoaded", function () {
     lockAll();
 
     /* ===============================
-       2️⃣ 현재 비밀번호 자동 검사 + Toast
+       2️⃣ 새 비밀번호 / 확인 비교
+    =============================== */
+    function checkPasswordMatch() {
+
+        // 🔒 잠겨 있으면 비교 안 함
+        if (!unlocked) return;
+
+        const pw = newPwInput.value;
+        const pwCheck = newPwCheckInput.value;
+
+        if (!pw || !pwCheck) {
+            lastPwMatch = null;
+            return;
+        }
+
+        const isMatch = pw === pwCheck;
+
+        if (isMatch === lastPwMatch) return;
+        lastPwMatch = isMatch;
+
+        if (isMatch) {
+            showToast("새 비밀번호가 서로 똑같습니다 👍");
+        } else {
+            showToast("새 비밀번호가 서로 다릅니다 ❌");
+        }
+    }
+
+    newPwInput.addEventListener("input", checkPasswordMatch);
+    newPwCheckInput.addEventListener("input", checkPasswordMatch);
+
+    /* ===============================
+       3️⃣ 현재 비밀번호 자동 검사
     =============================== */
     pwInput.addEventListener("input", function () {
         const pw = pwInput.value.trim();
@@ -44,6 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (pw.length < 4) {
             unlocked = false;
             lastResult = null;
+            lastPwMatch = null;
             lockAll();
             return;
         }
@@ -58,12 +96,12 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(res => res.json())
         .then(data => {
 
-            // 결과 같으면 toast 중복 출력 방지
             if (data.success === lastResult) return;
             lastResult = data.success;
 
             if (data.success) {
                 unlocked = true;
+                lastPwMatch = null;
                 unlockAll();
                 showToast("현재 비밀번호 확인 완료! 수정할 수 있어요 ✅");
             } else {
@@ -75,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     /* ===============================
-       3️⃣ 여행 스타일 버튼 로직
+       4️⃣ 여행 스타일 버튼 로직
     =============================== */
     const styleNames = {
         spring_flower: "🌸 봄꽃",
@@ -130,7 +168,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
-
+/* ===============================
+   Toast
+=============================== */
 function showToast(message, duration = 2000) {
     const toast = document.getElementById("toast");
     if (!toast) return;

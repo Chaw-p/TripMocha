@@ -242,7 +242,7 @@ button:hover,
     position: fixed;
     bottom: 40px;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, 0);   /* 기준 위치 고정 */
     background: rgba(0, 0, 0, 0.85);
     color: #fff;
     padding: 12px 20px;
@@ -256,7 +256,7 @@ button:hover,
 
 #toast.show {
     opacity: 1;
-    transform: translateX(-50%) translateY(-6px);
+    transform: translate(-50%, -6px); /* 위로 살짝 */
 }
 
 .hidden {

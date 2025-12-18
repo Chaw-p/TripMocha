@@ -333,12 +333,10 @@ def process_login():
 
         # 아이디 없음
         if not row:
-            return """
-                <script>
-                    alert("아이디 또는 비밀번호가 올바르지 않습니다.");
-                    history.back();
-                </script>
-            """
+            return render_template(
+            "login/login.html",
+            error="아이디 또는 비밀번호가 올바르지 않습니다."
+        )
 
         stored_hashed_pw = row[0]
         user_name = row[1]
@@ -592,23 +590,19 @@ def find_id_process():
         results = cursor.fetchall()
 
         if not results:
-            return """
-                <script>
-                    alert("일치하는 정보를 찾을 수 없습니다.");
-                    history.back();
-                </script>
-            """
+            return render_template(
+                "login/find_id.html",
+                toast="일치하는 정보를 찾을 수 없습니다."
+            )
 
         #  아이디 마스킹 후 화면 표시
         masked_ids = [mask_user_id(row[0]) for row in results]
         id_text = "\\n".join(masked_ids)
 
-        return f"""
-            <script>
-                alert("고객님의 아이디는 다음과 같습니다:\\n\\n{id_text}");
-                window.location.href = "/login";
-            </script>
-        """
+        return render_template(
+            "login/find_id.html",
+            toast=f"고객님의 아이디는 다음과 같습니다:\n{id_text}"
+        )
 
     except Exception as e:
         print("아이디 찾기 오류:", e)
