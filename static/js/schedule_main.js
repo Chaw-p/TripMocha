@@ -818,7 +818,6 @@ $('.button-make-travel').on('click', function(e) {
             let listHtml = `
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
                     <h3 style="color: #333; margin: 0;">${user_id} 님을 위한 추천 여행 리스트</h3>
-                    <button class="reload-btn">추천 다시 받기</button>
                 </div>
             `;
 

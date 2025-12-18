@@ -45,6 +45,7 @@
                     <button class="pdf-button" id="downloadPdfButton" onclick="downloadPDF()">PDF 저장</button>
                     <a class="pdf-button" href="{{ url_for('schedule.list') }}">목록</a>
                     <a class="pdf-button" href="{{ url_for('schedule.list') }}" id="list-del-btn">삭제</a>
+                    <a class="pdf-button" class="schedule_modify" id="popupbtn" id="list-del-btn">일정편집</a>
 
                 </div>
             </div>
@@ -59,7 +60,6 @@
                 <div class="modify_cntainer">
                     <div class="schedule-day-title" >Day {{ day }} - {{ day }}</div>
                     <div id="btnwrap">
-                        <a href="#" class="schedule_modify" id="popupbtn">일정편집</a>
                     </div>
                 </div>
                 {% for item in items %}
