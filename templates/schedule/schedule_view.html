@@ -23,10 +23,9 @@
                 <div class="trip-summary-left">
                     <h1 class="trip-title">{{user_id}}님을 위한 여행코스</h1>
                     <div class="meta-info">
-                        <div>trip ID 추가했어요 : {{trip_meta.trip_no}}</div>
                         <div>{{trip_meta.title}}</div>
                         <div>{{ trip_meta.start_date }} → {{ trip_meta.end_date }}</div>
-                        <div>{{trip_meta.trip_type}} | {{trip_meta.people}} 인</div>
+                        <div>{{trip_meta.trip_type}}  {{trip_meta.people}} 인</div>
 
                         <!-- <p>  - 여행지역 : <div id="trip-city">{{trip_meta.city}}</div> </p> -->
                     </div>
@@ -58,7 +57,7 @@
         <div class="travel-schedule-layout" id="">
             <div class="schedule-list-area">
                 <div class="modify_cntainer">
-                    <div class="schedule-day-title" >Day {{ day }} - {{ day }}</div>
+                    <div class="schedule-day-title" >Day {{ day }}</div>
                     <div id="btnwrap">
                     </div>
                 </div>
