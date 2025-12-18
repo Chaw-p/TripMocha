@@ -7,7 +7,37 @@
   {% include 'config/config.html' %}
   <link rel="stylesheet" href="{{url_for('static', filename='css/schedule_list.css')}}">
 </head>
+<script>
+// 여행태그 한글변환
+document.addEventListener("DOMContentLoaded", function() {
+    const TAG_TRANSLATIONS = {
+        'ai': 'AI추천',
+        'mountain': '산',
+        'sea': '바다',
+        'indoor': '실내',
+        'activity': '액티비티',
+        'experience': '체험',
+        'themepark': '테마파크',
+        'market': '전통시장',
+        'food': '맛집',
+        'festival': '축제',
+        'healing': '힐링',
+        'photo': '사진',
+        '여행': '여행',
+        '추천': '추천'
 
+    };
+
+    const tagElements = document.querySelectorAll('.tag-text');
+    tagElements.forEach(el => {
+            let rawContent = el.textContent.replace('#', '').trim().toLowerCase();
+            
+            if (TAG_TRANSLATIONS[rawContent]) {
+                el.textContent = '#' + TAG_TRANSLATIONS[rawContent];
+            }
+        });
+    });
+</script>
 <body>
     <div id="wrap">
         {% include 'config/header.html' %}
@@ -30,7 +60,8 @@
                                     alt="#" class="trip-image"></td>
                             <td style="width: calc(100% - 150px);">
                                 <div class="trip-title">{{ trip.title }}</div>
-                                <div>{{trip.trip_no}}</div>
+                                
+                                <!-- <div>{{trip.trip_no}}</div> -->
                             </td>
                         </tr>
                         <tr>
@@ -38,7 +69,7 @@
                                 <div class="trip-info">{{ trip.start_date}} → {{ trip.end_date }} 📍 {{trip.city}}</div>
                                 <div class="trip-tags">
                                     {% for tag in trip.tags %}
-                                    <span>#{{ tag }}</span>
+                                    <span class="tag-text">#{{ tag }}</span>
                                     {% endfor %}
                                 </div>
                             </td>
@@ -52,7 +83,7 @@
                 <div class="trip-item">
                     <table id="no-travle">
                         <tr>
-                            <td>📍
+                            <td>
                                 <img src="{{ url_for('static', filename='img/nono.png') }}">
                             </td>
                         </tr>

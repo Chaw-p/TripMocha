@@ -14,23 +14,22 @@ const TAG_TRANSLATIONS = {
     'photo': '사진',
     '여행': '여행',
     '추천': '추천'
+
 };
+
 function translateTags(tagsArray) {
     if (!tagsArray || !Array.isArray(tagsArray)) return [];
     return tagsArray.map(tag => {
-        const key = tag.toLowerCase().trim();
-        return TAG_TRANSLATIONS[key] || tag;
+        // tag가 객체면 tag.name을, 문자열이면 tag 자체를 사용
+        const rawTag = typeof tag === 'object' ? (tag.name || tag.tag) : tag;
+        if (!rawTag) return ''; 
+        
+        const key = rawTag.toLowerCase().trim();
+        return TAG_TRANSLATIONS[key] || rawTag;
     });
 }
 
-// 배열을 받아서 한글 배열로 뱉어주는 함수
-function translateTags(tagsArray) {
-    if (!tagsArray || !Array.isArray(tagsArray)) return [];
-    return tagsArray.map(tag => {
-        const key = tag.toLowerCase().trim();
-        return TAG_TRANSLATIONS[key] || tag; // 맵에 없으면 원래 단어 그대로 유지
-    });
-}
+
 
 function activateAddButton() {
     // '추가' 버튼을 활성화 상태로 되돌립니다.
@@ -42,6 +41,9 @@ function activateAddButton() {
         });
     }
 }
+translateTags(['healing', 'food', 'SEA']);
+console.log("테스트 번역:", translateTags(['healing', 'food', 'SEA']));
+
 
 $(function(){
     // 모든 드롭다운 요소를 변수로 지정
@@ -850,13 +852,17 @@ $('.button-make-travel').on('click', function(e) {
                 const displayCity = `   ${cityPrefix || ''}`; 
                 
                 const currentTags = (typeof tags !== 'undefined' ? tags : (typeof tripMeta !== 'undefined' ? tripMeta.tags : [])) || [];
+                console.log("원본 태그:", currentTags);
 
-                // 3. 한글 번역 적용 (함수가 정의되어 있는지 확인 필수!)
+                console.log("원본 태그2:", selectedThemeTags);
+
+                // 3. 한글 번역 적용
                 let koreanTags = [];
                 if (typeof translateTags === 'function') {
-                    koreanTags = translateTags(currentTags);
+                    koreanTags = translateTags(selectedThemeTags);
+                    console.log("번역된 태그:", koreanTags);
                 } else {
-                    koreanTags = currentTags; // 함수가 없으면 원본이라도 유지
+                    koreanTags = selectedThemeTags; 
                 }
                 
                 // ----------------------------------------------------
