@@ -41,7 +41,8 @@ const page = {
                   <h3 class="title" id="item-title">
                       <a href="/info/${item.id}">${item.title}</a>
                   </h3>
-                  <p class="loc" id="addr1">${item.addr1}</p>
+                  <input id="item-contenId" type="hidden" value=${item.id}>
+                  <p class="loc" id="item-addr1">${item.addr1}</p>
                   <input type="hidden" class="loc" id="item-mapX" value=${item.mapX}>
                   <input type="hidden" class="loc" id="item-mapY" value=${item.mapY}>
                   <p class="hash">
@@ -122,25 +123,30 @@ const io = new IntersectionObserver((entries, observer) => {
 	});
 });
 
-function SelectedLiData() {
+function SelectedLiData(trip_no) {
+  
   const $selectedLi = $('#schedule_travel_list').find('li.selected');
   if ($selectedLi.length === 0) {
-        console.log("선택된 여행지가 없습니다.");
-        return null;
+    console.log("선택된 여행지가 없습니다.");
+    return null;
   }
-
-  const title = $selectedLi.find('#item-title a').text().trim(); 
+  const data_trip_no = $('#trip_no').val();
+  const trip_detail = $('#item-contenId').val();
+  const day_no = document.getElementById('modalbody').dataset.day;
+  const detail_name = $selectedLi.find('#item-title a').text().trim(); 
   const addr1 = $selectedLi.find('#item-addr1').text().trim();    
   const mapX = $selectedLi.find('#item-mapX').val();
   const mapY = $selectedLi.find('#item-mapY').val();
 
   const selectedData = {
-        title: title,
-        addr1: addr1,
-        mapX: mapX,
-        mapY: mapY
+    trip_no : data_trip_no,
+    trip_detail : trip_detail,
+    detail_name: detail_name,
+    address: addr1,
+    longitude: mapX,
+    latitude: mapY,
+    day_no : day_no
   };
-
   console.log("--- 선택된 여행지 정보 ---");
   console.log(selectedData);
   console.log("------------------------");
@@ -157,7 +163,7 @@ $(document).on("click", "#schedule_travel_list > li", function(){
   $("#schedule_travel_list > li").removeClass("selected")
   $(this).addClass("selected")
 })
-// 드롭다운 리스트를 골랐을때 li값으로 변경
+// 드롭다운 기능
 $(document).on("click", ".options_dropdown  li", function(){
   $(this).siblings().removeClass('selected');
   $(this).addClass('selected');
@@ -166,20 +172,47 @@ $(document).on("click", ".options_dropdown  li", function(){
   );
   $(this).closest('.options_dropdown').removeClass('active');
 });
-// .selected_option을 클릭했을 때, active라는 클래스 추가
+// .selected_option을 클릭했을 때, active라는 클래스 추가하여 toggle 기능
 $(document).on("click", ".selected_option", function(){
   $(this).closest('.options_dropdown').toggleClass('active');
 });
 
-// // place_id 값 추가 함수
-// async function InsertPlaceId() {
-//   const selectedData = SelectedLiData();
+// place_id 값 추가 함수
+async function InsertPlaceId() {
+  const selectedData = SelectedLiData();
+  const trip_no = $("#trip_no").val();
+  const day_no = document.getElementById('modalbody').dataset.day;
 
-//   // 데이터가 없으면 중단 //이후 수정
-//   if (!selectedData) {
-//       alert("먼저 여행지를 선택해주세요!");
-//       return;
-//   }
-//   const url = `/info/location/${tripNo}`;
+  // 데이터가 없으면 중단 //이후 수정
+  if (!selectedData) {
+      alert("여행지를 먼저 선택해주세요!");
+      return;
+  }
+  if (!trip_no || !day_no) {
+    alert("여행 정보(ID 또는 날짜)가 누락되었습니다.");
+    return;
+  }
+  const url = `/info/location/${trip_no}/${day_no}`;
+  const selected_data = SelectedLiData(trip_no);
+  const $target = $(`.add-schedule-btn[data-day="${day_no}"]`);
+  var html = '추가된 임시 html';
+  try {
+    const response = await fetch(url,{
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        data : selected_data
+      })
+    });
 
-// }
+    if (response.ok) {
+      const serverResponse = await response.json(); // 서버 응답 받기
+      console.log("✅ 저장 성공:", serverResponse);
+      location.reload();
+    } else {
+      console.error("서버 응답 에러");
+    }
+  }catch(error) {
+    console.error("❌ 에러:", error);
+  }
+}
