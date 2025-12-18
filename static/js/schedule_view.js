@@ -85,6 +85,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // ==========================================================
     addScheduleBtns.forEach(btn => {
         btn.onclick = function(e) {
+            document.getElementById('modalbody').dataset.day = this.dataset.day
+
+            
             e.preventDefault();
             // 모달을 표시
             if (modal) {

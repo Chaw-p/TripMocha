@@ -313,3 +313,9 @@ button:hover,
         transform: rotate(360deg);
     }
 }
+
+
+
+#send_auth_btn.resend-active:hover {
+    background-color: #06402B;
+}

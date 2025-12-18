@@ -90,7 +90,14 @@ function startAuthTimer(seconds) {
 
         if (authTimeLeft <= 0) {
             clearInterval(authTimer);
-            $authBtn.text('인증번호 재전송').prop('disabled', false);
+            $authBtn
+            .text('인증번호 재전송')
+            .prop('disabled', false)
+            .css({
+                cursor: 'pointer',
+                opacity: 1
+            });
+            $authBtn.addClass('resend-active');
             $authCode.prop('disabled', true);
             showMessage('인증 시간이 만료되었습니다.', 'error');
         }
@@ -120,6 +127,7 @@ $(document).ready(function () {
     const $resetBtn = $('#reset_btn');
 
     // 초기 상태
+    $('#authCodeGroup').hide();     // ⬅️ 아예 안 보이게
     $authCode.prop('disabled', true);
     $newPasswordGroup.hide();
     $messageArea.hide();
@@ -153,10 +161,16 @@ $(document).ready(function () {
         }, function (res) {
 
             if (res.success) {
-                showMessage('인증번호를 이메일로 보냈어요! (3분)', 'success');
-                $authCode.val('').prop('disabled', false).focus();
-                startAuthTimer(180);
-            } else {
+            showMessage('인증번호를 이메일로 보냈어요! (3분)', 'success');
+
+            // 🔥 서버 성공 후에만 등장
+            if (!$('#authCodeGroup').is(':visible')) {
+                $('#authCodeGroup').slideDown(200);
+            }
+
+            $authCode.val('').prop('disabled', false).focus();
+            startAuthTimer(180);
+        } else {
                 showMessage(res.message || '인증번호 발송 실패', 'error');
                 hideButtonLoading($authBtn);
             }
