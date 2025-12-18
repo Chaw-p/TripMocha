@@ -231,11 +231,49 @@ def recommend_schedule():
     sorted_df = target_df.sort_values(by='SCORE', ascending=False)
 
     #추가 필터링
-    exclude_mask = target_df['VISIT_AREA_NM'].str.contains('호텔|아파트|오피스텔|점|펜션|화장실|PC방', case=False, na=False, regex=True)
+    exclude_mask = target_df['VISIT_AREA_NM'].str.contains('호텔|아파트|오피스텔|점|펜션|화장실|PC방|모텔|주유소|충전소|병원', case=False, na=False, regex=True)
     filtered_target_df = target_df[~exclude_mask].copy()
-    sorted_df = filtered_target_df.sort_values(by='SCORE', ascending=False)
 
-    #메인 후보
+    filtered_target_df['VISIT_AREA_NM'] = (
+        filtered_target_df['VISIT_AREA_NM']
+        .str.replace('주차장', '', regex=False)
+        .str.replace('매표소', '', regex=False)
+        .str.replace('입구', '', regex=False)
+        .str.strip()  # 앞뒤 공백 제거
+    )
+    selected_tags = theme_tags if theme_tags else []
+
+    # 태그별 검색 키워드 매핑
+    tag_keywords = {
+    'ai': '박물관|미술관|유적지|공원|해수욕장|명소', # 인기 키워드 혼합
+    'mountain': '산|봉|등산|계곡|령|고개|대관령|정상',
+    'sea': '해수욕장|해변|항|포구|해안|섬|바다|수변공원',
+    'indoor': '박물관|미술관|전시관|기념관|과학관|실내|아쿠아리움',
+    'activity': '액티비티|루지|카트|짚라인|레일바이크|랜드|월드|스키',
+    'experience': '체험|농원|목장|공방|마을|테마마을|숲체험',
+    'themepark': '테마파크|랜드|월드|공원|놀이동산|워터파크|유원지',
+    'market': '시장|오일장|재래시장|중앙시장|풍물시장',
+    'food': '맛집|식당|카페|전문점|빵집|베이커리|가든',
+    'festival': '축제|행사|광장|공연장|아트센터',
+    'healing': '힐링|숲|산책|휴양림|수목원|정원|식물원|둘레길',
+    'photo': '사진|전망대|벽화마을|야경|출사|포토존|공원'
+    }
+    combined_keywords = None 
+    if selected_tags:
+        valid_keywords = [tag_keywords[tag] for tag in selected_tags if tag in tag_keywords]
+        if valid_keywords:
+            combined_keywords = "|".join(valid_keywords)
+
+    if combined_keywords:
+        tag_mask = filtered_target_df['VISIT_AREA_NM'].str.contains(combined_keywords, case=False, na=False, regex=True)
+        # 점수를 대폭 가산 (지역 1순위를 유지하되 지역 내에선 1등으로)
+        filtered_target_df.loc[tag_mask, 'SCORE'] += 50000
+        print(f"태그 매칭 적용됨: {tag_mask.sum()}건")
+
+    # 5. ★중요★ 가중치가 반영된 SCORE로 다시 정렬
+    sorted_df = filtered_target_df.sort_values(by=['SCORE', 'VISIT_AREA_NM'], ascending=[False, True])
+
+        #메인 후보
     diverse_main_candidates = sorted_df.drop_duplicates(
     subset=['VISIT_AREA_TYPE_CD'], 
     keep='first'
@@ -251,50 +289,45 @@ def recommend_schedule():
     # 3. 🚨 전체 후보 리스트로 변환 (총 3*Duration 개의 딕셔너리)
     candidate_list = all_candidates_df.to_dict('records') 
 
-    # ----------------------------------------------------
-    # 4. 3개의 전체 일정(Itinerary) 생성 및 할당 로직 (신규)
-    # ----------------------------------------------------
-
     final_three_itineraries = []
-    used_main_ids = set() # 메인 장소 할당 시 중복을 피하기 위함
-    candidate_idx = 0 
+    global_used_main_names = set()
 
     # 3개의 전체 일정을 생성 (Itinerary 1, 2, 3)
     for itinerary_index in range(1, 4):
-        
-        current_itinerary = [] # Itinerary 1개에 대한 전체 스케줄 (일차별 리스트)
-        
-        # 해당 일정의 일차(Day)별 메인 장소를 할당
+        current_itinerary = [] 
+        itinerary_used_names = set() 
+
         for day in range(1, int(duration_days) + 1):
             day_unique_id = f"itin/{itinerary_index}_day_{day}"
             main_candidate = None
-            print(f"%%%%%%%%%로그: {day_unique_id} 생성 프로세스 시작 %%%%%%%%%")
             
-            # 다음 메인 후보지 선택 및 인덱스 이동
-            while candidate_idx < len(candidate_list):
-                
-                candidate = candidate_list[candidate_idx]
-                candidate_idx += 1 # 인덱스는 무조건 증가
-                
-                # 메인 후보의 고유 ID 확인 (CONTENT_ID를 사용한다고 가정)
-                candidate_id = hashlib.sha1(str(candidate['VISIT_AREA_NM']).encode('utf-8')).hexdigest()[:10]
-                
-                if candidate_id not in used_main_ids:
-                    main_candidate = candidate.copy()
-                    main_candidate['CONTENT_ID'] = candidate_id
+            for cand in candidate_list:
+                cand_name = cand['VISIT_AREA_NM']
+                if cand_name not in global_used_main_names:
+                    main_candidate = cand.copy()
+                    global_used_main_names.add(cand_name)
+                    itinerary_used_names.add(cand_name)
+                    
+                    # 데이터 할당
+                    cand_id = hashlib.sha1(cand_name.encode('utf-8')).hexdigest()[:10]
+                    main_candidate['CONTENT_ID'] = cand_id
                     main_candidate['DAY'] = day
                     main_candidate['ITINERARY_NO'] = itinerary_index
-                    used_main_ids.add(candidate_id)
                     break
             
+            # [수정] 후보가 진짜 아예 없으면 backup 장소라도 넣어서 일정이 끊기지 않게 함
             if main_candidate is None:
-                # 후보가 부족하면 해당 일정의 나머지 일차는 건너뜁니다.
-                break 
+                # sorted_df에서 정말 아무거나 중복 안 되는 거 하나 가져옴
+                backup = sorted_df[~sorted_df['VISIT_AREA_NM'].isin(itinerary_used_names)].head(1)
+                if not backup.empty:
+                    main_candidate = backup.iloc[0].to_dict()
+                    main_candidate['DAY'] = day
+                    main_candidate['ITINERARY_NO'] = itinerary_index
+                    itinerary_used_names.add(main_candidate['VISIT_AREA_NM'])
+                else:
+                    break
             
-            # 5. 기존의 서브 장소 추천 로직을 함수로 감싸거나 이 위치에 통합
-            
-            # 🚨 이 부분에 기존의 '메인 장소 추천 후 반복문' 내의 코드를 사용합니다.
-            
+            # 5. 기존의 서브 장소 추천 로직을 함수로 감싸거나 이 위치에 통합          
             # 메인 장소 정보 추출
             main_area_nm = str(main_candidate['VISIT_AREA_NM'])
             target_adm_code = main_candidate['ADM_CODE_NUMERIC']
@@ -308,46 +341,55 @@ def recommend_schedule():
             # 1단계 추천 3개 (동일지역, 동일테마)
             if target_type_cd is not None:
                 strict_filter = (sorted_df['ADM_CODE_NUMERIC'] == target_adm_code) & \
-                                (sorted_df['VISIT_AREA_TYPE_CD'] == target_type_cd) & \
-                                (sorted_df['VISIT_AREA_NM'] != main_area_nm) 
-                
-                related_places.extend(sorted_df[strict_filter]['VISIT_AREA_NM'].head(3).tolist())
-                address.extend(sorted_df[strict_filter]['LOTNO_ADDR'].head(3).tolist())
-                x_coord.extend(sorted_df[strict_filter]['X_COORD'].head(3).tolist())
-                y_coord.extend(sorted_df[strict_filter]['Y_COORD'].head(3).tolist())
+                            (sorted_df['VISIT_AREA_TYPE_CD'] == target_type_cd) & \
+                            (~sorted_df['VISIT_AREA_NM'].isin(itinerary_used_names)) # 
             
+            selected_df = sorted_df[strict_filter].head(3)
+            
+            for _, row in selected_df.iterrows():
+                related_places.append(row['VISIT_AREA_NM'])
+                address.append(row['LOTNO_ADDR'])
+                x_coord.append(row['X_COORD'])
+                y_coord.append(row['Y_COORD'])
+                itinerary_used_names.add(row['VISIT_AREA_NM']) # 사용 목록에 추가
+
             # 2단계 추천 (5개 채우기) - 기존 로직을 그대로 사용
-            if len(related_places) < 5:
-                current_places_set = set(related_places)
-                needed_count = 5 - len(related_places)
-                
-                wide_filter = (sorted_df['ADM_CODE_NUMERIC'] == target_adm_code) & \
-                            (sorted_df['VISIT_AREA_NM'] != main_area_nm)
-                
-                new_places_df = sorted_df[wide_filter].copy()
-                new_places_df = new_places_df[~new_places_df['VISIT_AREA_NM'].isin(current_places_set)]
-                
-                existing_themes = sorted_df[sorted_df['VISIT_AREA_NM'].isin(current_places_set)]['VISIT_AREA_TYPE_CD'].unique().tolist()
-                new_places_df = new_places_df[~new_places_df['VISIT_AREA_TYPE_CD'].isin(existing_themes)]
-                
-                diverse_places_df = new_places_df.drop_duplicates(subset=['VISIT_AREA_TYPE_CD'], keep='first')
-                
-                new_places = diverse_places_df['VISIT_AREA_NM'].head(needed_count).tolist()
-                address.extend(diverse_places_df['LOTNO_ADDR'].head(needed_count).tolist())
-                x_coord.extend(diverse_places_df['X_COORD'].head(needed_count).tolist())
-                y_coord.extend(diverse_places_df['Y_COORD'].head(needed_count).tolist())
-                related_places.extend(new_places)
+            if len(related_places) < 4:
+                needed_count = 4 - len(related_places)
+            
+            # 광역 필터: 동일 지역 내에서, 현재 일정(Itinerary)에서 한 번도 안 쓴 장소들만
+            wide_filter = (sorted_df['ADM_CODE_NUMERIC'] == target_adm_code) & \
+                          (~sorted_df['VISIT_AREA_NM'].isin(itinerary_used_names)) # [수정] 일정 내 중복 제거
+            
+            new_places_df = sorted_df[wide_filter].copy()
+            
+            # 테마 다양성 유지 로직 (기존 로직 유지)
+            existing_themes = [] # 현재 날짜에 이미 뽑힌 테마들
+            # (필요시 이전에 뽑힌 테마도 제외하고 싶다면 itinerary_used_themes 등을 사용 가능)
+
+            diverse_places_df = new_places_df.drop_duplicates(subset=['VISIT_AREA_TYPE_CD'], keep='first')
+            
+            top_new = diverse_places_df.head(needed_count)
+            for _, row in top_new.iterrows():
+                related_places.append(row['VISIT_AREA_NM'])
+                address.append(row['LOTNO_ADDR'])
+                x_coord.append(row['X_COORD'])
+                y_coord.append(row['Y_COORD'])
+                itinerary_used_names.add(row['VISIT_AREA_NM']) # 사용 목록에 추가
                 
                 # 데이터 부족 시 채우기 (기존 로직)
-                while len(related_places) < 5:
+                while len(related_places) < 4:
                     related_places.append("추가 추천 장소 (데이터 부족)")
+                    address.append("-")
+                    x_coord.append(0)
+                    y_coord.append(0)
             
             # 최종 서브 장소 리스트 생성 (기존 로직)
             final_related_places = []
-            seen_names = set()
             for i, place_name in enumerate(related_places):
-                if place_name in seen_names: continue
-                    
+                if place_name == "추가 추천 장소 (데이터 부족)":
+                    continue
+                
                 place_hash_id = hashlib.sha1(place_name.encode('utf-8')).hexdigest()[:10]
                 final_related_places.append({
                     "id": place_hash_id,
@@ -356,13 +398,10 @@ def recommend_schedule():
                     "latitude": y_coord[i],
                     "longitude": x_coord[i]
                 })
-                seen_names.add(place_name)
 
-            # --- (기존의 1단계 & 2단계 추천 로직 통합 끝) ---
-            
             # 6. 하루 일정 완성: 메인 장소를 0번째로, 서브 장소를 1~4번째로 배치합니다.
             day_schedule = [main_candidate] 
-            day_schedule.extend(final_related_places[:4]) # 총 5개로 맞춤
+            day_schedule.extend(final_related_places[:3]) # 총 4!!개로 맞춤
             
             # 7. 메타데이터 추가 (DURATION, SIDO_NM, SIGUNGU_NM)
             for place in day_schedule:
@@ -607,23 +646,12 @@ def view(draftId):
 
     cleaned_trip_schedule_data = clean_for_json(trip_schedule_data) 
     cleaned_trip_meta_data = clean_for_json(trip_meta_data)
-    
-    # meta_json_str = json.dumps(cleaned_trip_meta_data, ensure_ascii=False)
-    # schedule_json_str = json.dumps(cleaned_trip_schedule_data, ensure_ascii=False)
-
-    # safe_meta_data = quote_plus(meta_json_str)
-    # safe_schedule_data = quote_plus(schedule_json_str)
 
     print(f"view({draftId}):finish:--------------------------");
     return render_template("schedule/schedule_view.html",
-        # safe_meta_data=meta_json_str,           
-        # safe_schedule_data=schedule_json_str,
-        #trip_meta=trip_meta_data ,
         trip_meta=cleaned_trip_meta_data, 
         grouped_schedule=grouped_schedule,
-        #query=query,
         user_id=cleaned_trip_meta_data.get('user_id', 'Guest'), 
-        # draft_id=draftId, 
         choakey=key,
         final_schedule_list_from_flask=cleaned_trip_schedule_data 
     )
@@ -643,7 +671,6 @@ def finalize_schedule():
             # 프론트엔드에서 [ {place}, {place} ] 형태로 보낸 경우
             final_schedule = data
      
-    # trip_no는 URL에서 가져와야 하므로, 해당 로직을 추가해야 합니다.
     if not trip_no or not final_schedule:
         return jsonify({"status": "error", "message": "필요한 데이터가 누락되었습니다. (Trip No 확인 필요)"}), 400
 
@@ -651,14 +678,13 @@ def finalize_schedule():
         for index, place_data in enumerate(final_schedule):
             content_id = place_data.get('CONTENT_ID')
             
-            # --- A. TripDetail 삽입 (정수형 detail_id 획득) ---
             new_trip_detail = TripDetail(
                 trip_no=trip_no, 
-                detail_name=place_data.get('VISIT_AREA_NM'), # 'VISIT_AREA_NM' 사용
-                address=place_data.get('LOTNO_ADDR'),        # 'LOTNO_ADDR' 사용
-                latitude=place_data.get('Y_COORD', None),          # 'Y_COORD' 사용
-                longitude=place_data.get('X_COORD', None),         # 'X_COORD' 사용
-                category=place_data.get('VISIT_AREA_TYPE_CD'), # 'VISIT_AREA_TYPE_CD' 사용
+                detail_name=place_data.get('VISIT_AREA_NM'), 
+                address=place_data.get('LOTNO_ADDR'),        
+                latitude=place_data.get('Y_COORD', None),         
+                longitude=place_data.get('X_COORD', None),        
+                category=place_data.get('VISIT_AREA_TYPE_CD'), 
                 trip_detail=f"여행 상세 정보" 
             )
             db.session.add(new_trip_detail)
@@ -677,13 +703,9 @@ def finalize_schedule():
                 mapping_record.detail_id = new_detail_id
                 mapping_record.day_sequence = 1 # 현재 데이터에 day 정보가 없으므로 1일차로 가정
                 mapping_record.visit_order = index + 1
-                # mapping_record.day_sequence = place_data.get('day')
-                # mapping_record.visit_order = place_data.get('order')
             else:
-                # 🚨 로그 3: TripMapping 레코드 못 찾음 (가장 의심되는 부분)
                 print(f"로그 3: ⚠️ TripMapping 레코드 (trip_no={trip_no}, content_id={content_id}) 찾기 실패.")
 
-        # 3. 최종 커밋
         db.session.commit()
         return jsonify({"status": "success", "message": "여행 일정이 최종 확정되었습니다."})
 
@@ -694,7 +716,6 @@ def finalize_schedule():
         
         return jsonify({
             "status": "error", 
-            # ⚠️ str()로 감싸서 혹시 모를 비정상적인 객체 참조를 방지
             "message": f"서버 오류: {str(e)}" 
         }), 500
 
