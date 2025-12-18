@@ -2,7 +2,6 @@
 body { 
     font-family: Arial, sans-serif; 
     background-color: white; 
-    padding: 20px; 
     font-size: 14px;
     line-height: 1.5;
 }
@@ -105,13 +104,13 @@ p {
  */
 
 .travel-schedule-layout {
-    display: flex;
+    width: 100%;
     justify-content: space-between;
     gap: 30px; 
     margin-top: 20px;
 }
 
-.schedule-list-area {
+.travel-schedule {
     flex: 1; /* 너비 비율을 55% 대신 Flex 비율로 변경 */
     min-width: 400px;
     display: flex;
@@ -121,7 +120,6 @@ p {
 .map-section-wrapper { 
     flex: 1; /* 너비 비율을 45% 대신 Flex 비율로 변경 */
     margin-top: 0; 
-    border: 1px solid #ddd;
     border-radius: 8px;
     overflow: hidden;
     padding: 15px;
@@ -142,6 +140,14 @@ p {
     background-color: #e0e0e0; 
     border-radius: 5px; 
     overflow: hidden;
+
+    flex: 1; /* 너비 비율을 45% 대신 Flex 비율로 변경 */
+    margin-top: 0; 
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 15px;
+    box-sizing: border-box; 
 }
 
 
@@ -256,7 +262,7 @@ p {
         flex-direction: column; /* 태블릿/모바일에서는 세로로 배치 */
         gap: 0;
     }
-    .schedule-list-area, .map-section-wrapper {
+    .travel-schedule, .map-section-wrapper {
         width: 100%; /* 전체 너비 사용 */
         min-width: auto;
         padding: 0;
@@ -464,4 +470,6 @@ p {
     border-radius: 10px;
     font-size: 20px;
 }
-
+.schedule-contents {
+    display: flex;
+}
