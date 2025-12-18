@@ -376,8 +376,8 @@ $(".search-button").on("click", function() {
     };
     
     if (!searchData.adm_code || searchData.duration_days < 1 || searchData.personnel.count < 1 || searchData.theme_tags.length < 2) {
-        alert("⚠️ 여행지, 여행일(최소 1일), 인원, 테마(최소 2개)를 모두 선택해주세요.");
-        return; 
+        showToast("⚠️ 여행지, 여행일(최소 1일), 인원, 테마(최소 2개)를 모두 선택해주세요.");
+        return;
     }
 
     try {
@@ -665,17 +665,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const buttons = document.querySelectorAll('.select-btn');
     const minSelection = 2;
     const maxSelection = 4;
-    const messageElement = document.getElementById('selection-message');
 
     // 세션에 테마 데이터를 저장/업데이트하는 함수
     const saveThemesToSession = () => {
-        // 현재 선택된 모든 테마의 data-theme 값을 배열로 수집
         const selectedThemes = Array.from(document.querySelectorAll('.select-btn.selected'))
-                                    .map(el => el.getAttribute('data-theme'));
+            .map(el => el.getAttribute('data-theme'));
 
-        // 기존의 세션 데이터를 불러옵니다. (없으면 빈 객체)
         const currentDataJson = sessionStorage.getItem('currentSearchData') || '{}';
         let searchData;
+
         try {
             searchData = JSON.parse(currentDataJson);
         } catch (e) {
@@ -687,11 +685,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             sessionStorage.setItem('currentSearchData', JSON.stringify(searchData));
-            console.log("테마 정보가 세션에 업데이트되었습니다:", searchData.theme_tags);
+            console.log("테마 정보 세션 저장:", selectedThemes);
         } catch (e) {
-            console.error("세션 스토리지 저장 오류:", e);
+            console.error("세션 저장 오류:", e);
         }
-        
+
         return selectedThemes.length;
     };
 
@@ -701,35 +699,28 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentSelected = document.querySelectorAll('.select-btn.selected').length;
             let finalSelected;
 
+            // 이미 선택된 버튼 → 해제
             if (isSelected) {
                 button.classList.remove('selected');
-                finalSelected = saveThemesToSession(); 
-                messageElement.textContent = ''; 
-            } else {
-                if (currentSelected < maxSelection) {
-                    button.classList.add('selected');
-                    finalSelected = saveThemesToSession(); 
-                    messageElement.textContent = ''; 
-                } else {
-                    messageElement.textContent = `⚠️ 테마는 최대 ${maxSelection}개까지만 선택할 수 있습니다.`;
-                    return; 
+                finalSelected = saveThemesToSession();
+            }
+            // 새로 선택
+            else {
+                if (currentSelected >= maxSelection) {
+                    showToast(`⚠️ 테마는 최대 ${maxSelection}개까지만 선택할 수 있습니다.`);
+                    return;
                 }
+                button.classList.add('selected');
+                finalSelected = saveThemesToSession();
             }
 
-            // 메시지 업데이트 로직
+            // ✅ 선택 개수에 따른 Toast 안내
             if (finalSelected > 0 && finalSelected < minSelection) {
-                messageElement.textContent = `⚠️ 테마는 최소 ${minSelection}개 이상 선택해야 합니다. (현재 ${finalSelected}개)`;
-                messageElement.style.color = 'red'; // 색상 강조
-            } else if (finalSelected >= minSelection) {
-                messageElement.textContent = `✅ ${finalSelected}개의 테마가 선택되었습니다.`;
-                messageElement.style.color = 'green';
-            } else {
-                messageElement.textContent = '';
+                showToast(`⚠️ 테마는 최소 ${minSelection}개 이상 선택해야 합니다. (현재 ${finalSelected}개)`);
             }
         });
     });
 });
-
 
 
 
@@ -961,14 +952,14 @@ $('.button-make-travel').on('click', function(e) {
                 $resultArea.find('.trip-item.selected').removeClass('selected');
                 //선택요소 강조
                 $(this).addClass('selected');
-                alert("여행리스트가 선택되었습니다.")
+                showToast("여행리스트가 선택되었습니다 😊");
             })
 
             $resultArea.on('click', '.detail-btn', function(e){
                 e.preventDefault();
                 const $tripItem = $resultArea.find('.trip-item.selected');
                 if($tripItem.length === 0){
-                    alert("여행리스트를 선택해주세요.")
+                    showToast("여행리스트를 먼저 선택해주세요 🙏");
                     return;
                 }  
 
@@ -1045,15 +1036,15 @@ $('.button-make-travel').on('click', function(e) {
                             console.log("DB 저장 후 페이지 이동:", targetUrl);
                             window.location.href = targetUrl;
                         } else {
-                            alert("여행 계획 저장에 실패했습니다: " + (data.message || '서버 오류'));
+                            showToast("여행 계획 저장에 실패했습니다 😭");
                         }
                     })
                     .catch(error => {
                         console.error('DB 저장 중 오류 발생:', error);
-                        alert("여행 계획을 서버에 저장할 수 없습니다. 잠시 후 다시 시도해 주세요.");
+                        showToast("서버 저장 중 오류가 발생했어요 ⚠️");
                     });
                 }else {
-                    alert("선택된 여행 항목에 메타데이터가 없습니다.");
+                    showToast("여행 데이터가 없습니다 😢 다시 선택해주세요");
                     return; 
                 }
 
@@ -1071,3 +1062,15 @@ $('.button-make-travel').on('click', function(e) {
 });
 
 });
+
+function showToast(message, duration = 2000) {
+    const toast = document.getElementById("toast");
+    if (!toast) return;
+
+    toast.textContent = message;
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, duration);
+}
