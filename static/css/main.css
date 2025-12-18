@@ -148,6 +148,9 @@ a {
   cursor: pointer;
   transition: transform 80ms ease-in;
 }
+.txt-right {
+  text-align: right;
+}
 #nav {
   font-weight: bold;
 }
