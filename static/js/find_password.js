@@ -134,6 +134,15 @@ $(document).ready(function () {
             showMessage('아이디, 이름, 이메일을 입력하세요.', 'error');
             return;
         }
+        
+        // 이메일 형식 검사
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test($email.val())) {
+            showMessage('해당 이메일에 대한 아이디가 없습니다.', 'error');
+            return;
+        }
+
 
         showButtonLoading($authBtn, '발송 중...');
 

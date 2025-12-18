@@ -12,30 +12,7 @@
 <body>
       <div id="wrap">
     {% include 'config/header.html' %}
-    <header class="profile-header">
-        <div class="profile-header-inner">
-
-            <!-- 로고 -->
-            <!-- <div class="profile-logo">
-                <a href="/">
-                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Trip Mocha">
-                </a>
-            </div> -->
-
-            <!-- 메뉴 -->
-            <!-- <nav class="profile-nav">
-                <a href="{{ url_for('info.festival') }}">축제 보기</a>
-                <a href="{{ url_for('schedule.list') }}">나의 여행계획</a>
-            </nav> -->
-
-            <!-- 유저 -->
-            <div class="profile-user">
-                {{ session['user_name'] }} 님
-            </div>
-
-        </div>
-    </header>
-
+    
 
     <div class="profile-container">
 
