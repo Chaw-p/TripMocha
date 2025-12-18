@@ -431,6 +431,48 @@ def recommend_schedule():
         "recommended_trips": recommended_trips_list
     })
 
+@schedule_bp.route("/delete-detail", methods=["POST"])
+def delete_detail():
+    if "user_id" not in session:
+        return jsonify({"success": False, "message": "로그인 필요"}), 401
+
+    data = request.get_json()
+    detail_id = data.get("detail_id")
+
+    if not detail_id:
+        return jsonify({"success": False, "message": "detail_id 없음"}), 400
+
+    # 1️⃣ TripDetail 조회
+    detail = TripDetail.query.filter_by(detail_id=detail_id).first()
+    if not detail:
+        return jsonify({"success": False, "message": "일정 없음"}), 404
+
+    # 2️⃣ 소유자 체크 (TripMain.user_id 기준)
+    trip = TripMain.query.filter_by(
+        trip_no=detail.trip_no,
+        user_id=session["user_id"]
+    ).first()
+
+    if not trip:
+        return jsonify({"success": False, "message": "권한 없음"}), 403
+
+    try:
+        # 3️⃣ TripMapping 먼저 삭제
+        TripMapping.query.filter_by(detail_id=detail_id).delete()
+
+        # 4️⃣ TripDetail 삭제
+        db.session.delete(detail)
+        db.session.commit()
+
+        return jsonify({"success": True})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+
 
 @schedule_bp.route("/save-draft", methods=["POST"])
 def save_draft():

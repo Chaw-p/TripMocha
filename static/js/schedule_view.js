@@ -98,21 +98,68 @@ document.addEventListener('DOMContentLoaded', function() {
     // ==========================================================
     // D. 일정 편집 삭제버튼 얼럿
     // ==========================================================
-    if (deleteBtns.length > 0) {
-        deleteBtns.forEach(btn => {
-            btn.onclick = function(e) {
-                e.preventDefault(); 
+    // if (deleteBtns.length > 0) {
+    //     deleteBtns.forEach(btn => {
+    //         btn.onclick = function(e) {
+    //             e.preventDefault(); 
                 
-                const scheduleName = this.closest('.details').querySelector('h4').textContent;
+    //             const scheduleName = this.closest('.details').querySelector('h4').textContent;
                 
-                if (confirm(`'${scheduleName}' 일정을 정말로 삭제하시겠습니까?`)) {
-                    alert(`${scheduleName} 일정을 삭제합니다.`);
-                } else {
-                    alert("삭제가 취소되었습니다.");
-                }
-            };
-        });
+    //             if (confirm(`'${scheduleName}' 일정을 정말로 삭제하시겠습니까?`)) {
+    //                 alert(`${scheduleName} 일정을 삭제합니다.`);
+    //             } else {
+    //                 alert("삭제가 취소되었습니다.");
+    //             }
+    //         };
+    //     });
+    // }
+// 삭제 버튼이 아니면 무시
+// ✅ 일정 삭제 (이벤트 위임 방식)
+document.addEventListener("click", function (e) {
+
+    // 삭제 버튼 아니면 무시
+    if (!e.target.classList.contains("delete-btn")) return;
+
+    e.preventDefault();
+
+    const itemEl = e.target.closest(".timeline-item-content");
+    const detailId = itemEl.dataset.itemId;
+
+    if (!detailId) {
+        console.error("❌ detail_id 없음");
+        return;
     }
+
+    const scheduleName =
+        itemEl.querySelector(".header-info h4")?.textContent || "이 일정";
+
+    if (!confirm(`'${scheduleName}' 일정을 정말 삭제하시겠습니까?`)) {
+        return;
+    }
+
+    fetch("/schedule/delete-detail", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials: "same-origin",
+        body: JSON.stringify({
+            detail_id: detailId   // ⭐ 서버 기준
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            itemEl.remove(); // 🔥 화면 즉시 제거
+        } else {
+            alert(data.message || "삭제 실패");
+        }
+    })
+    .catch(err => {
+        console.error("삭제 오류:", err);
+    });
+});
+
 
     // ==========================================================
     // D-2. 전체 일정 목록 삭제 버튼 얼럿
