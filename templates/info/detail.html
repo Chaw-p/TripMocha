@@ -16,7 +16,11 @@
         <p><span class="addr1">{{item.addr1}}</span></p>
         <p class="title"><span>"{{item.title}}"</span></p>
         <div class="detail_img">
-          <img src="{{item.image}}">
+          {% if item.image %}
+            <img src="{{item.image}}">
+          {% else %}
+            <img src="{{ url_for('static', filename='img/no-image.png') }}">
+          {% endif %}
         </div>
       </div>
       <div id="contents">

@@ -47,7 +47,11 @@
                   {% for item in items %}
                   <li>
                     <a href="/info/{{item.id}}">
+                      {% if item.image %}
                       <img src="{{item.image}}">
+                      {% else %}
+                      <img src="{{ url_for('static', filename='img/no-image.png') }}">
+                      {% endif %}
                     </a>
                     <div class="list_cont">
                       <h3 class="title">
@@ -58,8 +62,10 @@
                         <a href="{{ url_for('info.info',type='%s' % item.typecode1) }}"
                         {% if type == item.typecode1 %}class="selected_hash"{% endif %}>
                           <span>#{{item.type}}</span></a>
-                        <a href="{{ url_for('info.info',type='%s' % item.typecode1, area='%s' % item.areacode) }}"
-                        {% if area == item.areacode %}class="selected_hash"{% endif %}>
+                        {% if item.areacode %}
+                          <a href="{{ url_for('info.info',type='%s' % item.typecode1, area='%s' % item.areacode) }}"
+                          {% if area == item.areacode %}class="selected_hash"{% endif %}>
+                        {% endif%}
                           <span>#{{item.area}}</span></a>
                         {% if item.cat3 and item.cat3_name %}
                         <a href="{{ url_for('info.info',type='%s' % item.typecode1, cat='%s' % item.cat3) }}"
