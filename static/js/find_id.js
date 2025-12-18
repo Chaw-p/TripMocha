@@ -52,3 +52,15 @@ $(document).ready(function() {
     });
 
 });
+
+
+// =======================================================
+// C. Toast 메시지 처리
+// =======================================================
+$(document).ready(function () {
+    const message = $("body").data("toast");
+
+    if (message) {
+        showToast(message);
+    }
+});

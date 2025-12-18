@@ -14,23 +14,22 @@ const TAG_TRANSLATIONS = {
     'photo': '사진',
     '여행': '여행',
     '추천': '추천'
+
 };
+
 function translateTags(tagsArray) {
     if (!tagsArray || !Array.isArray(tagsArray)) return [];
     return tagsArray.map(tag => {
-        const key = tag.toLowerCase().trim();
-        return TAG_TRANSLATIONS[key] || tag;
+        // tag가 객체면 tag.name을, 문자열이면 tag 자체를 사용
+        const rawTag = typeof tag === 'object' ? (tag.name || tag.tag) : tag;
+        if (!rawTag) return ''; 
+        
+        const key = rawTag.toLowerCase().trim();
+        return TAG_TRANSLATIONS[key] || rawTag;
     });
 }
 
-// 배열을 받아서 한글 배열로 뱉어주는 함수
-function translateTags(tagsArray) {
-    if (!tagsArray || !Array.isArray(tagsArray)) return [];
-    return tagsArray.map(tag => {
-        const key = tag.toLowerCase().trim();
-        return TAG_TRANSLATIONS[key] || tag; // 맵에 없으면 원래 단어 그대로 유지
-    });
-}
+
 
 function activateAddButton() {
     // '추가' 버튼을 활성화 상태로 되돌립니다.
@@ -42,6 +41,9 @@ function activateAddButton() {
         });
     }
 }
+translateTags(['healing', 'food', 'SEA']);
+console.log("테스트 번역:", translateTags(['healing', 'food', 'SEA']));
+
 
 $(function(){
     // 모든 드롭다운 요소를 변수로 지정
@@ -374,8 +376,8 @@ $(".search-button").on("click", function() {
     };
     
     if (!searchData.adm_code || searchData.duration_days < 1 || searchData.personnel.count < 1 || searchData.theme_tags.length < 2) {
-        alert("⚠️ 여행지, 여행일(최소 1일), 인원, 테마(최소 2개)를 모두 선택해주세요.");
-        return; 
+        showToast("⚠️ 여행지, 여행일(최소 1일), 인원, 테마(최소 2개)를 모두 선택해주세요.");
+        return;
     }
 
     try {
@@ -663,17 +665,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const buttons = document.querySelectorAll('.select-btn');
     const minSelection = 2;
     const maxSelection = 4;
-    const messageElement = document.getElementById('selection-message');
 
     // 세션에 테마 데이터를 저장/업데이트하는 함수
     const saveThemesToSession = () => {
-        // 현재 선택된 모든 테마의 data-theme 값을 배열로 수집
         const selectedThemes = Array.from(document.querySelectorAll('.select-btn.selected'))
-                                    .map(el => el.getAttribute('data-theme'));
+            .map(el => el.getAttribute('data-theme'));
 
-        // 기존의 세션 데이터를 불러옵니다. (없으면 빈 객체)
         const currentDataJson = sessionStorage.getItem('currentSearchData') || '{}';
         let searchData;
+
         try {
             searchData = JSON.parse(currentDataJson);
         } catch (e) {
@@ -685,11 +685,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             sessionStorage.setItem('currentSearchData', JSON.stringify(searchData));
-            console.log("테마 정보가 세션에 업데이트되었습니다:", searchData.theme_tags);
+            console.log("테마 정보 세션 저장:", selectedThemes);
         } catch (e) {
-            console.error("세션 스토리지 저장 오류:", e);
+            console.error("세션 저장 오류:", e);
         }
-        
+
         return selectedThemes.length;
     };
 
@@ -699,35 +699,28 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentSelected = document.querySelectorAll('.select-btn.selected').length;
             let finalSelected;
 
+            // 이미 선택된 버튼 → 해제
             if (isSelected) {
                 button.classList.remove('selected');
-                finalSelected = saveThemesToSession(); 
-                messageElement.textContent = ''; 
-            } else {
-                if (currentSelected < maxSelection) {
-                    button.classList.add('selected');
-                    finalSelected = saveThemesToSession(); 
-                    messageElement.textContent = ''; 
-                } else {
-                    messageElement.textContent = `⚠️ 테마는 최대 ${maxSelection}개까지만 선택할 수 있습니다.`;
-                    return; 
+                finalSelected = saveThemesToSession();
+            }
+            // 새로 선택
+            else {
+                if (currentSelected >= maxSelection) {
+                    showToast(`⚠️ 테마는 최대 ${maxSelection}개까지만 선택할 수 있습니다.`);
+                    return;
                 }
+                button.classList.add('selected');
+                finalSelected = saveThemesToSession();
             }
 
-            // 메시지 업데이트 로직
+            // ✅ 선택 개수에 따른 Toast 안내
             if (finalSelected > 0 && finalSelected < minSelection) {
-                messageElement.textContent = `⚠️ 테마는 최소 ${minSelection}개 이상 선택해야 합니다. (현재 ${finalSelected}개)`;
-                messageElement.style.color = 'red'; // 색상 강조
-            } else if (finalSelected >= minSelection) {
-                messageElement.textContent = `✅ ${finalSelected}개의 테마가 선택되었습니다.`;
-                messageElement.style.color = 'green';
-            } else {
-                messageElement.textContent = '';
+                showToast(`⚠️ 테마는 최소 ${minSelection}개 이상 선택해야 합니다. (현재 ${finalSelected}개)`);
             }
         });
     });
 });
-
 
 
 
@@ -850,13 +843,17 @@ $('.button-make-travel').on('click', function(e) {
                 const displayCity = `   ${cityPrefix || ''}`; 
                 
                 const currentTags = (typeof tags !== 'undefined' ? tags : (typeof tripMeta !== 'undefined' ? tripMeta.tags : [])) || [];
+                console.log("원본 태그:", currentTags);
 
-                // 3. 한글 번역 적용 (함수가 정의되어 있는지 확인 필수!)
+                console.log("원본 태그2:", selectedThemeTags);
+
+                // 3. 한글 번역 적용
                 let koreanTags = [];
                 if (typeof translateTags === 'function') {
-                    koreanTags = translateTags(currentTags);
+                    koreanTags = translateTags(selectedThemeTags);
+                    console.log("번역된 태그:", koreanTags);
                 } else {
-                    koreanTags = currentTags; // 함수가 없으면 원본이라도 유지
+                    koreanTags = selectedThemeTags; 
                 }
                 
                 // ----------------------------------------------------
@@ -955,14 +952,14 @@ $('.button-make-travel').on('click', function(e) {
                 $resultArea.find('.trip-item.selected').removeClass('selected');
                 //선택요소 강조
                 $(this).addClass('selected');
-                alert("여행리스트가 선택되었습니다.")
+                showToast("여행리스트가 선택되었습니다 😊");
             })
 
             $resultArea.on('click', '.detail-btn', function(e){
                 e.preventDefault();
                 const $tripItem = $resultArea.find('.trip-item.selected');
                 if($tripItem.length === 0){
-                    alert("여행리스트를 선택해주세요.")
+                    showToast("여행리스트를 먼저 선택해주세요 🙏");
                     return;
                 }  
 
@@ -1039,15 +1036,15 @@ $('.button-make-travel').on('click', function(e) {
                             console.log("DB 저장 후 페이지 이동:", targetUrl);
                             window.location.href = targetUrl;
                         } else {
-                            alert("여행 계획 저장에 실패했습니다: " + (data.message || '서버 오류'));
+                            showToast("여행 계획 저장에 실패했습니다 😭");
                         }
                     })
                     .catch(error => {
                         console.error('DB 저장 중 오류 발생:', error);
-                        alert("여행 계획을 서버에 저장할 수 없습니다. 잠시 후 다시 시도해 주세요.");
+                        showToast("서버 저장 중 오류가 발생했어요 ⚠️");
                     });
                 }else {
-                    alert("선택된 여행 항목에 메타데이터가 없습니다.");
+                    showToast("여행 데이터가 없습니다 😢 다시 선택해주세요");
                     return; 
                 }
 
@@ -1065,3 +1062,15 @@ $('.button-make-travel').on('click', function(e) {
 });
 
 });
+
+function showToast(message, duration = 2000) {
+    const toast = document.getElementById("toast");
+    if (!toast) return;
+
+    toast.textContent = message;
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, duration);
+}
