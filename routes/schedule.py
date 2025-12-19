@@ -13,6 +13,18 @@ from urllib.parse import quote_plus
 import builtins as b
 from datetime import datetime, timedelta
 
+from functools import wraps
+from flask import  url_for
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get("user_id"):
+            return redirect(url_for("login_bp.login_page"))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 load_dotenv()
 key = os.getenv("choakey")
 
@@ -71,6 +83,7 @@ except Exception as e:
 
 #메인 / db 연결
 @schedule_bp.route("/", methods=["GET"])
+@login_required
 def main():
     destinations = db.session.query(
         CityCounty.sido,
@@ -606,6 +619,7 @@ def clean_for_json(data):
         return data
 
 @schedule_bp.route("/view/<draftId>", methods=["GET"])
+@login_required
 def view(draftId):
     print(f"view({draftId}):start:--------------------------");
   
@@ -764,6 +778,7 @@ def finalize_schedule():
 
 # 여행일정 목록
 @schedule_bp.route("/list", methods=["GET"])
+@login_required
 def list():
     query = ""
     url_query = request.args.get("query")

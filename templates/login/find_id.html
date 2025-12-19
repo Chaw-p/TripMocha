@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 
-<body data-toast="{{ toast if toast }}">
+<!-- <body data-toast="{{ toast if toast }}"> -->
+<body data-page="find-id" data-toast="{{ toast }}">
     <div class="login-container">
         <img src="{{ url_for('static', filename='img/logo.png') }}" alt="TripMocha 로고" class="tripmocha-logo">
 
@@ -37,6 +38,7 @@
         </main>
     </div>
     <div id="toast" class="toast hidden"></div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="{{ url_for('static', filename='js/login.js') }}"></script>
