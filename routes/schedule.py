@@ -603,12 +603,21 @@ def view(draftId):
         'selectedPlaceId': selected_place_ids_list,
         'final_schedule_list_for_js' : cleaned_data
     }
-    trip_mappings = TripMapping.query.filter_by(trip_no=draftId).order_by(
-    TripMapping.day_sequence, 
-    TripMapping.visit_order
+    trip_mappings = db.session.query(
+        TripMapping, 
+        TripDetail.latitude, 
+        TripDetail.longitude
+    ).join(
+        TripDetail, 
+        TripMapping.detail_id == TripDetail.detail_id
+    ).filter(
+        TripMapping.trip_no == draftId
+    ).order_by(
+        TripMapping.day_sequence, 
+        TripMapping.visit_order
     ).all()
 
-    place_ids = [m.detail_id for m in trip_mappings]
+    place_ids = [m[0].detail_id for m in trip_mappings]
     place_details = TripDetail.query.filter(TripDetail.detail_id.in_(place_ids)).all()
     place_dict = {p.detail_id: p for p in place_details} 
 
@@ -616,7 +625,11 @@ def view(draftId):
     print("!!place_details count:", len(place_details))
 
     trip_schedule_data = []
-    for mapping in trip_mappings:
+    
+    for row in trip_mappings:
+        mapping = row[0]       # TripMapping 객체
+        lat = float(row[1]) if row[1] is not None else 0.0  # Decimal을 float으로 변환
+        lng = float(row[2]) if row[2] is not None else 0.0  # Decimal을 float으로 변환
         place_info = place_dict.get(mapping.detail_id)
         address_data = place_info.address if hasattr(place_info, 'address') and place_info.address is not None else "주소 정보 없음"
         if place_info:
@@ -625,7 +638,9 @@ def view(draftId):
                 'day': mapping.day_sequence,      
                 'sequence': mapping.visit_order, 
                 'name': place_info.detail_name, 
-                'address': address_data 
+                'address': address_data,
+                'latitude': lat,  # 조인으로 가져온 값 사용
+                'longitude': lng  # 조인으로 가져온 값 사용
             })     
 
     grouped_schedule = {}

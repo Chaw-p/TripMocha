@@ -56,10 +56,16 @@ document.addEventListener("DOMContentLoaded", function() {
                 <a href="{{ url_for('schedule.view', draftId=trip.trip_no) }}" class="trip-link-wrapper">
                     <table>
                         <tr>
-                            <td rowspan="2" style="width: 105px;"><img src="#"
-                                    alt="#" class="trip-image"></td>
-                            <td style="width: calc(100% - 150px);">
-                                <div class="trip-title">{{ trip.title }}</div>
+                            
+                           <td rowspan="2" style="width: 105px;">
+                                <img src="" 
+                                    data-tags="{{ trip.tags | join(',') }}" 
+                                    class="trip-image dynamic-random-img" 
+                                    alt="여행 이미지">
+                            </td>
+                            <td>
+                            <!-- <td style="width: calc(100% - 150px);"> -->
+                            <div class="trip-title">{{ trip.title }}</div>
                                 
                                 <!-- <div>{{trip.trip_no}}</div> -->
                             </td>
@@ -97,5 +103,45 @@ document.addEventListener("DOMContentLoaded", function() {
             {% include 'config/footer.html' %}
         </div>
 </body>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. 태그별 이미지 매핑 데이터 (테마 선택 테이블의 data-theme 값과 일치해야 함)
+    const themeToImg = {
+        "ai": "ai.jpg",
+        "mountain": "산1.jpg",
+        "sea": "바다1.jpg",
+        "indoor": "실내1.jpg",
+        "activity": "액티비티1.jpg",
+        "experience": "체험2.jpg",
+        "themepark": "테마파크1.jpg",
+        "market": "시장1.jpg",
+        "food": "맛집2.jpg",
+        "festival": "축제1.jpg",
+        "healing": "힐링2.jpg",
+        "photo": "사진1.jpg",
+        "default": "default.jpg" // 매칭되는 태그가 없을 때용
+    };
 
+    // 2. 모든 동적 이미지 요소 선택
+    const imgElements = document.querySelectorAll('.dynamic-random-img');
+
+    imgElements.forEach(img => {
+        const tagsString = img.getAttribute('data-tags');
+        if (tagsString) {
+            const tagArray = tagsString.split(','); // 문자열을 배열로 변환
+            
+            // 3. 배열 내의 태그 중 하나를 랜덤하게 선택
+            const randomTag = tagArray[Math.floor(Math.random() * tagArray.length)];
+            
+            // 4. 선택된 태그에 해당하는 이미지 파일명 가져오기
+            const fileName = themeToImg[randomTag] || themeToImg['default'];
+            
+            // 5. 최종 경로 설정
+            img.src = `/static/img/${fileName}`;
+        } else {
+            img.src = `/static/img/default.jpg`;
+        }
+    });
+});
+</script>
 </html>

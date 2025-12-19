@@ -1,37 +1,37 @@
 
 
-var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
-        mapOption = { 
-            center: new kakao.maps.LatLng(35.815967, 127.147255), // 지도의 중심좌표 (전주 인근)
-            level: 7 // 지도의 확대 레벨
-        };
+// var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+//         mapOption = { 
+//             center: new kakao.maps.LatLng(35.815967, 127.147255), // 지도의 중심좌표 (전주 인근)
+//             level: 7 // 지도의 확대 레벨
+//         };
 
-    // 지도를 표시할 div와 지도 옵션으로 지도를 생성합니다
-    var map = new kakao.maps.Map(mapContainer, mapOption); 
+//     // 지도를 표시할 div와 지도 옵션으로 지도를 생성합니다
+//     var map = new kakao.maps.Map(mapContainer, mapOption); 
     
-    var mapTypeControl = new kakao.maps.MapTypeControl();
+//     var mapTypeControl = new kakao.maps.MapTypeControl();
 
-    // 지도에 컨트롤을 추가
-    map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+//     // 지도에 컨트롤을 추가
+//     map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
 
-    // 지도 확대 축소를 제어할 수 있는 줌 컨트롤 생성
-    var zoomControl = new kakao.maps.ZoomControl();
-    map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+//     // 지도 확대 축소를 제어할 수 있는 줌 컨트롤 생성
+//     var zoomControl = new kakao.maps.ZoomControl();
+//     map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
 
     
-    var marker = new kakao.maps.Marker();
+//     var marker = new kakao.maps.Marker();
 
-    // 타일 로드가 완료되면 지도 중심에 마커를 표시합니다
-    kakao.maps.event.addListener(map, 'tilesloaded', displayMarker);
+//     // 타일 로드가 완료되면 지도 중심에 마커를 표시합니다
+//     kakao.maps.event.addListener(map, 'tilesloaded', displayMarker);
 
-    function displayMarker() {
+//     function displayMarker() {
         
-        // 마커의 위치를 지도중심으로 설정합니다 
-        marker.setPosition(map.getCenter()); 
-        marker.setMap(map); 
+//         // 마커의 위치를 지도중심으로 설정합니다 
+//         marker.setPosition(map.getCenter()); 
+//         marker.setMap(map); 
 
-        // kakao.maps.event.removeListener(map, 'tilesloaded', displayMarker);
-    }
+//         // kakao.maps.event.removeListener(map, 'tilesloaded', displayMarker);
+//     }
 
 // 모달창
 document.addEventListener('DOMContentLoaded', function() {
