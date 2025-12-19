@@ -119,7 +119,7 @@ p {
 
 .map-section-wrapper { 
     flex: 1; /* 너비 비율을 45% 대신 Flex 비율로 변경 */
-    margin-top: 0; 
+    margin-top: 20px; 
     border-radius: 8px;
     overflow: hidden;
     padding: 15px;
