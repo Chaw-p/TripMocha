@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TripMocha</title>
     {% include 'config/config.html' %}
     <!-- js -->
-     <script src="{{url_for('static', filename='js/info.js')}}"></script>
-     <script src="{{url_for('static', filename='js/add_location.js')}}"></script>
+    <script src="{{url_for('static', filename='js/info.js')}}"></script>
+    <script src="{{url_for('static', filename='js/add_location.js')}}"></script>
     <!-- css -->
     <link rel="stylesheet" href="{{url_for('static', filename='css/schedule_view.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/info.css')}}">
@@ -15,6 +16,7 @@
     <!-- etc -->
     <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey={{choakey}}"></script>
 </head>
+
 <body>
     <div id="wrap">
         {% include 'config/header.html' %}
@@ -26,7 +28,7 @@
                         <input id="trip_no" type="hidden" value="{{trip_meta.trip_no}}">
                         <div>{{trip_meta.title}}</div>
                         <div>{{ trip_meta.start_date }} → {{ trip_meta.end_date }}</div>
-                        <div>{{trip_meta.trip_type}}  {{trip_meta.people}} 인</div>
+                        <div>{{trip_meta.trip_type}} {{trip_meta.people}} 인</div>
 
                         <!-- <p>  - 여행지역 : <div id="trip-city">{{trip_meta.city}}</div> </p> -->
                     </div>
@@ -42,13 +44,12 @@
                 <div class="control-buttons">
                     <button class="pdf-button" id="downloadPdfButton" onclick="downloadPDF()">PDF 저장</button>
                     <a class="pdf-button" href="{{ url_for('schedule.list') }}">목록</a>
-                    <a class="pdf-button" href="{{ url_for('schedule.list') }}" id="list-del-btn">삭제</a>
+                    <button class="pdf-button" id="list-del-btn">삭제</button>
+
                     <a class="pdf-button" class="schedule_modify" id="popupbtn" id="list-del-btn">일정편집</a>
                 </div>
             </div>
-            <div 
-                id="final-schedule-data" 
-                data-schedule="{{ final_schedule_list_for_js | default([]) | tojson }}">
+            <div id="final-schedule-data" data-schedule="{{ final_schedule_list_for_js | default([]) | tojson }}">
             </div>
             <div class="schedule-contents">
                 <div class="travel-schedule">
@@ -57,20 +58,17 @@
                         <input type="hidden" id="trip_day" value="{{day}}">
                         <div class="schedule-list-area">
                             <div class="modify_cntainer">
-                                <div class="schedule-day-title" >Day {{ day }}</div>
+                                <div class="schedule-day-title">Day {{ day }}</div>
                             </div>
                             {% for item in items %}
-                            <div 
-                            class="timeline-item" 
-                            data-item-id="{{ item.id }}" 
-                            data-place-id="{{ item.place_id or item.detail_id }}" 
-                            data-sequence="{{ item.sequence }}"
-                            >
-                                <div class="timeline-item-content">
+                            <div class="timeline-item" data-item-id="{{ item.id }}"
+                                data-place-id="{{ item.place_id or item.detail_id }}"
+                                data-sequence="{{ item.sequence }}">
+                                <div class="timeline-item-content" data-item-id="{{ item.id }}">
                                     <div class="details">
                                         <div class="header-info">
                                             <div class="sequence">{{ item.sequence }}</div>
-                                            <h4> {{ item.name }}</h4>
+                                            <h4>{{ item.name }}</h4>
                                         </div>
                                         <div class="add-delete">
                                             <p>{{ item.address }}</p>
@@ -87,7 +85,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>   
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
@@ -99,92 +97,247 @@
                                 center: new kakao.maps.LatLng(35.815967, 127.147255), // 지도의 중심좌표 (전주 인근)
                                 level: 7 // 지도의 확대 레벨
                             };
-            
+
                         // 지도를 표시할 div와 지도 옵션으로 지도를 생성합니다
                         var map = new kakao.maps.Map(mapContainer, mapOption);
-            
+
                         var mapTypeControl = new kakao.maps.MapTypeControl();
-            
+
                         // 지도에 컨트롤을 추가
                         map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
-            
+
                         // 지도 확대 축소를 제어할 수 있는 줌 컨트롤 생성
                         var zoomControl = new kakao.maps.ZoomControl();
                         map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
-            
-            
+
+
                         var marker = new kakao.maps.Marker();
-            
+
                         // 타일 로드가 완료되면 지도 중심에 마커를 표시합니다
                         kakao.maps.event.addListener(map, 'tilesloaded', displayMarker);
-            
+
                         function displayMarker() {
                             // 마커의 위치를 지도중심으로 설정합니다 
                             marker.setPosition(map.getCenter());
                             marker.setMap(map);
-            
+
                             // kakao.maps.event.removeListener(map, 'tilesloaded', displayMarker);
                         }
                     </script>
                 </div>
             </div>
-        <div>
-    </div>
-    {% include 'config/footer.html' %}
-    </div>
-    <div id="modalwrap">
-        <div id="modalbody">
-            <span id="closebtn">&times;</span>
-            <p class="modal-p">방문지 추가</p>
-            <br>
-            <div id="modal_search_wrap">
-                <div class="search_wrap">
-                    <div class="search_area">
-                    <form id="modalform" class="sform" name="search" method="get" onsubmit="return DoSearch2(event);">
-                        <div name="locType" id="locType" class="search_type options_dropdown">
-                            <div class="selected_option">숙박 
-                                <span class="material-symbols-outlined">arrow_drop_down</span>
-                            </div>
-                            <ul>
-                                <li data-value="AC" class="option_item selected">숙박</li>
-                                <li data-value="EX" class="option_item">체험</li>
-                                <li data-value="FD" class="option_item">음식</li>
-                                <li data-value="HS" class="option_item">역사</li>
-                                <li data-value="NA" class="option_item">자연</li>
-                                <li data-value="SH" class="option_item">쇼핑</li>
-                                <li data-value="VE" class="option_item">문화</li>
-                            </ul>
-                        </div>
-                        <div class="search_input_box">
-                        <input type="search" id="locQuery" class="query" name="locQuery" placeholder="여행지를 입력해 주세요.">
-                    </div>
-                    <button class="search_btn">
-                        <i class="bi bi-search"></i>
-                    </button>
-                    </form>
-                    </div>
-                </div>
+            <div>
             </div>
-            <ul class="travel_list schedule_travel_list" id="schedule_travel_list">
-                <div class="no-result">
-                    <p>
-                    <span class="material-symbols-outlined">search</span>
-                    </p>
-                    <p>
-                    검색 결과가 없습니다.
-                    </p>
-                </div>
-                <li id="sentinel" style="height: 1px; margin: 0; padding: 0; visibility: hidden;"></li>
-            </ul>
-            <br>
-            <hr>
-            <div class="txt-right">
-                <button class="mocha_btn_1" onclick="InsertPlaceId()">선택</button>
-            </div>
-
+            {% include 'config/footer.html' %}
         </div>
-    </div>
-    <script type=text/javascript src="{{url_for('static', filename='js/schedule_view.js') }}"></script>
+        <div id="modalwrap">
+            <div id="modalbody">
+                <span id="closebtn">&times;</span>
+                <p class="modal-p">방문지 추가</p>
+                <br>
+                <div id="modal_search_wrap">
+                    <div class="search_wrap">
+                        <div class="search_area">
+                            <form id="modalform" class="sform" name="search" method="get"
+                                onsubmit="return DoSearch2(event);">
+                                <div name="locType" id="locType" class="search_type options_dropdown">
+                                    <div class="selected_option">숙박
+                                        <span class="material-symbols-outlined">arrow_drop_down</span>
+                                    </div>
+                                    <ul>
+                                        <li data-value="AC" class="option_item selected">숙박</li>
+                                        <li data-value="EX" class="option_item">체험</li>
+                                        <li data-value="FD" class="option_item">음식</li>
+                                        <li data-value="HS" class="option_item">역사</li>
+                                        <li data-value="NA" class="option_item">자연</li>
+                                        <li data-value="SH" class="option_item">쇼핑</li>
+                                        <li data-value="VE" class="option_item">문화</li>
+                                    </ul>
+                                </div>
+                                <div class="search_input_box">
+                                    <input type="search" id="locQuery" class="query" name="locQuery"
+                                        placeholder="여행지를 입력해 주세요.">
+                                </div>
+                                <button class="search_btn">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <ul class="travel_list schedule_travel_list" id="schedule_travel_list">
+                    <div class="no-result">
+                        <p>
+                            <span class="material-symbols-outlined">search</span>
+                        </p>
+                        <p>
+                            검색 결과가 없습니다.
+                        </p>
+                    </div>
+                    <li id="sentinel" style="height: 1px; margin: 0; padding: 0; visibility: hidden;"></li>
+                </ul>
+                <br>
+                <hr>
+                <div class="txt-right">
+                    <button class="mocha_btn_1" onclick="InsertPlaceId()">선택</button>
+                </div>
+
+            </div>
+        </div>
+        <script type=text/javascript src="{{url_for('static', filename='js/schedule_view.js') }}"></script>
 </body>
+<script>
+
+    const grouped_schedule = JSON.parse('{{ grouped_schedule | tojson | safe }}');
+    var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+        mapOption = {
+            center: new kakao.maps.LatLng(35.815967, 127.147255), // 지도의 중심좌표 (전주 인근)
+            level: 7 // 지도의 확대 레벨
+        };
+    
+    var map = new kakao.maps.Map(mapContainer, mapOption);
+
+    // 외부에서 정의된 REST_API_KEY가 있다고 가정합니다.
+    const REST_API_KEY = '6bbe75aecfd16e87eb73f2b8c46b14f9';
+
+    const lineColors = [
+        '#eb346b', // 1일차: 분홍
+        '#3474eb', // 2일차: 파랑
+        '#34eb46', // 3일차: 초록
+        '#eb9e34', // 4일차: 주황
+        '#8e34eb'  // 5일차: 보라
+    ];
+
+    const bounds = [];
+
+    Object.entries(grouped_schedule).forEach(([day, dayList], index) => {
+    let linePath = [];
+    
+    // 현재 dayList에 적용할 색상 선택
+    const currentColor = lineColors[index % lineColors.length];
+
+    // 1. 장소가 2개 미만인 경우
+    if (dayList.length < 2) {
+        dayList.forEach(item => {
+            const markerPosition = new kakao.maps.LatLng(item.latitude, item.longitude);
+            const marker = new kakao.maps.Marker({ position: markerPosition });
+            marker.setMap(map);
+        });
+        return;
+    }
+
+    // 2. API 요청 데이터 가공 (기존과 동일)
+    const origin = { x: dayList[0].longitude.toString(), y: dayList[0].latitude.toString() };
+    const destination = { x: dayList[dayList.length - 1].longitude.toString(), y: dayList[dayList.length - 1].latitude.toString() };
+    const waypoints = dayList.slice(1, -1).map((item, idx) => ({
+        name: `waypoint${idx}`,
+        x: item.longitude,
+        y: item.latitude
+    }));
+
+    // 3. fetch 호출
+    fetch("https://apis-navi.kakaomobility.com/v1/waypoints/directions", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `KakaoAK ${REST_API_KEY}`
+        },
+        body: JSON.stringify({ origin, destination, waypoints, priority: "RECOMMEND" })
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Network response was not ok");
+        return response.json();
+    })
+    .then(routeData => {
+        // 마커 생성
+        dayList.forEach(item => {
+            const markerPosition = new kakao.maps.LatLng(item.latitude, item.longitude);
+            const marker = new kakao.maps.Marker({ position: markerPosition });
+            marker.setMap(map);
+        });
+
+        // 경로 좌표 추출
+        routeData.routes.forEach(route => {
+            route.sections.forEach(section => {
+                bounds.push(new kakao.maps.LatLng(section.bound.min_y, section.bound.min_x));
+                bounds.push(new kakao.maps.LatLng(section.bound.max_y, section.bound.max_x));
+                section.roads.forEach(road => {
+                    const v = road.vertexes;
+                    for (let i = 0; i < v.length; i += 2) {
+                        const x = v[i];
+                        const y = v[i + 1];
+                        const last = linePath[linePath.length - 1];
+                        if (!last || last.getLat() !== y || last.getLng() !== x) {
+                            linePath.push(new kakao.maps.LatLng(y, x));
+                        }
+                    }
+                });
+            });
+        });
+
+        const bound = new kakao.maps.LatLngBounds();  
+        for (i = 0; i < bounds.length; i++) {
+            // LatLngBounds 객체에 좌표를 추가합니다
+            bound.extend(bounds[i]);
+        }
+
+        map.setBounds(bound);
+
+        // 폴리라인 그리기 (currentColor 적용)
+        var polyline = new kakao.maps.Polyline({
+            path: linePath,
+            strokeWeight: 5,
+            strokeColor: currentColor, // <--- 여기서 선택된 색상 적용
+            strokeOpacity: 0.7,
+            strokeStyle: 'solid'
+        });
+
+        polyline.setMap(map);
+    })
+    .catch(error => {
+        console.error(`${day} 경로 요청 실패:`, error);
+        dayList.forEach(item => {
+            const markerPosition = new kakao.maps.LatLng(item.latitude, item.longitude);
+            const marker = new kakao.maps.Marker({ position: markerPosition });
+            marker.setMap(map);
+        });
+    });
+});
+
+    // Object.values(grouped_schedule).forEach(dayList => {
+    //     // 2. 각 날짜 안에 들어있는 장소(item)들을 순회
+    //     dayList.forEach(item => {
+    //         const markerPosition  = new kakao.maps.LatLng(item.latitude, item.longitude); 
+    //         const marker = new kakao.maps.Marker({position: markerPosition});
+    //         marker.setMap(map);
+    //     });
+    // });
+
+    // 지도를 표시할 div와 지도 옵션으로 지도를 생성합니다
+    
+
+    var mapTypeControl = new kakao.maps.MapTypeControl();
+
+    // 지도에 컨트롤을 추가
+    map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+
+    // 지도 확대 축소를 제어할 수 있는 줌 컨트롤 생성
+    var zoomControl = new kakao.maps.ZoomControl();
+    map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+
+    var marker = new kakao.maps.Marker();
+
+    // 타일 로드가 완료되면 지도 중심에 마커를 표시합니다
+    // kakao.maps.event.addListener(map, 'tilesloaded', displayMarker);
+
+    // function displayMarker() {
+    //     // 마커의 위치를 지도중심으로 설정합니다 
+    //     marker.setPosition(map.getCenter());
+    //     marker.setMap(map);
+
+    //     // kakao.maps.event.removeListener(map, 'tilesloaded', displayMarker);
+    // }
+</script>
 
 </html>

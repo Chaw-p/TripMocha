@@ -1,37 +1,37 @@
 
 
-var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
-        mapOption = { 
-            center: new kakao.maps.LatLng(35.815967, 127.147255), // 지도의 중심좌표 (전주 인근)
-            level: 7 // 지도의 확대 레벨
-        };
+// var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+//         mapOption = { 
+//             center: new kakao.maps.LatLng(35.815967, 127.147255), // 지도의 중심좌표 (전주 인근)
+//             level: 7 // 지도의 확대 레벨
+//         };
 
-    // 지도를 표시할 div와 지도 옵션으로 지도를 생성합니다
-    var map = new kakao.maps.Map(mapContainer, mapOption); 
+//     // 지도를 표시할 div와 지도 옵션으로 지도를 생성합니다
+//     var map = new kakao.maps.Map(mapContainer, mapOption); 
     
-    var mapTypeControl = new kakao.maps.MapTypeControl();
+//     var mapTypeControl = new kakao.maps.MapTypeControl();
 
-    // 지도에 컨트롤을 추가
-    map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+//     // 지도에 컨트롤을 추가
+//     map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
 
-    // 지도 확대 축소를 제어할 수 있는 줌 컨트롤 생성
-    var zoomControl = new kakao.maps.ZoomControl();
-    map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+//     // 지도 확대 축소를 제어할 수 있는 줌 컨트롤 생성
+//     var zoomControl = new kakao.maps.ZoomControl();
+//     map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
 
     
-    var marker = new kakao.maps.Marker();
+//     var marker = new kakao.maps.Marker();
 
-    // 타일 로드가 완료되면 지도 중심에 마커를 표시합니다
-    kakao.maps.event.addListener(map, 'tilesloaded', displayMarker);
+//     // 타일 로드가 완료되면 지도 중심에 마커를 표시합니다
+//     kakao.maps.event.addListener(map, 'tilesloaded', displayMarker);
 
-    function displayMarker() {
+//     function displayMarker() {
         
-        // 마커의 위치를 지도중심으로 설정합니다 
-        marker.setPosition(map.getCenter()); 
-        marker.setMap(map); 
+//         // 마커의 위치를 지도중심으로 설정합니다 
+//         marker.setPosition(map.getCenter()); 
+//         marker.setMap(map); 
 
-        // kakao.maps.event.removeListener(map, 'tilesloaded', displayMarker);
-    }
+//         // kakao.maps.event.removeListener(map, 'tilesloaded', displayMarker);
+//     }
 
 // 모달창
 document.addEventListener('DOMContentLoaded', function() {
@@ -98,21 +98,68 @@ document.addEventListener('DOMContentLoaded', function() {
     // ==========================================================
     // D. 일정 편집 삭제버튼 얼럿
     // ==========================================================
-    if (deleteBtns.length > 0) {
-        deleteBtns.forEach(btn => {
-            btn.onclick = function(e) {
-                e.preventDefault(); 
+    // if (deleteBtns.length > 0) {
+    //     deleteBtns.forEach(btn => {
+    //         btn.onclick = function(e) {
+    //             e.preventDefault(); 
                 
-                const scheduleName = this.closest('.details').querySelector('h4').textContent;
+    //             const scheduleName = this.closest('.details').querySelector('h4').textContent;
                 
-                if (confirm(`'${scheduleName}' 일정을 정말로 삭제하시겠습니까?`)) {
-                    alert(`${scheduleName} 일정을 삭제합니다.`);
-                } else {
-                    alert("삭제가 취소되었습니다.");
-                }
-            };
-        });
+    //             if (confirm(`'${scheduleName}' 일정을 정말로 삭제하시겠습니까?`)) {
+    //                 alert(`${scheduleName} 일정을 삭제합니다.`);
+    //             } else {
+    //                 alert("삭제가 취소되었습니다.");
+    //             }
+    //         };
+    //     });
+    // }
+// 삭제 버튼이 아니면 무시
+// ✅ 일정 삭제 (이벤트 위임 방식)
+document.addEventListener("click", function (e) {
+
+    // 삭제 버튼 아니면 무시
+    if (!e.target.classList.contains("delete-btn")) return;
+
+    e.preventDefault();
+
+    const itemEl = e.target.closest(".timeline-item-content");
+    const detailId = itemEl.dataset.itemId;
+
+    if (!detailId) {
+        console.error("❌ detail_id 없음");
+        return;
     }
+
+    const scheduleName =
+        itemEl.querySelector(".header-info h4")?.textContent || "이 일정";
+
+    if (!confirm(`'${scheduleName}' 일정을 정말 삭제하시겠습니까?`)) {
+        return;
+    }
+
+    fetch("/schedule/delete-detail", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials: "same-origin",
+        body: JSON.stringify({
+            detail_id: detailId   // ⭐ 서버 기준
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            itemEl.remove(); // 🔥 화면 즉시 제거
+        } else {
+            alert(data.message || "삭제 실패");
+        }
+    })
+    .catch(err => {
+        console.error("삭제 오류:", err);
+    });
+});
+
 
     // ==========================================================
     // D-2. 전체 일정 목록 삭제 버튼 얼럿
@@ -272,6 +319,38 @@ document.addEventListener('DOMContentLoaded', function() {
     
     return finalData; 
 }
+
+document.getElementById("list-del-btn").addEventListener("click", function () {
+    const tripNo = document.getElementById("trip_no").value;
+
+    if (!tripNo) {
+        alert("trip_no 없음 😱");
+        return;
+    }
+
+    if (!confirm("이 여행을 삭제할까요? 되돌릴 수 없습니다 😢")) return;
+
+    fetch("/schedule/delete-trip", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ trip_no: tripNo })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert("여행이 삭제되었습니다 ✈️💨");
+            location.href = "/schedule/list";
+        } else {
+            alert(data.message || "삭제 실패");
+        }
+    })
+    .catch(() => {
+        alert("서버 오류 발생 🤯");
+    });
+});
+
 
 
 
