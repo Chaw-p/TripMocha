@@ -44,7 +44,8 @@
                 <div class="control-buttons">
                     <button class="pdf-button" id="downloadPdfButton" onclick="downloadPDF()">PDF 저장</button>
                     <a class="pdf-button" href="{{ url_for('schedule.list') }}">목록</a>
-                    <a class="pdf-button" href="{{ url_for('schedule.list') }}" id="list-del-btn">삭제</a>
+                    <button class="pdf-button" id="list-del-btn">삭제</button>
+
                     <a class="pdf-button" class="schedule_modify" id="popupbtn" id="list-del-btn">일정편집</a>
                 </div>
             </div>
@@ -90,8 +91,6 @@
                 </div>
                 <div class="map-section-wrapper">
                     <div id="map" class="map-container-bottom"></div>
-<<<<<<< HEAD
-=======
                     <script>
                         var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
                             mapOption = {
@@ -125,7 +124,6 @@
                             // kakao.maps.event.removeListener(map, 'tilesloaded', displayMarker);
                         }
                     </script>
->>>>>>> 7a7639b5d772dcb44048b908cebb3d74647ed14b
                 </div>
             </div>
             <div>

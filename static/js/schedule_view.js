@@ -320,5 +320,37 @@ document.addEventListener("click", function (e) {
     return finalData; 
 }
 
+document.getElementById("list-del-btn").addEventListener("click", function () {
+    const tripNo = document.getElementById("trip_no").value;
+
+    if (!tripNo) {
+        alert("trip_no 없음 😱");
+        return;
+    }
+
+    if (!confirm("이 여행을 삭제할까요? 되돌릴 수 없습니다 😢")) return;
+
+    fetch("/schedule/delete-trip", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ trip_no: tripNo })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert("여행이 삭제되었습니다 ✈️💨");
+            location.href = "/schedule/list";
+        } else {
+            alert(data.message || "삭제 실패");
+        }
+    })
+    .catch(() => {
+        alert("서버 오류 발생 🤯");
+    });
+});
+
+
 
 
