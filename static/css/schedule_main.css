@@ -1029,6 +1029,7 @@ th, td { padding: 8px 0; width: 14.28%; cursor: pointer; border-radius: 5px; }
     overflow: hidden;
 }
 .trip-container{
+    position: relative;
     width: 100%;
     display: flex; 
     justify-content: space-between; 
