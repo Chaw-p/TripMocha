@@ -597,11 +597,11 @@ def find_id_process():
 
         #  아이디 마스킹 후 화면 표시
         masked_ids = [mask_user_id(row[0]) for row in results]
-        id_text = "\\n".join(masked_ids)
+        id_text = "\n".join(masked_ids)
 
         return render_template(
             "login/find_id.html",
-            toast=f"고객님의 아이디는 다음과 같습니다:\n{id_text}"
+            toast=id_text
         )
 
     except Exception as e:

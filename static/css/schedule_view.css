@@ -473,3 +473,21 @@ p {
 .schedule-contents {
     display: flex;
 }
+
+
+/* ================================
+   일정 삭제 버튼 - 클릭 가능 보장
+================================ */
+
+
+.delete-btn {
+    color: #e74c3c;
+    border: none;
+    background: none;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    text-decoration: underline;
+}
