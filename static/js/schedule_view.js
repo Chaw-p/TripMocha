@@ -351,6 +351,33 @@ document.getElementById("list-del-btn").addEventListener("click", function () {
     });
 });
 
+async function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+
+    const element = document.getElementById("container");
+
+    if (!element) {
+        alert("PDF로 저장할 영역이 없습니다");
+        return;
+    }
+
+    const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+
+        ignoreElements: (el) => el.id === "map"
+    });
+
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF("p", "mm", "a4");
+    const pdfWidth = 210;
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save("TripMocha_여행일정.pdf");
+}
+
 
 
 
